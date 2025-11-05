@@ -1,1 +1,1 @@
-mod serde_for_enum;
+pub mod serde_for_enum;

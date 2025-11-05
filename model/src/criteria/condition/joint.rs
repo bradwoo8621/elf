@@ -1,5 +1,6 @@
-use super::parameter_condition::ParameterCondition;
+use super::ParameterCondition;
 use crate::serde_for_enum;
+use crate::BaseDataModel;
 use std::fmt;
 
 pub enum ParameterJointType {
@@ -23,7 +24,9 @@ serde_for_enum! {
     }
 }
 
-pub trait ParameterJoint: ParameterCondition {
-    fn joint_type(&self) -> Option<ParameterJointType>;
-    fn filters(&self) -> Option<Vec<Box<dyn ParameterCondition>>>;
+pub struct ParameterJoint {
+    pub joint_type: ParameterJointType,
+    pub filters: Option<Vec<ParameterCondition>>,
 }
+
+impl BaseDataModel for ParameterJoint {}

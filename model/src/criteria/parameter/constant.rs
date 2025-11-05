@@ -1,5 +1,5 @@
-use super::{parameter::Parameter, parameter_kind::ParameterKind};
 use crate::serde_for_enum;
+use crate::BaseDataModel;
 use std::fmt;
 
 pub enum VariablePredefineFunctions {
@@ -65,13 +65,10 @@ serde_for_enum! {
     }
 }
 
-/// parameter defined with a string,
-/// string could have special functions to generate value
-/// see [VariablePredefineFunctions]
-pub trait ConstantParameter: Parameter {
-    fn kind(&self) -> Option<ParameterKind> {
-        Some(ParameterKind::Constant)
-    }
-
-    fn value(&self) -> Option<String>;
+/// string stands for an expression to retrieve some value
+/// might include function calls, see [VariablePredefineFunctions]
+pub struct ConstantParameter {
+    pub value: Option<String>,
 }
+
+impl BaseDataModel for ConstantParameter {}

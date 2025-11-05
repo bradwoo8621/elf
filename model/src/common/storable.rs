@@ -1,4 +1,5 @@
-use super::{base::BaseDataModel, tuple_ids::UserId};
+use super::BaseDataModel;
+use super::UserId;
 use chrono::NaiveDateTime;
 
 pub trait Storable: BaseDataModel {}

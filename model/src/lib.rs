@@ -1,3 +1,6 @@
 mod common;
 mod criteria;
-mod serde;
+pub mod serde;
+
+pub use common::*;
+pub use criteria::*;

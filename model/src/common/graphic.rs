@@ -1,6 +1,4 @@
-use super::base::{BaseDataModel, DataModelValue};
-use serde_json::Value;
-use std::collections::HashMap;
+use super::BaseDataModel;
 
 pub trait GraphicPosition: BaseDataModel {
     fn x(&self) -> Option<f32>;
@@ -19,24 +17,7 @@ pub struct GraphicRect {
     pub height: Option<f32>,
 }
 
-impl BaseDataModel for GraphicRect {
-    fn to_map(&self) -> HashMap<&str, DataModelValue> {
-        let mut map = HashMap::new();
-        if let Some(x) = self.x {
-            map.insert("x", Value::from(x));
-        }
-        if let Some(y) = self.y {
-            map.insert("y", Value::from(y));
-        }
-        if let Some(width) = self.width {
-            map.insert("width", Value::from(width));
-        }
-        if let Some(height) = self.height {
-            map.insert("height", Value::from(height));
-        }
-        map
-    }
-}
+impl BaseDataModel for GraphicRect {}
 
 impl GraphicPosition for GraphicRect {
     fn x(&self) -> Option<f32> {

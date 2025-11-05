@@ -1,7 +1,6 @@
-use super::{
-    storable::Auditable,
-    tuple_ids::{TenantId, UserId},
-};
+use super::Auditable;
+use super::TenantId;
+use super::UserId;
 
 pub trait Tuple: Auditable {}
 
