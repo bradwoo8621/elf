@@ -1,7 +1,7 @@
 use crate::{serde_for_enum, BaseDataModel, Parameter, ParameterJoint};
-use std::fmt;
-use watchmen_model_marco::adapt_model;
+use watchmen_model_marco::{adapt_model, Display};
 
+#[derive(Display)]
 pub enum ParameterComputeType {
     None,
     Add,
@@ -18,28 +18,6 @@ pub enum ParameterComputeType {
     DayOfMonth,
     DayOfWeek,
     CaseThen,
-}
-
-impl fmt::Display for ParameterComputeType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            ParameterComputeType::None => write!(f, "none"),
-            ParameterComputeType::Add => write!(f, "add"),
-            ParameterComputeType::Subtract => write!(f, "subtract"),
-            ParameterComputeType::Multiply => write!(f, "multiply"),
-            ParameterComputeType::Divide => write!(f, "divide"),
-            ParameterComputeType::Modulus => write!(f, "modulus"),
-            ParameterComputeType::YearOf => write!(f, "year-of"),
-            ParameterComputeType::HalfYearOf => write!(f, "half-year-of"),
-            ParameterComputeType::QuarterOf => write!(f, "quarter-of"),
-            ParameterComputeType::MonthOf => write!(f, "month-of"),
-            ParameterComputeType::WeekOfYear => write!(f, "week-of-year"),
-            ParameterComputeType::WeekOfMonth => write!(f, "week-of-month"),
-            ParameterComputeType::DayOfMonth => write!(f, "day-of-month"),
-            ParameterComputeType::DayOfWeek => write!(f, "day-of-week"),
-            ParameterComputeType::CaseThen => write!(f, "case-then"),
-        }
-    }
 }
 
 serde_for_enum! {

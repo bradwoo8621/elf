@@ -3,30 +3,20 @@ use crate::{
     serde_for_enum, Auditable, BaseDataModel, OptimisticLock, Storable, TenantBasedTuple, TenantId,
     Tuple, UserGroupId, UserId,
 };
-use std::fmt;
-use watchmen_model_marco::adapt_model;
+use watchmen_model_marco::{adapt_model, Display};
 
+#[derive(Display)]
 pub enum UserRole {
     Console,
     Admin,
-    SuperAdmin,
-}
-
-impl fmt::Display for UserRole {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            UserRole::Console => write!(f, "console"),
-            UserRole::Admin => write!(f, "admin"),
-            UserRole::SuperAdmin => write!(f, "superadmin"),
-        }
-    }
+    Superadmin,
 }
 
 serde_for_enum! {
     UserRole {
         Console => "console",
         Admin => "admin",
-        SuperAdmin => "superadmin"
+        Superadmin => "superadmin"
     }
 }
 

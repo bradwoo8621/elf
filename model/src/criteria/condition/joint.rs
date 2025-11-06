@@ -1,19 +1,10 @@
 use crate::{serde_for_enum, BaseDataModel, ParameterCondition};
-use std::fmt;
-use watchmen_model_marco::adapt_model;
+use watchmen_model_marco::{adapt_model, Display};
 
+#[derive(Display)]
 pub enum ParameterJointType {
     And,
     Or,
-}
-
-impl fmt::Display for ParameterJointType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            ParameterJointType::And => write!(f, "and"),
-            ParameterJointType::Or => write!(f, "or"),
-        }
-    }
 }
 
 serde_for_enum! {

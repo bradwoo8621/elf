@@ -1,7 +1,7 @@
 use crate::{serde_for_enum, BaseDataModel};
-use std::fmt;
-use watchmen_model_marco::adapt_model;
+use watchmen_model_marco::{adapt_model, DisplayWithAnd};
 
+#[derive(DisplayWithAnd)]
 pub enum VariablePredefineFunctions {
     // Sequence functions
     NextSeq,
@@ -15,35 +15,16 @@ pub enum VariablePredefineFunctions {
     Max,
     Min,
     // Retrieve value from previous trigger data
+    #[display = "&old"]
     FromPreviousTriggerData,
     // Date related functions
     DayDiff,
     MonthDiff,
     YearDiff,
     MoveDate,
+    #[display = "&fmtDate"]
     DateFormat,
     Now,
-}
-
-impl fmt::Display for VariablePredefineFunctions {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            VariablePredefineFunctions::NextSeq => write!(f, "&nextSeq"),
-            VariablePredefineFunctions::Count => write!(f, "&count"),
-            VariablePredefineFunctions::Length => write!(f, "&length"),
-            VariablePredefineFunctions::Join => write!(f, "&join"),
-            VariablePredefineFunctions::Sum => write!(f, "&sum"),
-            VariablePredefineFunctions::Max => write!(f, "&max"),
-            VariablePredefineFunctions::Min => write!(f, "&min"),
-            VariablePredefineFunctions::FromPreviousTriggerData => write!(f, "&old"),
-            VariablePredefineFunctions::DayDiff => write!(f, "&dayDiff"),
-            VariablePredefineFunctions::MonthDiff => write!(f, "&monthDiff"),
-            VariablePredefineFunctions::YearDiff => write!(f, "&yearDiff"),
-            VariablePredefineFunctions::MoveDate => write!(f, "&moveDate"),
-            VariablePredefineFunctions::DateFormat => write!(f, "&fmtDate"),
-            VariablePredefineFunctions::Now => write!(f, "&now"),
-        }
-    }
 }
 
 serde_for_enum! {
