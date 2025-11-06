@@ -1,5 +1,6 @@
-use crate::{bdm, serde_for_enum, Parameter};
+use crate::{serde_for_enum, BaseDataModel, Parameter};
 use std::fmt;
+use watchmen_model_marco::adapt_model;
 
 pub enum ParameterExpressionOperator {
     Empty,
@@ -46,6 +47,7 @@ serde_for_enum! {
     }
 }
 
+#[adapt_model(bdm)]
 pub enum ParameterExpression {
     Empty(Option<Parameter>),
     NotEmpty(Option<Parameter>),
@@ -79,5 +81,3 @@ impl ParameterExpression {
         }
     }
 }
-
-bdm!(ParameterExpression);

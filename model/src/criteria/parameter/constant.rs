@@ -1,5 +1,6 @@
-use crate::{bdm, serde_for_enum};
+use crate::{serde_for_enum, BaseDataModel};
 use std::fmt;
+use watchmen_model_marco::adapt_model;
 
 pub enum VariablePredefineFunctions {
     // Sequence functions
@@ -66,8 +67,7 @@ serde_for_enum! {
 
 /// string stands for an expression to retrieve some value
 /// might include function calls, see [VariablePredefineFunctions]
+#[adapt_model(bdm)]
 pub struct ConstantParameter {
     pub value: Option<String>,
 }
-
-bdm!(ConstantParameter);

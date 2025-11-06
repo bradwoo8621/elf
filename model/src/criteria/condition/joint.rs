@@ -1,5 +1,6 @@
-use crate::{bdm, serde_for_enum, ParameterCondition};
+use crate::{serde_for_enum, BaseDataModel, ParameterCondition};
 use std::fmt;
+use watchmen_model_marco::adapt_model;
 
 pub enum ParameterJointType {
     And,
@@ -22,9 +23,8 @@ serde_for_enum! {
     }
 }
 
+#[adapt_model(bdm)]
 pub struct ParameterJoint {
     pub joint_type: ParameterJointType,
     pub filters: Option<Vec<ParameterCondition>>,
 }
-
-bdm!(ParameterJoint);

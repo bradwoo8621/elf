@@ -1,4 +1,5 @@
-use crate::{bdm, BaseDataModel};
+use crate::BaseDataModel;
+use watchmen_model_marco::adapt_model;
 
 pub trait GraphicPosition: BaseDataModel {
     fn x(&self) -> Option<f32>;
@@ -10,14 +11,13 @@ pub trait GraphicSize: BaseDataModel {
     fn height(&self) -> Option<f32>;
 }
 
+#[adapt_model(bdm)]
 pub struct GraphicRect {
     pub x: Option<f32>,
     pub y: Option<f32>,
     pub width: Option<f32>,
     pub height: Option<f32>,
 }
-
-bdm!(GraphicRect);
 
 impl GraphicPosition for GraphicRect {
     fn x(&self) -> Option<f32> {

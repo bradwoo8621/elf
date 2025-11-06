@@ -1,5 +1,6 @@
-use crate::{bdm, serde_for_enum, Parameter, ParameterJoint};
+use crate::{serde_for_enum, BaseDataModel, Parameter, ParameterJoint};
 use std::fmt;
+use watchmen_model_marco::adapt_model;
 
 pub enum ParameterComputeType {
     None,
@@ -62,6 +63,7 @@ serde_for_enum! {
 }
 
 /// use [Box<Parameter>] to avoid recursive type size issue
+#[adapt_model(bdm)]
 pub enum ComputedParameter {
     // math operations
     Add(Option<Vec<Parameter>>),
@@ -102,5 +104,3 @@ impl ComputedParameter {
         }
     }
 }
-
-bdm!(ComputedParameter);
