@@ -1,7 +1,8 @@
-use crate::{serde_for_enum, BaseDataModel};
-use watchmen_model_marco::{adapt_model, DisplayWithAmpersandPrefix};
+use crate::BaseDataModel;
+use watchmen_model_marco::{adapt_model, Display, Serde};
 
-#[derive(DisplayWithAmpersandPrefix)]
+#[derive(Display, Serde)]
+#[pattern = "ampersand-prefix"]
 pub enum VariablePredefineFunctions {
     // Sequence functions
     NextSeq,
@@ -25,25 +26,6 @@ pub enum VariablePredefineFunctions {
     #[display = "&fmtDate"]
     DateFormat,
     Now,
-}
-
-serde_for_enum! {
-    VariablePredefineFunctions {
-        NextSeq => "&nextSeq",
-        Count => "&count",
-        Length => "&length",
-        Join => "&join",
-        Sum => "&sum",
-        Max => "&max",
-        Min => "&min",
-        FromPreviousTriggerData => "&old",
-        DayDiff => "&dayDiff",
-        MonthDiff => "&monthDiff",
-        YearDiff => "&yearDiff",
-        MoveDate => "&moveDate",
-        DateFormat => "&fmtDate",
-        Now => "&now",
-    }
 }
 
 /// string stands for an expression to retrieve some value

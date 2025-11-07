@@ -1,7 +1,7 @@
-use crate::{serde_for_enum, BaseDataModel, Parameter, ParameterJoint};
-use watchmen_model_marco::{adapt_model, Display};
+use crate::{BaseDataModel, Parameter, ParameterJoint};
+use watchmen_model_marco::{adapt_model, Display, Serde};
 
-#[derive(Display)]
+#[derive(Display, Serde)]
 pub enum ParameterComputeType {
     None,
     Add,
@@ -18,26 +18,6 @@ pub enum ParameterComputeType {
     DayOfMonth,
     DayOfWeek,
     CaseThen,
-}
-
-serde_for_enum! {
-    ParameterComputeType {
-        None => "none",
-        Add => "add",
-        Subtract => "subtract",
-        Multiply => "multiply",
-        Divide => "divide",
-        Modulus => "modulus",
-        YearOf => "year-of",
-        HalfYearOf => "half-year-of",
-        QuarterOf => "quarter-of",
-        MonthOf => "month-of",
-        WeekOfYear => "week-of-year",
-        WeekOfMonth => "week-of-month",
-        DayOfMonth => "day-of-month",
-        DayOfWeek => "day-of-week",
-        CaseThen => "case-then",
-    }
 }
 
 /// use [Box<Parameter>] to avoid recursive type size issue

@@ -1,17 +1,8 @@
-use crate::serde_for_enum;
-use watchmen_model_marco::Display;
+use watchmen_model_marco::{Display, Serde};
 
-#[derive(Display)]
+#[derive(Display, Serde)]
 pub enum ParameterKind {
     Topic,
     Constant,
     Computed,
-}
-
-serde_for_enum! {
-    ParameterKind {
-        Topic => "topic",
-        Constant => "constant",
-        Computed => "computed",
-    }
 }

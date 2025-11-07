@@ -2,7 +2,7 @@ mod enum_adapt;
 mod model_adapt;
 mod utils;
 
-use crate::enum_adapt::{impl_display, impl_display_with_ampersand_prefix};
+use crate::enum_adapt::{impl_display, impl_serde};
 use proc_macro::TokenStream;
 
 /// Adapt the model struct or enum to various traits and fields based on the provided attributes.
@@ -40,44 +40,37 @@ use proc_macro::TokenStream;
 ///
 /// > for enum, only `bdm` is supported.
 ///
-/// > All traits and return types are from watchmen_model module:
-/// [BaseDataModel], [Storage], [Auditable], [OptimisticLock], [LastVisit],
-/// [Tuple], [TenantBasedTuple], [UserBasedTuple], [UserId]
+/// All traits and return types are from [watchmen_model] module:
+/// So import them by yourself, such as:
+/// ```
+/// use watchmen_model::{
+///     BaseDataModel, Storage,
+///     Auditable, OptimisticLock, LastVisit,
+///     Tuple, TenantBasedTuple, UserBasedTuple,
+///     TenantId, UserId
+/// };
+/// ```
 #[proc_macro_attribute]
 pub fn adapt_model(attr: TokenStream, item: TokenStream) -> TokenStream {
     model_adapt::model_adapt(attr, item)
 }
 
-/// implement std::fmt::Display for enum.
+/// implement [std::fmt::Display] for enum.
 /// enum variant name camel case to display with hyphen separated lowercase
-/// use [[display = "name"]] to custom the display string.
-#[proc_macro_derive(Display, attributes(display))]
+/// - use [#[pattern = "type"]] on enum to custom the display string transformation rule,
+///   Available pattern is [kebab] (default value if not appointed), [ampersand-prefix].
+/// - use [#[display = "name"]] on fields to custom the display string.
+#[proc_macro_derive(Display, attributes(pattern, display))]
 pub fn impl_display_for_enum(item: TokenStream) -> TokenStream {
     impl_display(item)
 }
 
-/// implement std::fmt::Display for enum.
-/// enum variant name camel case to display with first char lowercase and [&] as prefix.
-/// use [[display = "name"]] to custom the display string.
-///
-/// # Examples
-/// ```
-/// pub enum Foo {
-///    HelloWorld,
-///    #[display = "&new"]
-///    NewWorld
-/// }
-/// // expands to
-/// impl std::fmt::Display for Foo {
-///    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-///       match self {
-///          Foo::HelloWorld => f.write_fmt(::core::format_args!("{}", "&helloWorld")),
-///          Foo::NewWorld => f.write_fmt(::core::format_args!("{}", "&new")),
-///       }
-///    }
-/// }
-/// ```
-#[proc_macro_derive(DisplayWithAmpersandPrefix, attributes(display))]
-pub fn impl_display_with_and_for_enum(item: TokenStream) -> TokenStream {
-    impl_display_with_ampersand_prefix(item)
+/// implement [serde::Serialize] and [serde::Deserialize] for enum.
+/// enum variant name camel case to display with hyphen separated lowercase
+/// - use [#[pattern = "type"]] on enum to custom the display string transformation rule,
+///   Available pattern is [kebab] (default value if not appointed), [ampersand-prefix].
+/// - use [#[display = "name"]] on fields to custom the display string.
+#[proc_macro_derive(Serde, attributes(pattern, display))]
+pub fn impl_serde_for_enum(item: TokenStream) -> TokenStream {
+    impl_serde(item)
 }

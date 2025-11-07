@@ -1,7 +1,7 @@
-use crate::{serde_for_enum, BaseDataModel, Parameter};
-use watchmen_model_marco::{adapt_model, Display};
+use crate::{BaseDataModel, Parameter};
+use watchmen_model_marco::{adapt_model, Display, Serde};
 
-#[derive(Display)]
+#[derive(Display, Serde)]
 pub enum ParameterExpressionOperator {
     Empty,
     NotEmpty,
@@ -13,21 +13,6 @@ pub enum ParameterExpressionOperator {
     MoreEquals,
     In,
     NotIn,
-}
-
-serde_for_enum! {
-    ParameterExpressionOperator {
-        Empty => "empty",
-        NotEmpty => "not-empty",
-        Equals => "equals",
-        NotEquals => "not-equals",
-        Less => "less",
-        LessEquals => "less-equals",
-        More => "more",
-        MoreEquals => "more-equals",
-        In => "in",
-        NotIn => "not-in",
-    }
 }
 
 #[adapt_model(bdm)]

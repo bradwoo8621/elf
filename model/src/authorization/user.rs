@@ -1,24 +1,16 @@
 use crate::serde::option_naive_datetime;
 use crate::{
-    serde_for_enum, Auditable, BaseDataModel, OptimisticLock, Storable, TenantBasedTuple, TenantId,
-    Tuple, UserGroupId, UserId,
+    Auditable, BaseDataModel, OptimisticLock, Storable, TenantBasedTuple, TenantId, Tuple,
+    UserGroupId, UserId,
 };
-use watchmen_model_marco::{adapt_model, Display};
+use watchmen_model_marco::{adapt_model, Display, Serde};
 
-#[derive(Display)]
+#[derive(Display, Serde)]
 pub enum UserRole {
     Console,
     Admin,
     #[display = "superadmin"]
     SuperAdmin,
-}
-
-serde_for_enum! {
-    UserRole {
-        Console => "console",
-        Admin => "admin",
-        SuperAdmin => "superadmin"
-    }
 }
 
 #[adapt_model(opt_lock, tenant_based)]
