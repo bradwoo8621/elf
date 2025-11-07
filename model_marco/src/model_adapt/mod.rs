@@ -25,8 +25,7 @@ pub fn model_adapt(attr: TokenStream, item: TokenStream) -> TokenStream {
     match input.data {
         syn::Data::Struct(s) => match s.fields {
             Fields::Named(named_fields) => {
-                let named_field_list = named_fields.named;
-                let existing_fields = named_field_list.to_token_stream();
+                let existing_fields = adapt_to.rebuild_existing_fields(&named_fields.named);
                 // modifications
                 let attributes = adapt_to.attributes();
                 let new_fields = adapt_to.fields();
