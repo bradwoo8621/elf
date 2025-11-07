@@ -1,7 +1,7 @@
 use crate::{serde_for_enum, BaseDataModel};
-use watchmen_model_marco::{adapt_model, DisplayWithAnd};
+use watchmen_model_marco::{adapt_model, DisplayWithAmpersandPrefix};
 
-#[derive(DisplayWithAnd)]
+#[derive(DisplayWithAmpersandPrefix)]
 pub enum VariablePredefineFunctions {
     // Sequence functions
     NextSeq,

@@ -2,7 +2,7 @@ mod enum_adapt;
 mod model_adapt;
 mod utils;
 
-use crate::enum_adapt::{impl_display, impl_display_with_and};
+use crate::enum_adapt::{impl_display, impl_display_with_ampersand_prefix};
 use proc_macro::TokenStream;
 
 /// Adapt the model struct or enum to various traits and fields based on the provided attributes.
@@ -77,7 +77,7 @@ pub fn impl_display_for_enum(item: TokenStream) -> TokenStream {
 ///    }
 /// }
 /// ```
-#[proc_macro_derive(DisplayWithAnd, attributes(display))]
+#[proc_macro_derive(DisplayWithAmpersandPrefix, attributes(display))]
 pub fn impl_display_with_and_for_enum(item: TokenStream) -> TokenStream {
-    impl_display_with_and(item)
+    impl_display_with_ampersand_prefix(item)
 }

@@ -15,7 +15,7 @@ fn first_lowercase_with_ampersand(s: &str) -> String {
     }
 }
 
-pub fn impl_display_with_and(item: TokenStream) -> TokenStream {
+pub fn impl_display_with_ampersand_prefix(item: TokenStream) -> TokenStream {
     let input = parse_macro_input!(item as DeriveInput);
     let name = input.ident;
 
