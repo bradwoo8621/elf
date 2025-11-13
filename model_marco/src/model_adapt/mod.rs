@@ -50,7 +50,7 @@ pub fn model_adapt(attr: TokenStream, item: TokenStream) -> TokenStream {
         },
         syn::Data::Enum(e) => {
             if !adapt_to.suitable_for_enum() {
-                panic!("Enums can only adapt to [bdm].");
+                panic!("Enums can only adapt to [bdm] or [storable].");
             }
             let variants = e.variants.to_token_stream();
             // modifications

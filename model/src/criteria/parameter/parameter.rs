@@ -1,9 +1,10 @@
 use crate::{
-    BaseDataModel, ComputedParameter, ConstantParameter, ParameterKind, TopicFactorParameter,
+    BaseDataModel, ComputedParameter, ConstantParameter, ParameterKind, Storable,
+    TopicFactorParameter,
 };
 use watchmen_model_marco::adapt_model;
 
-#[adapt_model(bdm)]
+#[adapt_model(storable)]
 pub enum Parameter {
     Topic(TopicFactorParameter),
     Constant(ConstantParameter),

@@ -1,4 +1,4 @@
-use crate::{BaseDataModel, ParameterCondition};
+use crate::{BaseDataModel, ParameterCondition, Storable};
 use watchmen_model_marco::{adapt_model, Display, Serde};
 
 #[derive(Display, Serde)]
@@ -7,7 +7,7 @@ pub enum ParameterJointType {
     Or,
 }
 
-#[adapt_model(bdm)]
+#[adapt_model(storable)]
 pub struct ParameterJoint {
     pub joint_type: ParameterJointType,
     pub filters: Option<Vec<ParameterCondition>>,

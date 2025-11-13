@@ -57,8 +57,7 @@ impl AdaptTo {
     }
 
     pub fn suitable_for_enum(&self) -> bool {
-        !self.storable
-            && !self.audit
+        !self.audit
             && !self.opt_lock
             && !self.last_visit
             && !self.tuple

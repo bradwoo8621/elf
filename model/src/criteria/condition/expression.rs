@@ -1,4 +1,4 @@
-use crate::{BaseDataModel, Parameter};
+use crate::{BaseDataModel, Parameter, Storable};
 use watchmen_model_marco::{adapt_model, Display, Serde};
 
 #[derive(Display, Serde)]
@@ -15,7 +15,7 @@ pub enum ParameterExpressionOperator {
     NotIn,
 }
 
-#[adapt_model(bdm)]
+#[adapt_model(storable)]
 pub enum ParameterExpression {
     Empty(Option<Parameter>),
     NotEmpty(Option<Parameter>),

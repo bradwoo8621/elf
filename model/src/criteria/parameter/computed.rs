@@ -1,4 +1,4 @@
-use crate::{BaseDataModel, Parameter, ParameterJoint};
+use crate::{BaseDataModel, Parameter, ParameterJoint, Storable};
 use watchmen_model_marco::{adapt_model, Display, Serde};
 
 #[derive(Display, Serde)]
@@ -21,7 +21,7 @@ pub enum ParameterComputeType {
 }
 
 /// use [Box<Parameter>] to avoid recursive type size issue
-#[adapt_model(bdm)]
+#[adapt_model(storable)]
 pub enum ComputedParameter {
     // math operations
     Add(Option<Vec<Parameter>>),
