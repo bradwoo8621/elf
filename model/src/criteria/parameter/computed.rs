@@ -21,6 +21,7 @@ pub enum ParameterComputeType {
 }
 
 /// use [Box<Parameter>] to avoid recursive type size issue
+/// TODO is it workable?
 #[adapt_model(storable)]
 pub enum ComputedParameter {
     // math operations

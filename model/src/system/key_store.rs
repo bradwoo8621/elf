@@ -5,7 +5,7 @@ use chrono::NaiveDateTime;
 use std::collections::HashMap;
 use watchmen_model_marco::adapt_model;
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
 pub enum KeyStoreValue {
     Str(String),
     Num(BigDecimal),

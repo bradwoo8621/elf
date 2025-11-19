@@ -4,13 +4,13 @@ use crate::{
 };
 use watchmen_model_marco::{adapt_model, Display, Serde};
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
 pub enum DataSourceParamValue {
     Str(String),
     Bool(bool),
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
 pub struct DataSourceParam {
     pub name: Option<String>,
     pub value: Option<DataSourceParamValue>,

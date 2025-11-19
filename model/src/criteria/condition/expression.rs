@@ -15,6 +15,7 @@ pub enum ParameterExpressionOperator {
     NotIn,
 }
 
+/// TODO is it workable?
 #[adapt_model(storable)]
 pub enum ParameterExpression {
     Empty(Option<Parameter>),

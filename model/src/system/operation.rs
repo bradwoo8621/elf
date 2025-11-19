@@ -11,7 +11,7 @@ pub enum OperationType {
     Delete,
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
 pub enum OperationContent {
     Str(String),
     Num(BigDecimal),

@@ -257,6 +257,7 @@ pub struct DeleteRowsAction {
     pub by: Option<ParameterJoint>,
 }
 
+/// TODO is it workable?
 #[adapt_model(storable)]
 pub enum PipelineAction {
     Alarm(AlarmAction),
