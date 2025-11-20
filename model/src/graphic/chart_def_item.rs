@@ -14,28 +14,30 @@ pub enum ChartDefItemType {
     Dropdown,
 }
 
-/// TODO is it workable?
-#[adapt_model(storable)]
+// TODO can't find out where this is used, seems to define the chart properties
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum ChartDefItem {
+    #[serde(rename = "section")]
     Section(ChartSectionItem),
-    Input(ChartInputItem),
+    #[serde(rename = "number")]
+    Number(ChartNumberItem),
+    #[serde(rename = "percentage")]
+    Percentage(ChartPercentageItem),
+    #[serde(rename = "boolean")]
+    Boolean(ChartBooleanItem),
+    #[serde(rename = "text")]
+    Text(ChartTextItem),
+    #[serde(rename = "color")]
+    Color(ChartColorItem),
+    #[serde(rename = "dropdown")]
+    Dropdown(ChartDropdownItem),
 }
 
 #[adapt_model(storable)]
 pub struct ChartSectionItem {
     pub r#type: Option<ChartDefItemType>,
     pub label: Option<String>,
-}
-
-/// TODO is it workable?
-#[adapt_model(storable)]
-pub enum ChartInputItem {
-    Number(ChartNumberItem),
-    Percentage(ChartPercentageItem),
-    Boolean(ChartBooleanItem),
-    Text(ChartTextItem),
-    Color(ChartColorItem),
-    Dropdown(ChartDropdownItem),
 }
 
 #[adapt_model(storable)]

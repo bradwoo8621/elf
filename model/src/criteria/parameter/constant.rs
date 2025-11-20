@@ -1,4 +1,4 @@
-use crate::{BaseDataModel, Storable};
+use crate::{BaseDataModel, ParameterKind, Storable};
 use watchmen_model_marco::{adapt_model, Display, Serde};
 
 #[derive(Display, Serde)]
@@ -32,5 +32,6 @@ pub enum VariablePredefineFunctions {
 /// might include function calls, see [VariablePredefineFunctions]
 #[adapt_model(storable)]
 pub struct ConstantParameter {
+    pub kind: Option<ParameterKind>,
     pub value: Option<String>,
 }

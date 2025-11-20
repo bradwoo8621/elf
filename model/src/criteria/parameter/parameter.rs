@@ -1,23 +1,13 @@
-use crate::{
-    BaseDataModel, ComputedParameter, ConstantParameter, ParameterKind, Storable,
-    TopicFactorParameter,
-};
-use watchmen_model_marco::adapt_model;
+use crate::{ComputedParameter, ConstantParameter, TopicFactorParameter};
+use serde::{Deserialize, Serialize};
 
-/// TODO is it workable?
-#[adapt_model(storable)]
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "kind")]
 pub enum Parameter {
+    #[serde(rename = "topic")]
     Topic(TopicFactorParameter),
+    #[serde(rename = "constant")]
     Constant(ConstantParameter),
+    #[serde(rename = "computed")]
     Computed(ComputedParameter),
-}
-
-impl Parameter {
-    pub fn kind(&self) -> ParameterKind {
-        match self {
-            Parameter::Topic(_) => ParameterKind::Topic,
-            Parameter::Constant(_) => ParameterKind::Constant,
-            Parameter::Computed(_) => ParameterKind::Computed,
-        }
-    }
 }

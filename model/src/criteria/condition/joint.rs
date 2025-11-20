@@ -9,6 +9,6 @@ pub enum ParameterJointType {
 
 #[adapt_model(storable)]
 pub struct ParameterJoint {
-    pub joint_type: ParameterJointType,
+    pub joint_type: Option<ParameterJointType>,
     pub filters: Option<Vec<ParameterCondition>>,
 }

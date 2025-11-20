@@ -3,6 +3,7 @@ use crate::{
     Auditable, BaseDataModel, ExternalWriterId, FactorId, OptimisticLock, Parameter,
     ParameterJoint, Storable, TenantBasedTuple, TenantId, TopicId, Tuple, UserId,
 };
+use serde::{Deserialize, Serialize};
 use watchmen_model_marco::{adapt_model, Display, Serde};
 
 #[derive(Display, Serde)]
@@ -257,22 +258,36 @@ pub struct DeleteRowsAction {
     pub by: Option<ParameterJoint>,
 }
 
-/// TODO is it workable?
-#[adapt_model(storable)]
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum PipelineAction {
+    #[serde(rename = "alarm")]
     Alarm(AlarmAction),
+    #[serde(rename = "copy-to-memory")]
     CopyToMemory(CopyToMemoryAction),
+    #[serde(rename = "write-to-external")]
     WriteToExternal(WriteToExternalAction),
+    #[serde(rename = "read-row")]
     ReadRow(ReadRowAction),
+    #[serde(rename = "read-factor")]
     ReadFactor(ReadFactorAction),
+    #[serde(rename = "exists")]
     Exists(ExistsAction),
+    #[serde(rename = "read-rows")]
     ReadRows(ReadRowsAction),
+    #[serde(rename = "read-factors")]
     ReadFactors(ReadFactorsAction),
+    #[serde(rename = "merge-row")]
     MergeRow(MergeRowAction),
+    #[serde(rename = "insert-row")]
     InsertRow(InsertRowAction),
+    #[serde(rename = "insert-or-merge-row")]
     InsertOrMergeRow(InsertOrMergeRowAction),
+    #[serde(rename = "write-factor")]
     WriteFactor(WriteFactorAction),
+    #[serde(rename = "delete-row")]
     DeleteRow(DeleteRowAction),
+    #[serde(rename = "delete-rows")]
     DeleteRows(DeleteRowsAction),
 }
 

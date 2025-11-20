@@ -5,6 +5,7 @@ use crate::{
     LineChart, NightingaleChart, PieChart, ScatterChart, Storable, TreeChart, TreemapChart,
 };
 use bigdecimal::BigDecimal;
+use serde::{Deserialize, Serialize};
 use watchmen_model_marco::{adapt_model, Display, Serde};
 
 #[derive(Display, Serde)]
@@ -96,8 +97,8 @@ pub struct ChartSettings {
     pub truncation: Option<ChartTruncation>,
 }
 
-/// TODO is it workable?
-#[adapt_model(storable)]
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum ChartSettingsRecitation {
     Chart(ChartSettings),
     ECharts(EChartsSettings),
@@ -125,19 +126,31 @@ pub enum ChartType {
     Customized,
 }
 
-// todo is it workable?
-#[adapt_model(storable)]
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "type")]
 pub enum ChartRecitation {
+    #[serde(rename = "count")]
     Count(CountChart),
+    #[serde(rename = "bar")]
     Bar(BarChart),
+    #[serde(rename = "line")]
     Line(LineChart),
+    #[serde(rename = "scatter")]
     Scatter(ScatterChart),
+    #[serde(rename = "pie")]
     Pie(PieChart),
+    #[serde(rename = "doughnut")]
     Doughnut(DoughnutChart),
+    #[serde(rename = "nightingale")]
     Nightingale(NightingaleChart),
+    #[serde(rename = "sunburst")]
     Sunburst(SunburstChart),
+    #[serde(rename = "tree")]
     Tree(TreeChart),
+    #[serde(rename = "treemap")]
     Treemap(TreemapChart),
+    #[serde(rename = "map")]
     Map(MapChart),
+    #[serde(rename = "customized")]
     Customized(CustomizedChart),
 }

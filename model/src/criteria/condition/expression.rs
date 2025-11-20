@@ -1,4 +1,5 @@
 use crate::{BaseDataModel, Parameter, Storable};
+use serde::{Deserialize, Serialize};
 use watchmen_model_marco::{adapt_model, Display, Serde};
 
 #[derive(Display, Serde)]
@@ -15,34 +16,95 @@ pub enum ParameterExpressionOperator {
     NotIn,
 }
 
-/// TODO is it workable?
 #[adapt_model(storable)]
-pub enum ParameterExpression {
-    Empty(Option<Parameter>),
-    NotEmpty(Option<Parameter>),
-    Equal(Option<Parameter>, Option<Parameter>),
-    NotEqual(Option<Parameter>, Option<Parameter>),
-    LessThan(Option<Parameter>, Option<Parameter>),
-    LessThanOrEqual(Option<Parameter>, Option<Parameter>),
-    MoreThan(Option<Parameter>, Option<Parameter>),
-    MoreThanOrEqual(Option<Parameter>, Option<Parameter>),
-    In(Option<Vec<Parameter>>),
-    NotIn(Option<Vec<Parameter>>),
+pub struct EmptyExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
 }
 
-impl ParameterExpression {
-    pub fn operator(&self) -> ParameterExpressionOperator {
-        match self {
-            ParameterExpression::Empty(_) => ParameterExpressionOperator::Empty,
-            ParameterExpression::NotEmpty(_) => ParameterExpressionOperator::NotEmpty,
-            ParameterExpression::Equal(_, _) => ParameterExpressionOperator::Equals,
-            ParameterExpression::NotEqual(_, _) => ParameterExpressionOperator::NotEquals,
-            ParameterExpression::LessThan(_, _) => ParameterExpressionOperator::Less,
-            ParameterExpression::LessThanOrEqual(_, _) => ParameterExpressionOperator::LessEquals,
-            ParameterExpression::MoreThan(_, _) => ParameterExpressionOperator::More,
-            ParameterExpression::MoreThanOrEqual(_, _) => ParameterExpressionOperator::MoreEquals,
-            ParameterExpression::In(_) => ParameterExpressionOperator::In,
-            ParameterExpression::NotIn(_) => ParameterExpressionOperator::NotIn,
-        }
-    }
+#[adapt_model(storable)]
+pub struct NotEmptyExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
+}
+
+#[adapt_model(storable)]
+pub struct EqualsExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
+    pub right: Option<Parameter>,
+}
+
+#[adapt_model(storable)]
+pub struct NotEqualsExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
+    pub right: Option<Parameter>,
+}
+
+#[adapt_model(storable)]
+pub struct LessThanExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
+    pub right: Option<Parameter>,
+}
+
+#[adapt_model(storable)]
+pub struct LessThanOrEqualsExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
+    pub right: Option<Parameter>,
+}
+
+#[adapt_model(storable)]
+pub struct MoreThanExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
+    pub right: Option<Parameter>,
+}
+
+#[adapt_model(storable)]
+pub struct MoreThanOrEqualsExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
+    pub right: Option<Parameter>,
+}
+
+#[adapt_model(storable)]
+pub struct InExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
+    pub right: Option<Parameter>,
+}
+
+#[adapt_model(storable)]
+pub struct NotInExpression {
+    pub left: Option<Parameter>,
+    pub operator: Option<ParameterExpressionOperator>,
+    pub right: Option<Parameter>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(tag = "operator")]
+pub enum ParameterExpression {
+    #[serde(rename = "empty")]
+    Empty(EmptyExpression),
+    #[serde(rename = "not-empty")]
+    NotEmpty(NotEmptyExpression),
+    #[serde(rename = "equals")]
+    Equals(EqualsExpression),
+    #[serde(rename = "not-equals")]
+    NotEquals(NotEqualsExpression),
+    #[serde(rename = "less")]
+    LessThan(LessThanExpression),
+    #[serde(rename = "less-equals")]
+    LessThanOrEquals(LessThanOrEqualsExpression),
+    #[serde(rename = "more")]
+    MoreThan(MoreThanExpression),
+    #[serde(rename = "more-equals")]
+    MoreThanOrEqual(MoreThanOrEqualsExpression),
+    #[serde(rename = "in")]
+    In(InExpression),
+    #[serde(rename = "not-in")]
+    NotIn(NotInExpression),
 }

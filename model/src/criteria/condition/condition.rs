@@ -1,8 +1,8 @@
-use crate::{BaseDataModel, ParameterExpression, ParameterJoint, Storable};
-use watchmen_model_marco::adapt_model;
+use crate::{ParameterExpression, ParameterJoint};
+use serde::{Deserialize, Serialize};
 
-/// TODO is it workable?
-#[adapt_model(storable)]
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum ParameterCondition {
     Expression(ParameterExpression),
     Joint(ParameterJoint),

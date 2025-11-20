@@ -1,5 +1,6 @@
 mod bar_chart;
 mod chart;
+mod chart_def_item;
 mod connected_space_graphic;
 mod count_chart;
 mod customized_chart;
@@ -14,10 +15,10 @@ mod scatter_chart;
 mod sunburst_chart;
 mod tree_chart;
 mod treemap_chart;
-mod chart_def_item;
 
 pub use bar_chart::*;
 pub use chart::*;
+pub use chart_def_item::*;
 pub use connected_space_graphic::*;
 pub use count_chart::*;
 pub use customized_chart::*;
