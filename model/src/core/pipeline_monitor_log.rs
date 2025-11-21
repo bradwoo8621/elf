@@ -4,7 +4,6 @@ use crate::{
     PipelineTriggerTraceId, PipelineUnitId, Storable, TenantId, TopicDataId, TopicId,
 };
 use chrono::NaiveDateTime;
-use std::any::Any;
 use watchmen_model_marco::{adapt_model, Display, Serde};
 
 #[derive(Display, Serde)]
@@ -17,6 +16,10 @@ pub enum MonitorLogStatus {
     /// exception occurred
     ERROR,
 }
+
+/// TODO Any needs to be changed to some struct, according to where it is
+///  there sure thing is, it is not a [String]
+pub type NotKnownYetDataStruct = String;
 
 #[adapt_model(storable)]
 pub struct StandardMonitorLog {
@@ -36,8 +39,7 @@ pub struct ConditionalMonitorLog {
     /// result of prerequisite, True when it is not defined
     pub prerequisite: Option<bool>,
     /// definition of prerequisite
-    /// TODO Any needs to be changed to some struct
-    pub prerequisite_defined_as: Option<Box<dyn Any>>,
+    pub prerequisite_defined_as: Option<NotKnownYetDataStruct>,
 }
 
 pub type MonitorLogActionId = String;
@@ -52,8 +54,7 @@ pub struct MonitorLogAction {
     pub update_count: Option<u32>,
     pub delete_count: Option<u32>,
     /// definition of action
-    /// TODO Any needs to be changed to some struct
-    pub defined_as: Option<Box<dyn Any>>,
+    pub defined_as: Option<NotKnownYetDataStruct>,
     /// touched value,
     /// for deletion, update and insert, always be list of dict
     /// for read-exists, bool,
@@ -61,16 +62,14 @@ pub struct MonitorLogAction {
     /// for read-factor, arithmetic, Decimal
     /// for read-row, dict
     /// for read-rows, list of dict
-    /// TODO Any needs to be changed to some struct
-    pub touched: Option<Box<dyn Any>>,
+    pub touched: Option<NotKnownYetDataStruct>,
 }
 
 #[adapt_model(storable)]
 pub struct MonitorLogFindByAction {
     //(MonitorLogAction):
     /// runtime describing of find by
-    /// TODO Any needs to be changed to some struct
-    pub find_by: Option<Box<dyn Any>>,
+    pub find_by: Option<NotKnownYetDataStruct>,
 }
 
 #[adapt_model(storable)]
@@ -144,8 +143,7 @@ pub struct MonitorLogUnit {
     pub unit_id: Option<PipelineUnitId>,
     pub name: Option<String>,
     pub loop_variable_name: Option<String>,
-    /// TODO Any needs to be changed to some struct
-    pub loop_variable_value: Option<Box<dyn Any>>,
+    pub loop_variable_value: Option<NotKnownYetDataStruct>,
     pub actions: Option<Vec<MonitorLogAction>>,
 }
 
@@ -167,16 +165,13 @@ pub struct PipelineMonitorLog {
     pub pipeline_id: Option<PipelineId>,
     pub topic_id: Option<TopicId>,
     pub data_id: Option<TopicDataId>,
-    /// TODO Any needs to be changed to some struct
-    pub old_value: Option<Box<dyn Any>>,
-    /// TODO Any needs to be changed to some struct
-    pub new_value: Option<Box<dyn Any>>,
+    pub old_value: Option<NotKnownYetDataStruct>,
+    pub new_value: Option<NotKnownYetDataStruct>,
     pub stages: Option<Vec<MonitorLogStage>>,
 }
 
 #[adapt_model(storable)]
 pub struct PipelineMonitorLogCriteria {
-    //(Pageable):
     pub topic_id: Option<TopicId>,
     pub pipeline_id: Option<PipelineId>,
     pub start_date: Option<String>,
