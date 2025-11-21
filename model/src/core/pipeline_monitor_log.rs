@@ -108,35 +108,6 @@ pub struct MonitorWriteToExternalAction {
     pub r#type: Option<PipelineActionType>,
 }
 
-fn is_read_action(action_type: PipelineActionType) -> bool {
-    match action_type {
-        PipelineActionType::ReadRow => true,
-        PipelineActionType::ReadFactor => true,
-        PipelineActionType::Exists => true,
-        PipelineActionType::ReadRows => true,
-        PipelineActionType::ReadFactors => true,
-        _ => false,
-    }
-}
-
-fn is_write_action(action_type: PipelineActionType) -> bool {
-    match action_type {
-        PipelineActionType::InsertRow => true,
-        PipelineActionType::MergeRow => true,
-        PipelineActionType::InsertOrMergeRow => true,
-        PipelineActionType::WriteFactor => true,
-        _ => false,
-    }
-}
-
-fn is_delete_action(action_type: PipelineActionType) -> bool {
-    match action_type {
-        PipelineActionType::DeleteRow => true,
-        PipelineActionType::DeleteRows => true,
-        _ => false,
-    }
-}
-
 #[adapt_model(storable)]
 pub struct MonitorLogUnit {
     //(ConditionalMonitorLog):
