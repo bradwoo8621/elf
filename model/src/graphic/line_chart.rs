@@ -1,8 +1,7 @@
 use crate::{
-    BarChartSettingsLabel, BaseDataModel, ChartBorder, ChartColor,
-    ChartTruncation, ChartType, EChartsGrid, EChartsLegend,
-    EChartsTitle, EChartsXAxis, EChartsYAxis, PredefinedChartColorSeries,
-    Storable,
+    BarChartSettingsLabel, BaseDataModel, ChartBorder, ChartColor, ChartTruncation, ChartType,
+    EChartsGrid, EChartsLegend, EChartsTitle, EChartsXAxis, EChartsYAxis,
+    PredefinedChartColorSeries, Storable,
 };
 use watchmen_model_marco::adapt_model;
 

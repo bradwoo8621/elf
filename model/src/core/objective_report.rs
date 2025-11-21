@@ -1,10 +1,10 @@
-use std::collections::HashMap;
 use crate::serde::option_naive_datetime;
 use crate::{
     Auditable, BaseDataModel, LastVisit, ObjectiveId, ObjectiveTimeframe, ObjectiveVariable,
     Storable, TenantId, UserBasedTuple, UserId,
 };
 use bigdecimal::BigDecimal;
+use std::collections::HashMap;
 use watchmen_model_marco::adapt_model;
 
 #[adapt_model(storable)]

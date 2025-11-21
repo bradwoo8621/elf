@@ -1,6 +1,6 @@
 use crate::{
-    BaseDataModel, ConnectedSpaceId, GraphicRect, Storable, TenantId, TopicId, UserBasedTuple,
-    UserId,
+	BaseDataModel, ConnectedSpaceId, GraphicRect, Storable, TenantId, TopicId, UserBasedTuple,
+	UserId,
 };
 use watchmen_model_marco::adapt_model;
 

@@ -1,7 +1,7 @@
 use crate::{
-	BaseDataModel, ChartBorder, ChartColor, ChartFont, ChartTruncation, ChartType,
-	EChartsGridPositionOnly, EChartsHorizontalAlignment, EChartsLegend, EChartsTitle,
-	EChartsVerticalAlignment, PredefinedChartColorSeries, Storable,
+    BaseDataModel, ChartBorder, ChartColor, ChartFont, ChartTruncation, ChartType,
+    EChartsGridPositionOnly, EChartsHorizontalAlignment, EChartsLegend, EChartsTitle,
+    EChartsVerticalAlignment, PredefinedChartColorSeries, Storable,
 };
 use bigdecimal::BigDecimal;
 use watchmen_model_marco::{adapt_model, Display, Serde};

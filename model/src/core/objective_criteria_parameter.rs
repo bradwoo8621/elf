@@ -610,7 +610,9 @@ impl ObjectiveCaseThenParameterRoute {
 
     /// it is to create the conditional route
     pub fn case(joint: ObjectiveParameterJoint) -> Self {
-        ObjectiveCaseThenParameterRoute::new().conditional(true).on(joint)
+        ObjectiveCaseThenParameterRoute::new()
+            .conditional(true)
+            .on(joint)
     }
 }
 
