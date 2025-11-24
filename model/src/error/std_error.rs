@@ -1,37 +1,52 @@
 use serde::{Deserialize, Serialize};
-use watchmen_model_marco::{Display, Serde, StrEnum};
 
-#[derive(Display, Serde, StrEnum)]
+pub trait StdErrorCode {
+    fn code(&self) -> &'static str;
+}
+
 pub enum StdErrCode {
-    #[display = "99999"]
     Unknown,
+}
+
+impl StdErrorCode for StdErrCode {
+    fn code(&self) -> &'static str {
+        match self {
+            StdErrCode::Unknown => "99999",
+        }
+    }
 }
 
 /// Convert other types of exceptions to this exception to enable the use of the `?` syntactic sugar.
 #[derive(Serialize, Deserialize)]
 pub struct StdErr {
-    code: StdErrCode,
-    msg: String,
+    code: &'static str,
+    msg: Option<String>,
 }
 
 impl StdErr {
-    pub fn of<R>(code: StdErrCode, msg: String) -> Result<R, Self> {
-        Err(StdErr { code, msg })
-    }
-
-    /// code only
-    pub fn co<R>(code: StdErrCode) -> Result<R, Self> {
+    pub fn of<R, M>(code: &'static str, msg: M) -> Result<R, Self>
+    where
+        M: Into<String>,
+    {
         Err(StdErr {
             code,
-            msg: String::from(""),
+            msg: Some(msg.into()),
         })
     }
 
+    /// code only
+    pub fn co<R>(code: &'static str) -> Result<R, Self> {
+        Err(StdErr { code, msg: None })
+    }
+
     /// message only
-    pub fn mo<R>(msg: String) -> Result<R, Self> {
+    pub fn mo<R, M>(msg: M) -> Result<R, Self>
+    where
+        M: Into<String>,
+    {
         Err(StdErr {
-            code: StdErrCode::Unknown,
-            msg,
+            code: StdErrCode::Unknown.code(),
+            msg: Some(msg.into()),
         })
     }
 }

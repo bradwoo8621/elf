@@ -10,7 +10,7 @@ pub enum TokenType {
 impl TokenType {
     pub fn value(self) -> &'static str {
         match self {
-            TokenType::Bearer => "bearer",
+            TokenType::Bearer => "Bearer",
         }
     }
 }

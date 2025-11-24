@@ -4,15 +4,15 @@ mod core;
 mod criteria;
 mod error;
 mod graphic;
+mod lineage;
 mod monitor;
 mod profile;
 mod system;
+mod webhook;
 
-mod lineage;
 pub mod pipelines;
 pub mod serde;
 pub mod topics;
-mod webhook;
 
 pub use analysis::*;
 pub use common::*;

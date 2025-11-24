@@ -13,6 +13,17 @@ pub enum UserRole {
     SuperAdmin,
 }
 
+impl PartialEq<UserRole> for UserRole {
+    fn eq(&self, other: &UserRole) -> bool {
+        match (self, other) {
+            (UserRole::Console, UserRole::Console) => true,
+            (UserRole::Admin, UserRole::Admin) => true,
+            (UserRole::SuperAdmin, UserRole::SuperAdmin) => true,
+            _ => false,
+        }
+    }
+}
+
 pub type UserId = String;
 
 #[adapt_model(opt_lock, tenant_based)]
