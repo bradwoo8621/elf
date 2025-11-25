@@ -139,7 +139,7 @@ pub enum FactorIndexGroup {
 #[pattern = "kebab-upper"]
 pub enum FactorEncryptMethod {
     #[display = "none"]
-    NONE,
+    None,
     Aes256Pkcs5Padding,
     Md5,
     Sha256,
@@ -172,4 +172,25 @@ pub struct Factor {
     pub index_group: Option<FactorIndexGroup>,
     pub encrypt: Option<FactorEncryptMethod>,
     pub precision: Option<String>,
+}
+
+impl Factor {
+    pub fn is_flatten(&self) -> bool {
+        self.flatten.unwrap_or_else(|| false)
+    }
+
+    pub fn is_date_or_time(&self) -> bool {
+        match self.r#type {
+            Some(FactorType::Date)
+            | Some(FactorType::Time)
+            | Some(FactorType::Datetime)
+            | Some(FactorType::FullDatetime)
+            | Some(FactorType::DateOfBirth) => true,
+            _ => false,
+        }
+    }
+
+    pub fn has_default_value(&self) -> bool {
+        self.default_value.is_some()
+    }
 }

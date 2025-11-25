@@ -327,6 +327,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "watchmen_meta_kernel"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "watchmen_model",
+]
+
+[[package]]
 name = "watchmen_model"
 version = "0.1.0"
 dependencies = [
@@ -351,6 +359,7 @@ name = "watchmen_pipeline_kernel"
 version = "0.1.0"
 dependencies = [
  "watchmen_auth",
+ "watchmen_meta_kernel",
  "watchmen_model",
 ]
 

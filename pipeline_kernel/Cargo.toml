@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 watchmen_model = { path = "../model" }
 watchmen_auth = { path = "../auth" }
+watchmen_meta_kernel = { path = "../meta_kernel" }

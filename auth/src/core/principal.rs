@@ -29,7 +29,8 @@ impl Principal {
             _ => false,
         }
     }
-    fn from_user(user: &User) -> Result<Principal, StdErr> {
+
+    pub fn from_user(user: User) -> Result<Principal, StdErr> {
         if user.tenant_id.is_none() {
             return StdErr::of(
                 AuthErrorCode::TenantIdMissedInUser.code(),
@@ -56,10 +57,10 @@ impl Principal {
         }
 
         Ok(Principal {
-            tenant_id: user.tenant_id.clone().unwrap(),
-            user_id: user.user_id.clone().unwrap(),
-            name: user.name.clone().unwrap(),
-            role: user.role.clone().unwrap(),
+            tenant_id: user.tenant_id.unwrap(),
+            user_id: user.user_id.unwrap(),
+            name: user.name.unwrap(),
+            role: user.role.unwrap(),
         })
     }
 
@@ -100,6 +101,6 @@ impl Principal {
         token: String,
     ) -> Result<Self, StdErr> {
         let user = authorization.authorize_token(scheme, token)?;
-        Principal::from_user(&user)
+        Principal::from_user(user)
     }
 }

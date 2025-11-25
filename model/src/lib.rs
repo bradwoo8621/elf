@@ -8,6 +8,7 @@ mod lineage;
 mod monitor;
 mod profile;
 mod system;
+mod utils;
 mod webhook;
 
 pub mod pipelines;
@@ -25,4 +26,5 @@ pub use monitor::*;
 pub use pipelines::*;
 pub use profile::*;
 pub use system::*;
+pub use utils::*;
 pub use webhook::*;
