@@ -1,9 +1,8 @@
 use watchmen_auth::Principal;
-use watchmen_meta_kernel::TopicSchema;
 use watchmen_model::{
-	PipelineTriggerData, PipelineTriggerTraceId, PipelineTriggerType, StdErr,
-	TopicDataId,
+    PipelineTriggerData, PipelineTriggerTraceId, PipelineTriggerType, StdErr, TopicDataId,
 };
+use watchmen_runtime_model_kernel::TopicSchema;
 
 type TopicDataService = String;
 type TopicTrigger = String;

@@ -1,5 +1,5 @@
 [package]
-name = "watchmen_meta_kernel"
+name = "watchmen_runtime_model_kernel"
 version = "0.1.0"
 edition = "2024"
 
