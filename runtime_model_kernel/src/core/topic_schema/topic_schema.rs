@@ -52,7 +52,7 @@ impl TopicSchema {
 
 #[cfg(test)]
 mod tests {
-    use watchmen_model::{Topic, TopicKind, TopicType};
+    use watchmen_model::{Factor, Topic, TopicKind, TopicType};
 
     fn create_sample_topic() -> Topic {
         Topic::new()
@@ -60,7 +60,11 @@ mod tests {
             .name(String::from("Sample Topic"))
             .r#type(TopicType::Raw)
             .kind(TopicKind::Business)
-            .factors(vec![])
+            .factors(vec![
+                Factor::new()
+                    .name(String::from("factor-1"))
+                    .default_value(String::from("abc")),
+            ])
             .tenant_id(String::from("Tenant-1"))
             .version(1)
     }

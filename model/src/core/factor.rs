@@ -1,7 +1,8 @@
 use crate::{BaseDataModel, EnumId, Storable};
+use std::cmp::PartialEq;
 use watchmen_model_marco::{adapt_model, Display, Serde, StrEnum};
 
-#[derive(Display, Serde, StrEnum)]
+#[derive(Display, Serde, PartialEq, StrEnum)]
 pub enum FactorType {
     Sequence,
     Number,
@@ -87,6 +88,81 @@ pub enum FactorType {
     Enum,
     Object,
     Array,
+}
+
+#[derive(PartialEq)]
+pub enum FactorTypeCategory {
+    Text,
+    TextLike,
+    EnumText,
+    Numeric,
+    DatetimeNumeric,
+    FullDatetime,
+    Datetime,
+    Date,
+    Time,
+    Boolean,
+    Complex,
+}
+
+impl FactorType {
+    pub fn category(&self) -> FactorTypeCategory {
+        match self {
+            FactorType::Text => FactorTypeCategory::Text,
+            FactorType::Address
+            | FactorType::Road
+            | FactorType::Community
+            | FactorType::Email
+            | FactorType::Phone
+            | FactorType::Mobile
+            | FactorType::Fax
+            | FactorType::Occupation
+            | FactorType::IdNo => FactorTypeCategory::TextLike,
+            FactorType::Continent
+            | FactorType::Region
+            | FactorType::Country
+            | FactorType::Province
+            | FactorType::City
+            | FactorType::District
+            | FactorType::ResidenceType
+            | FactorType::Gender
+            | FactorType::Religion
+            | FactorType::Nationality
+            | FactorType::BizTrade
+            | FactorType::Enum => FactorTypeCategory::EnumText,
+            FactorType::Sequence
+            | FactorType::Number
+            | FactorType::Unsigned
+            | FactorType::Floor
+            | FactorType::ResidentialArea
+            | FactorType::Age
+            | FactorType::BizScale => FactorTypeCategory::Numeric,
+            FactorType::Year
+            | FactorType::HalfYear
+            | FactorType::Quarter
+            | FactorType::Month
+            | FactorType::HalfMonth
+            | FactorType::TenDays
+            | FactorType::WeekOfYear
+            | FactorType::WeekOfMonth
+            | FactorType::HalfWeek
+            | FactorType::DayOfMonth
+            | FactorType::DayOfWeek
+            | FactorType::DayKind
+            | FactorType::Hour
+            | FactorType::HourKind
+            | FactorType::Minute
+            | FactorType::Second
+            | FactorType::Millisecond
+            | FactorType::AmPm => FactorTypeCategory::DatetimeNumeric,
+            FactorType::FullDatetime => FactorTypeCategory::FullDatetime,
+            FactorType::Datetime => FactorTypeCategory::Datetime,
+            FactorType::Date | FactorType::DateOfBirth => FactorTypeCategory::Date,
+            FactorType::Time => FactorTypeCategory::Time,
+            FactorType::Boolean => FactorTypeCategory::Boolean,
+            FactorType::Object | FactorType::Array => FactorTypeCategory::Complex,
+        }
+    }
 }
 
 #[derive(Display, Serde, StrEnum)]

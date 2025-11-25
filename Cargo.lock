@@ -359,6 +359,7 @@ dependencies = [
 name = "watchmen_runtime_model_kernel"
 version = "0.1.0"
 dependencies = [
+ "bigdecimal",
  "watchmen_model",
 ]
 
