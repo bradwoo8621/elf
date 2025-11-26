@@ -1,9 +1,9 @@
 use crate::{
     ArcTopic, TopicSchemaDefaultValueFactorGroup, TopicSchemaDefaultValueFactorGroups,
-    TopicSchemaFactorGroups,
+    TopicSchemaEncryptFactorGroup, TopicSchemaEncryptFactorGroups, TopicSchemaFactorGroups,
 };
 use std::sync::Arc;
-use watchmen_model::{Topic, TopicData};
+use watchmen_model::{Topic, TopicData, TopicKind};
 
 /// The schema of a topic, including various factor groups.
 /// all factor fields are optional, depending on whether the topic has the corresponding factors.
@@ -11,8 +11,8 @@ use watchmen_model::{Topic, TopicData};
 pub struct TopicSchema {
     topic: Arc<ArcTopic>,
     _flatten_factors: Option<String>, // Option<Arc<Vec<Arc<TopicSchemaFlattenFactor>>>>,
-    _date_or_time_factors: Option<String>, // Option<Arc<Vec<Arc<TopicSchemaDateOrTimeFactor>>>>,
-    _encrypt_factor_groups: Option<String>, // Option<Arc<Vec<Arc<TopicSchemaEncryptFactor>>>>,
+    _date_or_time_factors: Option<String>, // Option<Arc<Vec<Arc<TopicSchemaDateOrTimeFactorGroup>>>>,
+    encrypt_factor_groups: Option<Arc<Vec<Arc<TopicSchemaEncryptFactorGroup>>>>,
     default_value_factor_groups: Option<Arc<Vec<Arc<TopicSchemaDefaultValueFactorGroup>>>>,
 }
 
@@ -23,7 +23,7 @@ impl TopicSchema {
             topic: arc_topic.clone(),
             _flatten_factors: None,
             _date_or_time_factors: None,
-            _encrypt_factor_groups: None,
+            encrypt_factor_groups: TopicSchemaEncryptFactorGroups::create(&arc_topic),
             default_value_factor_groups: TopicSchemaDefaultValueFactorGroups::create(&arc_topic),
         }
     }
@@ -39,12 +39,30 @@ impl TopicSchema {
         }
     }
 
-    /// given data might be changed, and returns exactly the given one
+    /// given data might be changed
     pub fn initialize_default_values(&self, data: &mut TopicData) {
         if self.should_init_default_values() {
             self.default_value_factor_groups.as_deref().map(|groups| {
                 for group in groups.iter() {
                     group.init_default_value(data);
+                }
+            });
+        }
+    }
+
+    fn should_encrypt(&self) -> bool {
+        match self.topic().kind.as_deref().unwrap_or(&TopicKind::Business) {
+            TopicKind::System => false,
+            _ => true,
+        }
+    }
+
+    /// given data might be changed
+    pub fn encrypt(&self, data: &mut TopicData) {
+        if self.should_encrypt() {
+            self.encrypt_factor_groups.as_deref().map(|groups| {
+                for group in groups.iter() {
+                    group.encrypt(data);
                 }
             });
         }
