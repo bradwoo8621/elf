@@ -1,6 +1,4 @@
-use crate::{
-    BaseDataModel, PipelineTriggerType, Storable, TenantId, TopicData, TopicDataId,
-};
+use crate::{BaseDataModel, PipelineTriggerType, Storable, TenantId, TopicCode, TopicData, TopicDataId};
 use watchmen_model_marco::adapt_model;
 
 pub type PipelineTriggerTraceId = String;
@@ -8,7 +6,7 @@ pub type PipelineTriggerTraceId = String;
 #[adapt_model(storable)]
 pub struct PipelineTriggerData {
     /// topic name
-    pub code: Option<String>,
+    pub code: Option<TopicCode>,
     /// current data
     pub data: Option<TopicData>,
     pub trigger_type: Option<PipelineTriggerType>,

@@ -34,11 +34,13 @@ impl TopicType {
 }
 
 pub type TopicId = String;
+pub type TopicCode = String;
 
 #[adapt_model(opt_lock, tenant_based)]
 pub struct Topic {
     pub topic_id: Option<TopicId>,
-    pub name: Option<String>,
+    /// must be unique within a tenant
+    pub name: Option<TopicCode>,
     pub r#type: Option<TopicType>,
     pub kind: Option<TopicKind>,
     pub data_source_id: Option<DataSourceId>,

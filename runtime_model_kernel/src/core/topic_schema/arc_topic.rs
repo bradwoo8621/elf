@@ -1,6 +1,6 @@
 use crate::ArcFactor;
 use std::sync::Arc;
-use watchmen_model::{DataSourceId, TenantId, Topic, TopicId, TopicKind, TopicType};
+use watchmen_model::{DataSourceId, TenantId, Topic, TopicCode, TopicId, TopicKind, TopicType};
 
 /// An Arc-wrapped version of Topic for shared ownership and thread safety.
 /// This struct uses Arc pointers for each field to allow efficient sharing
@@ -10,7 +10,7 @@ use watchmen_model::{DataSourceId, TenantId, Topic, TopicId, TopicKind, TopicTyp
 #[derive(Debug)]
 pub struct ArcTopic {
     pub topic_id: Option<Arc<TopicId>>,
-    pub name: Option<Arc<String>>,
+    pub name: Option<Arc<TopicCode>>,
     pub r#type: Option<Arc<TopicType>>,
     pub kind: Option<Arc<TopicKind>>,
     pub data_source_id: Option<Arc<DataSourceId>>,

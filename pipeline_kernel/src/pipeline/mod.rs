@@ -1,3 +1,3 @@
-mod invoker;
+mod entrypoint;
 
-pub use invoker::*;
+pub use entrypoint::*;
