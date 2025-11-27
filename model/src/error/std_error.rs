@@ -2,6 +2,17 @@ use serde::Serialize;
 
 pub trait StdErrorCode {
     fn code(&self) -> &'static str;
+
+    fn msg<R, M>(&self, msg: M) -> StdR<R>
+    where
+        M: Into<String>,
+    {
+        StdErr::of(self.code(), msg.into())
+    }
+
+    fn err<R>(&self) -> StdR<R> {
+        StdErr::code_only(self.code())
+    }
 }
 
 pub enum StdErrCode {
@@ -50,8 +61,7 @@ impl StdErr {
         })
     }
 
-    /// code only
-    pub fn co<R>(code: &'static str) -> Result<R, Self> {
+    pub fn code_only<R>(code: &'static str) -> Result<R, Self> {
         Err(StdErr {
             code,
             details: None,
@@ -59,7 +69,7 @@ impl StdErr {
     }
 
     /// message only
-    pub fn mo<R, M>(msg: M) -> Result<R, Self>
+    pub fn unknown<R, M>(msg: M) -> Result<R, Self>
     where
         M: Into<String>,
     {
@@ -69,8 +79,7 @@ impl StdErr {
         })
     }
 
-    /// multiple sub errors
-    pub fn me<R>(details: Vec<StdErr>) -> Result<R, Self> {
+    pub fn accumulate<R>(details: Vec<StdErr>) -> StdR<R> {
         Err(StdErr {
             code: StdErrCode::Multiple.code(),
             details: Some(StdErrDetails::Sub(details)),
@@ -80,3 +89,25 @@ impl StdErr {
 
 pub type StdR<T> = Result<T, StdErr>;
 pub type VoidR = StdR<()>;
+
+pub trait VoidResultHelper {
+    fn collect(self, result: VoidR) -> Self;
+    fn accumulate(self) -> VoidR;
+}
+
+impl VoidResultHelper for Vec<StdErr> {
+    fn collect(mut self, result: VoidR) -> Self {
+        if let Err(e) = result {
+            self.push(e);
+        }
+        self
+    }
+
+    fn accumulate(mut self) -> VoidR {
+        match self.len() {
+            0 => Ok(()),
+            1 => Err(self.remove(0)),
+            _ => StdErr::accumulate(self),
+        }
+    }
+}

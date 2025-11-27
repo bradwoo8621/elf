@@ -1,5 +1,5 @@
 use crate::{AuthErrorCode, AuthenticationManager, AuthenticationScheme};
-use watchmen_model::{StdErr, StdErrorCode, StdR, User, UserRole};
+use watchmen_model::{StdErrorCode, StdR, User, UserRole};
 
 pub struct Authorization {
     // TODO where to get the authenticator?
@@ -25,15 +25,15 @@ impl Authorization {
                         Ok(u)
                     } else {
                         // given user role is not allowed
-                        StdErr::of(AuthErrorCode::Forbidden.code(), "Forbidden")
+                        AuthErrorCode::Forbidden.msg("Forbidden")
                     }
                 } else {
                     // user has no role assigned
-                    StdErr::of(AuthErrorCode::Unauthorized.code(), "Unauthorized")
+                    AuthErrorCode::Unauthorized.msg("Unauthorized")
                 }
             }
             // no user authenticated
-            None => StdErr::of(AuthErrorCode::Unauthorized.code(), "Unauthorized"),
+            None => AuthErrorCode::Unauthorized.msg("Unauthorized"),
         }
     }
 
@@ -41,7 +41,7 @@ impl Authorization {
         if let Ok(user) = self.authenticator.authenticate(scheme, token) {
             self.authorize(Some(user))
         } else {
-            StdErr::of(AuthErrorCode::Unauthorized.code(), "Unauthorized")
+            AuthErrorCode::Unauthorized.msg("Unauthorized")
         }
     }
 }

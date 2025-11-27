@@ -1,4 +1,4 @@
-use crate::{StdErr, StdErrCode, StdErrorCode, StdR};
+use crate::{StdErrCode, StdErrorCode, StdR};
 use bigdecimal::BigDecimal;
 use std::str::FromStr;
 
@@ -17,10 +17,7 @@ impl NumericUtils for String {
         if let Ok(v) = BigDecimal::from_str(&self) {
             Ok(v)
         } else {
-            StdErr::of(
-                StdErrCode::DecimalParse.code(),
-                format!("Cannot parse '{}' to decimal", self),
-            )
+            StdErrCode::DecimalParse.msg(format!("Cannot parse '{}' to decimal", self))
         }
     }
 }

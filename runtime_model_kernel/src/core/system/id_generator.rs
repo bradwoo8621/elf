@@ -1,7 +1,7 @@
 use crate::RuntimeModelKernelErrorCode;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
-use watchmen_model::{StdErr, StdErrorCode, StdR};
+use watchmen_model::{StdErrorCode, StdR};
 
 /// max to 20 digits numbers
 pub trait IdGenerator {
@@ -54,10 +54,10 @@ pub struct SnowflakeIdGenerator {
 impl SnowflakeIdGenerator {
     pub fn new(node_id: u64) -> StdR<Self> {
         if node_id > MAX_NODE_ID {
-            StdErr::of(
-                RuntimeModelKernelErrorCode::SnowflakeNodeIdTooBig.code(),
-                format!("Snowflake id generator node id must be <= {}.", MAX_NODE_ID),
-            )
+            RuntimeModelKernelErrorCode::SnowflakeNodeIdTooBig.msg(format!(
+                "Snowflake id generator node id must be <= {}.",
+                MAX_NODE_ID
+            ))
         } else {
             Ok(Self {
                 node_id,

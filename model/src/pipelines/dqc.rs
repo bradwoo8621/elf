@@ -16,7 +16,7 @@ fn find_topic<'a>(topics: &'a Vec<Topic>, topic_name: &'static str) -> StdR<&'a 
     if let Some(topic) = found {
         Ok(topic)
     } else {
-        StdErr::mo(format!("Topic[{}] not found.", topic_name))
+        StdErr::unknown(format!("Topic[{}] not found.", topic_name))
     }
 }
 
@@ -24,7 +24,7 @@ fn find_topic_id(topic: &Topic) -> StdR<&TopicId> {
     if let Some(topic_id) = &topic.topic_id {
         Ok(topic_id)
     } else {
-        StdErr::mo(format!("Topic[{:?}] has no factor_id value.", &topic.name))
+        StdErr::unknown(format!("Topic[{:?}] has no factor_id value.", &topic.name))
     }
 }
 
@@ -45,10 +45,10 @@ fn find_factor_id<'a>(topic: &'a Topic, factor_name: &'static str) -> StdR<&'a F
         if let Some(factor_id) = &factor.factor_id {
             Ok(factor_id)
         } else {
-            StdErr::mo(format!("Factor[{}] has no factor_id value.", factor_name))
+            StdErr::unknown(format!("Factor[{}] has no factor_id value.", factor_name))
         }
     } else {
-        StdErr::mo(format!("Factor[{}] not found.", factor_name))
+        StdErr::unknown(format!("Factor[{}] not found.", factor_name))
     }
 }
 

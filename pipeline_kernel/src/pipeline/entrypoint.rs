@@ -1,7 +1,7 @@
 use crate::PipelineKernelErrorCode;
 use watchmen_auth::Principal;
 use watchmen_model::{
-    PipelineTriggerData, PipelineTriggerTraceId, StdErr, StdErrorCode, StdR, StringUtils,
+    PipelineTriggerData, PipelineTriggerTraceId, StdErrorCode, StdR, StringUtils, VoidResultHelper,
     TopicDataId, VoidR,
 };
 
@@ -23,75 +23,67 @@ impl PipelineEntrypoint {
         self
     }
 
-    fn check_trigger_code(trigger_data: &PipelineTriggerData) -> VoidR {
+    fn check_trigger_code(&self, trigger_data: &PipelineTriggerData) -> VoidR {
         if let Some(code) = &trigger_data.code {
             if code.is_blank() {
-                StdErr::of(
-                    PipelineKernelErrorCode::TriggerCodeIsBlank.code(),
-                    "Pipeline trigger code cannot be blank.",
-                )
+                PipelineKernelErrorCode::TriggerCodeIsBlank
+                    .msg("Pipeline trigger code cannot be blank.")
             } else {
                 Ok(())
             }
         } else {
-            StdErr::of(
-                PipelineKernelErrorCode::TriggerCodeMissed.code(),
-                "Pipeline trigger code cannot be empty.",
-            )
+            PipelineKernelErrorCode::TriggerCodeMissed.msg("Pipeline trigger code cannot be empty.")
         }
     }
 
-    fn check_trigger_type(trigger_data: &PipelineTriggerData) -> VoidR {
+    fn check_trigger_type(&self, trigger_data: &PipelineTriggerData) -> VoidR {
         if trigger_data.trigger_type.is_none() {
-            StdErr::of(
-                PipelineKernelErrorCode::TriggerTypeMissed.code(),
-                "Pipeline trigger type cannot be empty.",
-            )
+            PipelineKernelErrorCode::TriggerTypeMissed.msg("Pipeline trigger type cannot be empty.")
         } else {
             Ok(())
         }
     }
 
-    fn check_trigger_data(trigger_data: &PipelineTriggerData) -> VoidR {
+    fn check_trigger_data(&self, trigger_data: &PipelineTriggerData) -> VoidR {
         if trigger_data.data.is_none() {
-            StdErr::of(
-                PipelineKernelErrorCode::TriggerDataMissed.code(),
-                "Pipeline trigger data cannot be empty.",
-            )
+            PipelineKernelErrorCode::TriggerDataMissed.msg("Pipeline trigger data cannot be empty.")
         } else {
             Ok(())
         }
     }
 
-    fn check(trigger_data: &PipelineTriggerData) -> VoidR {
-        let mut errors = Vec::new();
-        vec![
-            PipelineEntrypoint::check_trigger_code,
-            PipelineEntrypoint::check_trigger_type,
-            PipelineEntrypoint::check_trigger_data,
-        ]
-        .iter()
-        .for_each(|f| {
-            if let Err(e) = f(trigger_data) {
-                errors.push(e);
-            }
-        });
+    fn check_trigger_access(&self, trigger_data: &PipelineTriggerData) -> VoidR {
+        let principal = &self.principal;
+        let opt_tenant_id = &trigger_data.tenant_id;
 
-        match errors.len() {
-            0 => Ok(()),
-            1 => Err(errors.remove(0)),
-            _ => StdErr::me(errors),
+        if principal.is_super_admin() {
+            if opt_tenant_id.is_none() {
+                return PipelineKernelErrorCode::TriggerTenantIdMissed.msg(
+                    "Pipeline trigger tenant id cannot be empty when triggered by super admin.",
+                );
+            }
+        } else {
         }
+        Ok(())
+    }
+
+    fn check(&self, trigger_data: &PipelineTriggerData) -> VoidR {
+        Vec::new()
+            .collect(self.check_trigger_access(trigger_data))
+            .collect(self.check_trigger_code(trigger_data))
+            .collect(self.check_trigger_type(trigger_data))
+            .collect(self.check_trigger_data(trigger_data))
+            .accumulate()
     }
 
     pub fn execute(&self, trigger_data: PipelineTriggerData) -> StdR<TopicDataId> {
-        PipelineEntrypoint::check(&trigger_data)?;
+        self.check(&trigger_data)?;
 
         todo!("implement execute for PipelineEntrypoint")
     }
 
     pub async fn execute_async(&self, trigger_data: PipelineTriggerData) -> StdR<TopicDataId> {
-        PipelineEntrypoint::check(&trigger_data)?;
+        self.check(&trigger_data)?;
 
         todo!("implement execute_async for PipelineEntrypoint")
     }

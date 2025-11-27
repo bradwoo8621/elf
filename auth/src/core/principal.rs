@@ -1,5 +1,5 @@
 use crate::{AuthErrorCode, AuthenticationScheme, Authorization};
-use watchmen_model::{StdErr, StdErrorCode, StdR, TenantId, User, UserId, UserRole};
+use watchmen_model::{StdErrorCode, StdR, TenantId, User, UserId, UserRole};
 
 pub struct Principal {
     pub tenant_id: TenantId,
@@ -32,28 +32,16 @@ impl Principal {
 
     pub fn from_user(user: User) -> StdR<Principal> {
         if user.tenant_id.is_none() {
-            return StdErr::of(
-                AuthErrorCode::TenantIdMissedInUser.code(),
-                "Tenant id is missing in user.",
-            );
+            return AuthErrorCode::TenantIdMissedInUser.msg("Tenant id is missing in user.");
         }
         if user.user_id.is_none() {
-            return StdErr::of(
-                AuthErrorCode::UserIdMissedInUser.code(),
-                "User id is missing in user.",
-            );
+            return AuthErrorCode::UserIdMissedInUser.msg("User id is missing in user.");
         }
         if user.name.is_none() {
-            return StdErr::of(
-                AuthErrorCode::NameMissedInUser.code(),
-                "Name is missing in user.",
-            );
+            return AuthErrorCode::NameMissedInUser.msg("Name is missing in user.");
         }
         if user.role.is_none() {
-            return StdErr::of(
-                AuthErrorCode::RoleMissedInUser.code(),
-                "Role is missing in user.",
-            );
+            return AuthErrorCode::RoleMissedInUser.msg("Role is missing in user.");
         }
 
         Ok(Principal {

@@ -1,5 +1,5 @@
 use crate::{AuthErrorCode, AuthenticationDetails, AuthenticationProvider, AuthenticationScheme};
-use watchmen_model::{StdErr, StdErrorCode, StdR, User};
+use watchmen_model::{StdErrorCode, StdR, User};
 
 pub struct AuthenticationManager {
     providers: Vec<Box<dyn AuthenticationProvider>>,
@@ -32,10 +32,7 @@ impl AuthenticationManager {
                 }
             }
         }
-        StdErr::of(
-            AuthErrorCode::AuthenticationFailed.code(),
-            "Authentication failed",
-        )
+        AuthErrorCode::AuthenticationFailed.msg("Authentication failed")
     }
 
     pub fn authenticate(&self, scheme: AuthenticationScheme, token: String) -> StdR<User> {
