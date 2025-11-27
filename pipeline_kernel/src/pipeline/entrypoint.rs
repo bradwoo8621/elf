@@ -13,8 +13,8 @@ struct CheckedPipelineTriggerData {
     /// current data
     trigger_data: TopicData,
     trigger_type: PipelineTriggerType,
-    principal: Arc<Principal>,
-    trace_id: Arc<PipelineTriggerTraceId>,
+    principal: Principal,
+    trace_id: PipelineTriggerTraceId,
 }
 
 pub struct PipelineEntrypoint {
@@ -134,21 +134,24 @@ impl PipelineEntrypoint {
             topic_schema,
             trigger_data: trigger_data.data.unwrap(),
             trigger_type: trigger_data.trigger_type.unwrap(),
-            principal: Arc::new(execute_principal),
-            trace_id: Arc::new(trace_id),
+            principal: execute_principal,
+            trace_id,
         })
     }
 
     fn create_trigger(&self, trigger_data: CheckedPipelineTriggerData) -> PipelineTrigger {
+        let principal = Arc::new(trigger_data.principal);
+        let trace_id = Arc::new(trigger_data.trace_id);
+
         PipelineTrigger {
             topic_schema: trigger_data.topic_schema,
             data: trigger_data.trigger_data,
             r#type: trigger_data.trigger_type,
-            trace_id: trigger_data.trace_id.clone(),
-            principal: trigger_data.principal.clone(),
+            trace_id: trace_id.clone(),
+            principal: principal.clone(),
             execution_log_monitor: PipelineExecutionLogMonitor {
-                trace_id: trigger_data.trace_id,
-                principal: trigger_data.principal,
+                trace_id,
+                principal,
             },
         }
     }
