@@ -5,7 +5,7 @@ use watchmen_model::{
     PipelineTriggerData, PipelineTriggerTraceId, PipelineTriggerType, StdErrorCode, StdR,
     StringUtils, TopicCode, TopicData, TopicDataId, UserRole, VoidR, VoidResultHelper,
 };
-use watchmen_runtime_model_kernel::{IdGenerator, TopicSchema};
+use watchmen_runtime_model_kernel::{IdGen, TopicMetaService, TopicSchema};
 
 struct CheckedPipelineTriggerData {
     /// topic name
@@ -102,11 +102,7 @@ impl PipelineEntrypoint {
     }
 
     fn find_topic_schema(&self, _code: TopicCode) -> StdR<TopicSchema> {
-        todo!("implement find_topic_schema for PipelineEntrypoint")
-    }
-
-    fn ask_trace_id_generator(&self) -> StdR<Arc<dyn IdGenerator>> {
-        todo!("implement ask_trace_id_generator for PipelineEntrypoint")
+        TopicMetaService::with(self.principal.tenant_id.clone()).find_topic_schema()
     }
 
     fn check_and_prepare(
@@ -137,7 +133,7 @@ impl PipelineEntrypoint {
         let trace_id = if let Some(trace_id) = &self.trace_id {
             trace_id.clone()
         } else {
-            self.ask_trace_id_generator()?.next_id().to_string()
+            IdGen::next_id()?.to_string()
         };
 
         Ok(CheckedPipelineTriggerData {

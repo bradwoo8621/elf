@@ -1,9 +1,8 @@
-use crate::IdGenerator;
+use crate::IdGen;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::sync::Arc;
-use watchmen_model::{TopicData, TopicDataValue};
+use watchmen_model::{TopicData, TopicDataValue, VoidR};
 
 const MY_AID_ID: &'static str = "aid_me";
 const AID_ROOT: &'static str = "aid_root";
@@ -15,13 +14,11 @@ pub struct Ancestor {
     aid_id: String,
 }
 
-pub struct HierarchyAid {
-    id_generator: Arc<dyn IdGenerator>,
-}
+pub struct HierarchyAid;
 
 impl HierarchyAid {
-    pub fn new(id_generator: Arc<dyn IdGenerator>) -> Self {
-        HierarchyAid { id_generator }
+    pub fn new() -> Self {
+        HierarchyAid {}
     }
 
     /// apply ancestor aid id to given data.\n
@@ -80,9 +77,9 @@ impl HierarchyAid {
     }
 
     /// given data should be modified
-    fn do_aid(&self, data: &mut TopicData, ancestors: &Vec<Rc<Ancestor>>) {
+    fn do_aid(&self, data: &mut TopicData, ancestors: &Vec<Rc<Ancestor>>) -> VoidR {
         // create aid me
-        let aid_id_of_me = self.id_generator.next_id();
+        let aid_id_of_me = IdGen::next_id()?;
         data.insert(
             MY_AID_ID.to_string(),
             TopicDataValue::Str(aid_id_of_me.to_string()),
@@ -100,28 +97,31 @@ impl HierarchyAid {
             );
         });
 
-        data.iter_mut().for_each(|(name, value)| {
+        for (name, value) in data.iter_mut() {
             match value {
                 TopicDataValue::Map(map) => self.do_aid(
                     map,
                     &self.append_ancestor(ancestors, name.clone(), aid_id_of_me),
-                ),
+                )?,
                 TopicDataValue::Vec(vec) => {
                     let ancestors_of_sub =
                         self.append_ancestor(ancestors, name.clone(), aid_id_of_me);
-                    vec.iter_mut().for_each(|row| match row {
-                        TopicDataValue::Map(map) => self.do_aid(map, &ancestors_of_sub),
-                        // otherwise do nothing, even if it is a vec
-                        _ => {}
-                    })
+                    for row in vec.iter_mut() {
+                        match row {
+                            TopicDataValue::Map(map) => self.do_aid(map, &ancestors_of_sub)?,
+                            // TIP otherwise do nothing, even if it is a vec
+                            _ => {}
+                        }
+                    }
                 }
                 // otherwise do nothing
                 _ => {}
             }
-        });
+        }
+        Ok(())
     }
 
-    pub fn aid(&self, data: &mut TopicData) {
-        self.do_aid(data, &vec![]);
+    pub fn aid(&self, data: &mut TopicData) -> VoidR {
+        self.do_aid(data, &vec![])
     }
 }

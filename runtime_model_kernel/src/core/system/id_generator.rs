@@ -50,6 +50,8 @@ impl IdGen {
 #[cfg(test)]
 mod tests {
     use crate::{IdGen, IdGenerator, SnowflakeIdGenerator};
+    use std::thread;
+    use std::time::Instant;
     // use std::panic;
 
     // #[test]
@@ -71,5 +73,30 @@ mod tests {
         let id = IdGen::next_id().expect("failed to get next id by SnowflakeIdGenerator");
         println!("{}", id);
         assert!(id > 1);
+
+        let mut handles = vec![];
+
+        let start = Instant::now();
+        for idx in 0..10 {
+            let handle = thread::spawn(move || {
+                let id = IdGen::next_id().expect(
+                    format!(
+                        "failed to get next id by SnowflakeIdGenerator at thread[{}]",
+                        idx
+                    )
+                    .as_str(),
+                );
+                println!("{}", id);
+                assert!(id > 1);
+            });
+            handles.push(handle);
+        }
+
+        for handle in handles {
+            handle.join().expect("Thread panicked");
+        }
+
+        let end = Instant::now();
+        println!("execution spent: {:?}", end - start);
     }
 }
