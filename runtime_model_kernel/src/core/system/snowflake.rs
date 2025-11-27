@@ -13,8 +13,8 @@ const MAX_SEQUENCE: u64 = (1 << SEQUENCE_BITS) - 1;
 const NODE_SHIFT: u8 = SEQUENCE_BITS;
 const TIMESTAMP_SHIFT: u8 = SEQUENCE_BITS + NODE_ID_BITS;
 
-/// 2025-11-27 12:00:00.000, time when create this
-const EPOCH_MS: u128 = 1764244800000;
+/// 2014-12-31 16:00:00, copy from python version
+const EPOCH_MS: u128 = 1420041600000;
 
 /// max value is [99_999_999_999_998_951_423], and in radix 2, which is [2^66 - 1].
 /// - the max value of radix 10, is [99_999_999_999_999_999_999],
@@ -76,11 +76,9 @@ impl IdGenerator for SnowflakeIdGenerator {
         let mut seq = self.sequence.lock().unwrap();
 
         let ts = SnowflakeIdGenerator::current_millis();
-        // relative timestamp since configured epoch
-        let rel_ts = ts.saturating_sub(EPOCH_MS);
 
         // handle clock going backwards by waiting until time catches up
-        if rel_ts <= *last_ts {
+        if ts <= *last_ts {
             // when relative timestamp is greater than last timestamp,
             // means all sequences of relative timestamp are consumed already.
             // never mind, just continue consuming the last timestamp's.
@@ -93,11 +91,12 @@ impl IdGenerator for SnowflakeIdGenerator {
             }
         } else {
             *seq = 0;
-            *last_ts = rel_ts;
+            *last_ts = ts;
         }
 
-        let id =
-            ((rel_ts) << TIMESTAMP_SHIFT) | ((self.node_id as u128) << NODE_SHIFT) | (*seq as u128);
+        let id = ((ts.saturating_sub(EPOCH_MS)) << TIMESTAMP_SHIFT)
+            | ((self.node_id as u128) << NODE_SHIFT)
+            | (*seq as u128);
 
         // safety: our bit allocation keeps id well below the max value
         debug_assert!(id <= 99_999_999_999_998_951_423u128);
@@ -107,9 +106,9 @@ impl IdGenerator for SnowflakeIdGenerator {
 
 #[cfg(test)]
 mod tests {
-	use chrono::NaiveDateTime;
+    use chrono::{DateTime, NaiveDateTime};
 
-	#[test]
+    #[test]
     fn test_() {
         let millis: u128 = 0b101_01101_01111_00011_10101_11100_01011_01011_00010;
         let years: f64 = millis as f64 / 1000.0 / 60.0 / 60.0 / 24.0 / 365.0;
@@ -134,11 +133,18 @@ mod tests {
             "101011010111100011101011110001011010110001                         ", //  2980232238769, 94.5y
         ];
 
-        let specific_date_str = "2025-11-27 12:00:00.000";
+        let specific_date_str = "2020-11-27 12:00:00.000";
         let specific_date =
             NaiveDateTime::parse_from_str(specific_date_str, "%Y-%m-%d %H:%M:%S%.3f").unwrap();
 
         let timestamp_millis = specific_date.and_utc().timestamp_millis();
         println!("{}, {}", specific_date_str, timestamp_millis);
+
+        let seconds = 1420041600000 / 1000;
+        let subsec_millis = (1420041600000i64 % 1000) as u32;
+        println!(
+            "{:?}",
+            DateTime::from_timestamp(seconds, subsec_millis * 1_000_000)
+        )
     }
 }

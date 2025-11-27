@@ -32,7 +32,7 @@ impl StdErrorCode for StdErrCode {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 #[serde(untagged)]
 pub enum StdErrDetails {
     Str(String),
@@ -43,7 +43,7 @@ pub enum StdErrDetails {
 /// However, in normal use, you should try to keep it to two levels.
 ///
 /// Convert other types of exceptions to this exception to enable the use of the `?` syntactic sugar.
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct StdErr {
     /// code must be [XXXX-99999], each module has its own code prefix [XXXX]
     code: &'static str,
