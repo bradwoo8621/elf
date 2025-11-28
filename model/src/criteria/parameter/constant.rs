@@ -38,11 +38,11 @@ pub struct ConstantParameter {
 
 impl ConstantParameter {
     pub fn init() -> Self {
-        ConstantParameter::new().kind(ParameterKind::Constant)
+        Self::new().kind(ParameterKind::Constant)
     }
 
     pub fn of(value: String) -> Self {
-        ConstantParameter::init().value(value)
+        Self::init().value(value)
     }
 
     pub fn to_parameter(self) -> Parameter {

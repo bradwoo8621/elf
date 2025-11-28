@@ -13,7 +13,7 @@ impl Principal {
     /// switch to given tenant and role
     /// keep the user
     pub fn switch_tenant(&self, tenant_id: TenantId, role: UserRole) -> Self {
-        Principal {
+        Self {
             tenant_id,
             user_id: self.user_id.clone(),
             name: self.name.clone(),
@@ -101,6 +101,6 @@ impl Principal {
         token: String,
     ) -> StdR<Self> {
         let user = authorization.authorize_token(scheme, token)?;
-        Principal::from_user(user)
+        Self::from_user(user)
     }
 }

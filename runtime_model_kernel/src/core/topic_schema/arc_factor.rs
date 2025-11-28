@@ -20,7 +20,7 @@ pub struct ArcFactor {
 }
 
 impl ArcFactor {
-    pub fn from(factor: Factor) -> StdR<Arc<ArcFactor>> {
+    pub fn new(factor: Factor) -> StdR<Arc<Self>> {
         if factor.name.is_none() {
             return RuntimeModelKernelErrorCode::FactorNameMissed.msg("Factor must have a name.");
         }
@@ -29,7 +29,7 @@ impl ArcFactor {
             return RuntimeModelKernelErrorCode::FactorTypeMissed.msg("Factor must have a name.");
         }
 
-        Ok(Arc::new(ArcFactor {
+        Ok(Arc::new(Self {
             factor_id: factor.factor_id.map(Arc::new),
             r#type: Arc::new(factor.r#type.unwrap()),
             name,

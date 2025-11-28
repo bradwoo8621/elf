@@ -2,10 +2,10 @@ use crate::{PipelineExecutionLogMonitor, PipelineKernelErrorCode, PipelineTrigge
 use std::sync::Arc;
 use watchmen_auth::Principal;
 use watchmen_model::{
-    PipelineTriggerData, PipelineTriggerTraceId, PipelineTriggerType, StdErrorCode, StdR,
-    StringUtils, TopicCode, TopicData, TopicDataId, UserRole, VoidR, VoidResultHelper,
+    PipelineId, PipelineTriggerData, PipelineTriggerTraceId, PipelineTriggerType, StdErrorCode,
+    StdR, StringUtils, TopicCode, TopicData, TopicDataId, UserRole, VoidR, VoidResultHelper,
 };
-use watchmen_runtime_model_kernel::{IdGen, TopicMetaService, TopicSchema};
+use watchmen_runtime_model_kernel::{IdGen, TopicSchema, TopicSchemaService};
 
 /// This is the main entry point for executing pipelines.
 /// At this point, the specific pipelines to be executed are not yet known.
@@ -19,6 +19,7 @@ use watchmen_runtime_model_kernel::{IdGen, TopicMetaService, TopicSchema};
 ///   then the trace id needs to be provided; otherwise, it is not required.
 pub struct PipelineEntrypoint {
     principal: Principal,
+    pipeline_id: Option<PipelineId>,
     trace_id: Option<PipelineTriggerTraceId>,
 }
 
@@ -26,13 +27,28 @@ impl PipelineEntrypoint {
     pub fn with(principal: Principal) -> Self {
         PipelineEntrypoint {
             principal,
+            pipeline_id: None,
             trace_id: None,
         }
     }
 
-    pub fn traced_with(mut self, trace_id: PipelineTriggerTraceId) -> Self {
-        self.trace_id = Some(trace_id);
-        self
+    pub fn pipeline(mut self, pipeline_id: PipelineId) -> StdR<Self> {
+        if pipeline_id.is_blank() {
+            PipelineKernelErrorCode::TriggerPipelineIdIsBlank
+                .msg("Given pipeline id cannot be blank")
+        } else {
+            self.pipeline_id = Some(pipeline_id);
+            Ok(self)
+        }
+    }
+
+    pub fn traced_with(mut self, trace_id: PipelineTriggerTraceId) -> StdR<Self> {
+        if trace_id.is_blank() {
+            PipelineKernelErrorCode::TriggerTraceIdIsBlank.msg("Given pipeline id cannot be blank")
+        } else {
+            self.trace_id = Some(trace_id);
+            Ok(self)
+        }
     }
 
     fn check_trigger_code(&self, trigger_data: &PipelineTriggerData) -> VoidR {
@@ -123,12 +139,12 @@ impl PipelineEntrypoint {
         Ok(())
     }
 
-    fn find_topic_meta_service(&self) -> StdR<Arc<TopicMetaService>> {
-        TopicMetaService::with(&self.principal.tenant_id)
+    fn find_topic_meta_service(&self) -> StdR<Arc<TopicSchemaService>> {
+        TopicSchemaService::with(&self.principal.tenant_id)
     }
 
     fn find_topic_schema(&self, code: &TopicCode) -> StdR<Arc<TopicSchema>> {
-        self.find_topic_meta_service()?.find_topic_schema(code)
+        self.find_topic_meta_service()?.find_by_code(code)
     }
 
     fn check_and_prepare(
@@ -166,6 +182,7 @@ impl PipelineEntrypoint {
         let principal = Arc::new(execute_principal);
         let trace_id = Arc::new(trace_id);
         let pipeline_trigger = PipelineTrigger {
+            pipeline_id: self.pipeline_id.clone(),
             topic_schema,
             r#type: trigger_data.trigger_type.unwrap(),
             trace_id: trace_id.clone(),
@@ -203,7 +220,8 @@ mod tests {
             .trigger_type(PipelineTriggerType::Insert)
             .tenant_id(String::from("tenant-1"));
         let result = PipelineEntrypoint::with(Principal::fake_super_admin())
-            .traced_with("".to_string())
+            .traced_with("123".to_string())
+            .expect("trace id cannot be blank")
             .execute(trigger_data);
         assert!(result.is_ok());
     }

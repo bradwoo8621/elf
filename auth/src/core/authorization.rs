@@ -10,7 +10,7 @@ pub struct Authorization {
 
 impl Authorization {
     pub fn new(authenticator: AuthenticationManager, roles: Vec<UserRole>) -> Self {
-        Authorization {
+        Self {
             authenticator,
             roles,
         }

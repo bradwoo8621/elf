@@ -13,6 +13,10 @@ pub enum PipelineKernelErrorCode {
     TopicDataIdNotFound,
     TopicDataIdTypeNotSupported,
     TriggerTypeNotSupportedOnRaw,
+    TriggerPipelineIdIsBlank,
+    TriggerTraceIdIsBlank,
+    TriggerTypeMismatchPipeline,
+    TriggerPipelineNotFound
 }
 
 impl StdErrorCode for PipelineKernelErrorCode {
@@ -30,6 +34,10 @@ impl StdErrorCode for PipelineKernelErrorCode {
             PipelineKernelErrorCode::TopicDataIdNotFound => "PLKN-000010",
             PipelineKernelErrorCode::TopicDataIdTypeNotSupported => "PLKN-000011",
             PipelineKernelErrorCode::TriggerTypeNotSupportedOnRaw => "PLKN-000012",
+            PipelineKernelErrorCode::TriggerPipelineIdIsBlank => "PLKN-000013",
+            PipelineKernelErrorCode::TriggerTraceIdIsBlank => "PLKN-000014",
+            PipelineKernelErrorCode::TriggerTypeMismatchPipeline => "PLKN-000015",
+            PipelineKernelErrorCode::TriggerPipelineNotFound => "PLKN-000016",
         }
     }
 }

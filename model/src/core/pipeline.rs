@@ -476,7 +476,7 @@ pub struct PipelineStage {
     pub on: Option<ParameterJoint>,
 }
 
-#[derive(Display, Serde, PartialEq, StrEnum)]
+#[derive(Display, Serde, PartialEq, Debug, StrEnum)]
 pub enum PipelineTriggerType {
     Insert,
     Merge,

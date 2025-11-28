@@ -23,17 +23,13 @@ impl TopicTrigger {
             Some(data_id) => match data_id {
                 TopicDataValue::Str(data_id) => Ok(Arc::new(data_id.clone())),
                 TopicDataValue::Num(num) => Ok(Arc::new(num.to_string())),
-                _ => {
-                    return PipelineKernelErrorCode::TopicDataIdTypeNotSupported.msg(format!(
-                        "Topic data id type not supported, of data[{:?}].",
-                        data
-                    ));
-                }
+                _ => PipelineKernelErrorCode::TopicDataIdTypeNotSupported.msg(format!(
+                    "Topic data id type not supported, of data[{:?}].",
+                    data
+                )),
             },
-            _ => {
-                return PipelineKernelErrorCode::TopicDataIdNotFound
-                    .msg(format!("Topic data id not found, of data[{:?}].", data));
-            }
+            _ => PipelineKernelErrorCode::TopicDataIdNotFound
+                .msg(format!("Topic data id not found, of data[{:?}].", data)),
         }
     }
 

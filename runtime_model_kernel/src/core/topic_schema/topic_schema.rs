@@ -9,9 +9,8 @@ use watchmen_model::{StdR, Topic, TopicCode, TopicData, VoidR};
 
 /// The schema of a topic, including various factor groups.
 /// all factor fields are optional, depending on whether the topic has the corresponding factors.
-#[derive(Debug)]
 pub struct TopicSchema {
-    topic: Arc<ArcTopic>,
+    inner: Arc<ArcTopic>,
     flatten_factors: Option<Arc<Vec<Arc<TopicSchemaFlattenFactorGroup>>>>,
     date_or_time_factors: Option<Arc<Vec<Arc<TopicSchemaDateOrTimeFactorGroup>>>>,
     encrypt_factor_groups: Option<Arc<Vec<Arc<TopicSchemaEncryptFactorGroup>>>>,
@@ -20,18 +19,18 @@ pub struct TopicSchema {
 
 impl TopicSchema {
     pub fn new(topic: Topic) -> StdR<Self> {
-        let arc_topic = ArcTopic::from(topic)?;
+        let arc_topic = ArcTopic::new(topic)?;
         Ok(TopicSchema {
-            topic: arc_topic.clone(),
             flatten_factors: TopicSchemaFlattenFactorGroups::create(&arc_topic),
             date_or_time_factors: TopicSchemaDateOrTimeFactorGroups::create(&arc_topic),
             encrypt_factor_groups: TopicSchemaEncryptFactorGroups::create(&arc_topic),
             default_value_factor_groups: TopicSchemaDefaultValueFactorGroups::create(&arc_topic),
+            inner: arc_topic,
         })
     }
 
     pub fn topic(&self) -> &Arc<ArcTopic> {
-        &self.topic
+        &self.inner
     }
 
     pub fn topic_name(&self) -> Arc<TopicCode> {
@@ -90,7 +89,7 @@ impl TopicSchema {
 
     /// given data might be changed
     fn flatten(&self, data: &mut TopicData) {
-        if self.topic.is_raw_topic() {
+        if self.inner.is_raw_topic() {
             return;
         }
 
@@ -162,11 +161,8 @@ mod tests {
         let topic = create_sample_topic();
         let topic_schema = super::TopicSchema::new(topic).expect("failed to create topic schema");
 
-        assert_eq!(
-            *topic_schema.topic().topic_id.as_deref().unwrap(),
-            String::from("topic-1")
-        );
+        assert_eq!(topic_schema.topic().topic_id.as_str(), "topic-1");
         // assert!(topic_schema.default_value_factor_groups.is_none());
-        println!("{:?}", topic_schema)
+        // println!("{:?}", topic_schema)
     }
 }
