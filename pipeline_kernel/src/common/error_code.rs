@@ -12,6 +12,7 @@ pub enum PipelineKernelErrorCode {
     TriggerTenantIdMismatchPrincipal,
     TopicDataIdNotFound,
     TopicDataIdTypeNotSupported,
+    TriggerTypeNotSupportedOnRaw,
 }
 
 impl StdErrorCode for PipelineKernelErrorCode {
@@ -28,6 +29,7 @@ impl StdErrorCode for PipelineKernelErrorCode {
             PipelineKernelErrorCode::TriggerTenantIdMismatchPrincipal => "PLKN-00009",
             PipelineKernelErrorCode::TopicDataIdNotFound => "PLKN-000010",
             PipelineKernelErrorCode::TopicDataIdTypeNotSupported => "PLKN-000011",
+            PipelineKernelErrorCode::TriggerTypeNotSupportedOnRaw => "PLKN-000012",
         }
     }
 }

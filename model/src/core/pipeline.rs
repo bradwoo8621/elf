@@ -476,12 +476,30 @@ pub struct PipelineStage {
     pub on: Option<ParameterJoint>,
 }
 
-#[derive(Display, Serde, StrEnum)]
+#[derive(Display, Serde, PartialEq, StrEnum)]
 pub enum PipelineTriggerType {
     Insert,
     Merge,
     InsertOrMerge,
     Delete,
+}
+
+impl PipelineTriggerType {
+    pub fn is_insert(&self) -> bool {
+        *self == PipelineTriggerType::Insert
+    }
+
+    pub fn is_insert_or_merge(&self) -> bool {
+        *self == PipelineTriggerType::InsertOrMerge
+    }
+
+    pub fn is_merge(&self) -> bool {
+        *self == PipelineTriggerType::Merge
+    }
+
+    pub fn is_delete(&self) -> bool {
+        *self == PipelineTriggerType::Delete
+    }
 }
 
 pub type PipelineId = String;

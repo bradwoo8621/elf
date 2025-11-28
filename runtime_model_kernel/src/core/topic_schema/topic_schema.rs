@@ -5,7 +5,7 @@ use crate::{
     TopicSchemaFlattenFactorGroup, TopicSchemaFlattenFactorGroups,
 };
 use std::sync::Arc;
-use watchmen_model::{Topic, TopicCode, TopicData, TopicKind, VoidR};
+use watchmen_model::{StdR, Topic, TopicCode, TopicData, VoidR};
 
 /// The schema of a topic, including various factor groups.
 /// all factor fields are optional, depending on whether the topic has the corresponding factors.
@@ -19,15 +19,15 @@ pub struct TopicSchema {
 }
 
 impl TopicSchema {
-    pub fn new(topic: Topic) -> Self {
-        let arc_topic = ArcTopic::from(topic);
-        TopicSchema {
+    pub fn new(topic: Topic) -> StdR<Self> {
+        let arc_topic = ArcTopic::from(topic)?;
+        Ok(TopicSchema {
             topic: arc_topic.clone(),
             flatten_factors: TopicSchemaFlattenFactorGroups::create(&arc_topic),
             date_or_time_factors: TopicSchemaDateOrTimeFactorGroups::create(&arc_topic),
             encrypt_factor_groups: TopicSchemaEncryptFactorGroups::create(&arc_topic),
             default_value_factor_groups: TopicSchemaDefaultValueFactorGroups::create(&arc_topic),
-        }
+        })
     }
 
     pub fn topic(&self) -> &Arc<ArcTopic> {
@@ -35,17 +35,11 @@ impl TopicSchema {
     }
 
     pub fn topic_name(&self) -> Arc<TopicCode> {
-        self.topic
-            .name
-            .clone()
-            .unwrap_or(Arc::new(String::from("")))
+        self.topic().name.clone()
     }
 
     fn should_init_default_values(&self) -> bool {
-        match self.topic().name.as_deref() {
-            Some(name) => name.to_string() != "raw_pipeline_monitor_log",
-            _ => true,
-        }
+        self.topic_name().as_ref() != "raw_pipeline_monitor_log"
     }
 
     /// given data might be changed
@@ -60,10 +54,7 @@ impl TopicSchema {
     }
 
     fn should_encrypt(&self) -> bool {
-        match self.topic().kind.as_deref().unwrap_or(&TopicKind::Business) {
-            TopicKind::System => false,
-            _ => true,
-        }
+        !self.topic().kind.is_system()
     }
 
     /// given data might be changed
@@ -112,14 +103,7 @@ impl TopicSchema {
 
     fn should_aid_hierarchy(&self) -> bool {
         let topic = self.topic();
-        if topic.is_raw_topic() {
-            return false;
-        }
-
-        match topic.name.as_deref() {
-            Some(name) => name.to_string() != "raw_pipeline_monitor_log",
-            _ => true,
-        }
+        !topic.is_raw_topic() && topic.name.as_ref() != "raw_pipeline_monitor_log"
     }
 
     /// given data might be changed
@@ -176,7 +160,7 @@ mod tests {
     #[test]
     fn test_topic_schema() {
         let topic = create_sample_topic();
-        let topic_schema = super::TopicSchema::new(topic);
+        let topic_schema = super::TopicSchema::new(topic).expect("failed to create topic schema");
 
         assert_eq!(
             *topic_schema.topic().topic_id.as_deref().unwrap(),

@@ -1,10 +1,8 @@
-use crate::{PipelineExecutionLogMonitor, PipelineKernelErrorCode, TopicTrigger};
-use std::ops::Deref;
+use crate::{PipelineExecutionLogMonitor, TopicTrigger};
 use std::sync::Arc;
 use watchmen_auth::Principal;
 use watchmen_model::{
-    PipelineTriggerTraceId, PipelineTriggerType, StdErrorCode, StdR, TopicData, TopicDataId,
-    TopicKind, VoidR,
+    PipelineTriggerTraceId, PipelineTriggerType, StdR, TopicData, TopicDataId, VoidR,
 };
 use watchmen_runtime_model_kernel::{TopicDataService, TopicSchema};
 
@@ -26,56 +24,39 @@ impl PipelineTrigger {
     }
 
     fn save_trigger_data(&self, mut data: TopicData) -> StdR<Arc<TopicTrigger>> {
-        let topic_kind = &self.topic_schema.topic().kind;
-        match topic_kind {
-            Some(kind) => match kind.deref() {
-                TopicKind::Synonym => {
-                    return match self.r#type {
-                        PipelineTriggerType::Insert => {
-                            // only insertion is supported on synonym
-                            // will do nothing on synonym topic itself, simply trigger the insert pipeline
-                            // typically, there should a historical topic to handle data from synonym topic
-                            // and process data based on historical topic insertion
-                            self.prepare_trigger_data(&mut data)?;
-                            TopicTrigger::insert_to_synonym(data)
-                        }
-                        _ => {
-                            PipelineKernelErrorCode::TriggerTypeNotSupportedOnSynonym.msg(format!(
-                                "Trigger type[{}] is not supported on synonym[{}].",
-                                self.r#type,
-                                self.topic_schema.topic_name()
-                            ))
-                        }
-                    };
-                }
-                _ => {}
-            },
-            _ => {}
-        };
+        let topic = self.topic_schema.topic();
 
         self.prepare_trigger_data(&mut data)?;
 
-        let topic_data_service = self.find_topic_data_service()?;
+        if topic.is_synonym_topic() && self.r#type.is_insert() {
+            TopicTrigger::insert_to_synonym(data)
+        } else {
+            let topic_data_service = self.find_topic_data_service()?;
 
-        match self.r#type {
-            PipelineTriggerType::Insert => {
-                let current_data = topic_data_service.insert(data)?;
-                TopicTrigger::insert(current_data)
-            }
-            PipelineTriggerType::InsertOrMerge => {
-                let (previous_data, current_data) = topic_data_service.insert_or_merge(data)?;
-                match previous_data {
-                    Some(previous_data) => TopicTrigger::merge(previous_data, current_data),
-                    _ => TopicTrigger::insert(current_data),
+            match self.r#type {
+                PipelineTriggerType::Insert => {
+                    let current_data =
+                        topic_data_service.insert(&self.topic_schema.topic_name(), data)?;
+                    TopicTrigger::insert(current_data)
                 }
-            }
-            PipelineTriggerType::Merge => {
-                let (previous_data, current_data) = topic_data_service.merge(data)?;
-                TopicTrigger::merge(previous_data, current_data)
-            }
-            PipelineTriggerType::Delete => {
-                let previous_data = topic_data_service.delete(data)?;
-                TopicTrigger::delete(previous_data)
+                PipelineTriggerType::InsertOrMerge => {
+                    let (previous_data, current_data) = topic_data_service
+                        .insert_or_merge(&self.topic_schema.topic_name(), data)?;
+                    match previous_data {
+                        Some(previous_data) => TopicTrigger::merge(previous_data, current_data),
+                        _ => TopicTrigger::insert(current_data),
+                    }
+                }
+                PipelineTriggerType::Merge => {
+                    let (previous_data, current_data) =
+                        topic_data_service.merge(&self.topic_schema.topic_name(), data)?;
+                    TopicTrigger::merge(previous_data, current_data)
+                }
+                PipelineTriggerType::Delete => {
+                    let previous_data =
+                        topic_data_service.delete(&self.topic_schema.topic_name(), data)?;
+                    TopicTrigger::delete(previous_data)
+                }
             }
         }
     }

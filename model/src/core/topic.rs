@@ -6,11 +6,25 @@ use crate::{
 use std::cmp::PartialEq;
 use watchmen_model_marco::{adapt_model, Display, Serde, StrEnum};
 
-#[derive(Display, Serde, Debug, StrEnum)]
+#[derive(Display, Serde, PartialEq, Debug, StrEnum)]
 pub enum TopicKind {
     System,
     Business,
     Synonym,
+}
+
+impl TopicKind {
+    pub fn is_system(&self) -> bool {
+        *self == TopicKind::System
+    }
+
+    pub fn is_business(&self) -> bool {
+        *self == TopicKind::Business
+    }
+
+    pub fn is_synonym(&self) -> bool {
+        *self == TopicKind::Synonym
+    }
 }
 
 #[derive(Display, Serde, PartialEq, Debug, StrEnum)]
@@ -28,8 +42,24 @@ impl TopicType {
         *self == TopicType::Raw
     }
 
+    pub fn is_meta_topic(&self) -> bool {
+        *self == TopicType::Meta
+    }
+
+    pub fn is_distinct_topic(&self) -> bool {
+        *self == TopicType::Distinct
+    }
+
     pub fn is_aggregation_topic(&self) -> bool {
         *self == TopicType::Aggregate
+    }
+
+    pub fn is_time_topic(&self) -> bool {
+        *self == TopicType::Time
+    }
+
+    pub fn is_ratio_topic(&self) -> bool {
+        *self == TopicType::Ratio
     }
 }
 

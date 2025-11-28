@@ -2,7 +2,7 @@ use crate::{PipelineExecutionLogMonitor, PipelineKernelErrorCode, PipelineTrigge
 use std::sync::Arc;
 use watchmen_auth::Principal;
 use watchmen_model::{
-    PipelineTriggerData, PipelineTriggerTraceId, StdErrorCode, StdR,
+    PipelineTriggerData, PipelineTriggerTraceId, PipelineTriggerType, StdErrorCode, StdR,
     StringUtils, TopicCode, TopicData, TopicDataId, UserRole, VoidR, VoidResultHelper,
 };
 use watchmen_runtime_model_kernel::{IdGen, TopicMetaService, TopicSchema};
@@ -56,6 +56,38 @@ impl PipelineEntrypoint {
         }
     }
 
+    fn check_trigger_type_with_topic(
+        &self,
+        trigger_data: &PipelineTriggerData,
+        topic_schema: &Arc<TopicSchema>,
+    ) -> VoidR {
+        match &trigger_data.trigger_type {
+            Some(trigger_type) => match trigger_type {
+                PipelineTriggerType::Insert => Ok(()),
+                other => {
+                    let topic = topic_schema.topic();
+                    if topic.is_synonym_topic() {
+                        PipelineKernelErrorCode::TriggerTypeNotSupportedOnSynonym.msg(format!(
+                            "Trigger type[{}] is not supported on synonym[{}].",
+                            other,
+                            topic_schema.topic_name()
+                        ))
+                    } else if topic.is_raw_topic() {
+                        PipelineKernelErrorCode::TriggerTypeNotSupportedOnRaw.msg(format!(
+                            "Trigger type[{}] is not supported on raw[{}].",
+                            other,
+                            topic_schema.topic_name()
+                        ))
+                    } else {
+                        Ok(())
+                    }
+                }
+            },
+            _ => PipelineKernelErrorCode::TriggerTypeMissed
+                .msg("Pipeline trigger type cannot be empty."),
+        }
+    }
+
     fn check_trigger_data(&self, trigger_data: &PipelineTriggerData) -> VoidR {
         if trigger_data.data.is_none() {
             PipelineKernelErrorCode::TriggerDataMissed.msg("Pipeline trigger data cannot be empty.")
@@ -95,8 +127,8 @@ impl PipelineEntrypoint {
         TopicMetaService::with(&self.principal.tenant_id)
     }
 
-    fn find_topic_schema(&self, _code: TopicCode) -> StdR<Arc<TopicSchema>> {
-        self.find_topic_meta_service()?.find_topic_schema()
+    fn find_topic_schema(&self, code: &TopicCode) -> StdR<Arc<TopicSchema>> {
+        self.find_topic_meta_service()?.find_topic_schema(code)
     }
 
     fn check_and_prepare(
@@ -111,7 +143,8 @@ impl PipelineEntrypoint {
             .collect(self.check_trigger_data(&trigger_data))
             .accumulate()?;
 
-        let topic_schema = self.find_topic_schema(trigger_data.code.unwrap())?;
+        let topic_schema = self.find_topic_schema(&trigger_data.code.as_ref().unwrap())?;
+        self.check_trigger_type_with_topic(&trigger_data, &topic_schema)?;
 
         // prepare execute principal
         let execute_principal: Principal = if self.principal.is_super_admin() {

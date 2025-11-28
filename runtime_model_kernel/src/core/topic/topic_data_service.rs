@@ -1,6 +1,6 @@
 use crate::TopicMetaService;
 use std::sync::Arc;
-use watchmen_model::{StdR, TenantId, TopicData};
+use watchmen_model::{StdR, TenantId, TopicCode, TopicData};
 
 pub struct TopicDataService {
     tenant_id: TenantId,
@@ -16,19 +16,23 @@ impl TopicDataService {
         }))
     }
 
-    pub fn insert(&self, data: TopicData) -> StdR<TopicData> {
+    pub fn insert(&self, _code: &TopicCode, _data: TopicData) -> StdR<TopicData> {
         todo!("implement insert for TopicDataService")
     }
 
-    pub fn insert_or_merge(&self, data: TopicData) -> StdR<(Option<TopicData>, TopicData)> {
+    pub fn insert_or_merge(
+        &self,
+        _code: &TopicCode,
+        _data: TopicData,
+    ) -> StdR<(Option<TopicData>, TopicData)> {
         todo!("implement insert_or_merge for TopicDataService")
     }
 
-    pub fn merge(&self, data: TopicData) -> StdR<(TopicData, TopicData)> {
+    pub fn merge(&self, _code: &TopicCode, _data: TopicData) -> StdR<(TopicData, TopicData)> {
         todo!("implement merge for TopicDataService")
     }
 
-    pub fn delete(&self, data: TopicData) -> StdR<TopicData> {
+    pub fn delete(&self, _code: &TopicCode, _data: TopicData) -> StdR<TopicData> {
         todo!("implement delete for TopicDataService")
     }
 }
