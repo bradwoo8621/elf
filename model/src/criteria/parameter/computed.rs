@@ -30,7 +30,7 @@ pub struct NoneParameter {
 
 impl NoneParameter {
     pub fn init() -> Self {
-        NoneParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::None)
     }
@@ -53,7 +53,7 @@ pub struct AddParameter {
 
 impl AddParameter {
     pub fn init() -> Self {
-        AddParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::Add)
     }
@@ -76,7 +76,7 @@ pub struct SubtractParameter {
 
 impl SubtractParameter {
     pub fn init() -> Self {
-        SubtractParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::Subtract)
     }
@@ -99,7 +99,7 @@ pub struct MultiplyParameter {
 
 impl MultiplyParameter {
     pub fn init() -> Self {
-        MultiplyParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::Multiply)
     }
@@ -122,7 +122,7 @@ pub struct DivideParameter {
 
 impl DivideParameter {
     pub fn init() -> Self {
-        DivideParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::Divide)
     }
@@ -145,7 +145,7 @@ pub struct ModulusParameter {
 
 impl ModulusParameter {
     pub fn init() -> Self {
-        ModulusParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::Modulus)
     }
@@ -170,7 +170,7 @@ pub struct YearOfParameter {
 
 impl YearOfParameter {
     pub fn init() -> Self {
-        YearOfParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::YearOf)
     }
@@ -195,7 +195,7 @@ pub struct HalfYearOfParameter {
 
 impl HalfYearOfParameter {
     pub fn init() -> Self {
-        HalfYearOfParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::HalfYearOf)
     }
@@ -220,7 +220,7 @@ pub struct QuarterOfParameter {
 
 impl QuarterOfParameter {
     pub fn init() -> Self {
-        QuarterOfParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::QuarterOf)
     }
@@ -245,7 +245,7 @@ pub struct MonthOfParameter {
 
 impl MonthOfParameter {
     pub fn init() -> Self {
-        MonthOfParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::MonthOf)
     }
@@ -270,7 +270,7 @@ pub struct WeekOfYearParameter {
 
 impl WeekOfYearParameter {
     pub fn init() -> Self {
-        WeekOfYearParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::WeekOfYear)
     }
@@ -295,7 +295,7 @@ pub struct WeekOfMonthParameter {
 
 impl WeekOfMonthParameter {
     pub fn init() -> Self {
-        WeekOfMonthParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::WeekOfMonth)
     }
@@ -320,7 +320,7 @@ pub struct DayOfMonthParameter {
 
 impl DayOfMonthParameter {
     pub fn init() -> Self {
-        DayOfMonthParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::DayOfMonth)
     }
@@ -345,7 +345,7 @@ pub struct DayOfWeekParameter {
 
 impl DayOfWeekParameter {
     pub fn init() -> Self {
-        DayOfWeekParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::DayOfWeek)
     }
@@ -370,12 +370,12 @@ pub struct CaseThenParameterRoute {
 impl CaseThenParameterRoute {
     /// it is to create the default route (without condition), not the [Default::default]
     pub fn default() -> Self {
-        CaseThenParameterRoute::new().conditional(false)
+        Self::new().conditional(false)
     }
 
     /// it is to create the conditional route
     pub fn case(joint: ParameterJoint) -> Self {
-        CaseThenParameterRoute::new().conditional(true).on(joint)
+        Self::new().conditional(true).on(joint)
     }
 }
 
@@ -388,7 +388,7 @@ pub struct CaseThenParameter {
 
 impl CaseThenParameter {
     pub fn init() -> Self {
-        CaseThenParameter::new()
+        Self::new()
             .kind(ParameterKind::Computed)
             .r#type(ParameterComputeType::CaseThen)
     }

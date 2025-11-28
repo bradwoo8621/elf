@@ -12,7 +12,7 @@ pub struct TopicSchemaFlattenFactor {
 
 impl TopicSchemaFlattenFactor {
     pub fn new(inner: TopicSchemaFactorInner) -> Self {
-        TopicSchemaFlattenFactor { inner }
+        Self { inner }
     }
 }
 
@@ -40,7 +40,7 @@ pub struct TopicSchemaFlattenFactorGroup {
 
 impl TopicSchemaFlattenFactorGroup {
     pub fn new(inner: TopicSchemaFlattenFactorGroupInner) -> Self {
-        TopicSchemaFlattenFactorGroup { inner }
+        Self { inner }
     }
 
     /// flatten the value from hierarchical object to root level with "dot connected field name"
@@ -55,7 +55,7 @@ impl TopicSchemaFactorGroup<'_, TopicSchemaFlattenFactor, TopicSchemaFlattenFact
     type Inner = TopicSchemaFlattenFactorGroupInner;
 
     fn new(name: Arc<String>, factors: Arc<Vec<Arc<TopicSchemaFlattenFactor>>>) -> Self {
-        TopicSchemaFlattenFactorGroup::new(TopicSchemaFactorGroupInner::new(name, factors))
+        Self::new(TopicSchemaFactorGroupInner::new(name, factors))
     }
 
     fn get_inner(&self) -> &TopicSchemaFlattenFactorGroupInner {

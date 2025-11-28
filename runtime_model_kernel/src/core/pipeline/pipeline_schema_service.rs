@@ -13,7 +13,7 @@ pub struct PipelineSchemaService {
 // TODO maybe find from cache
 impl PipelineSchemaService {
     pub fn with(tenant_id: &TenantId) -> StdR<Arc<Self>> {
-        Ok(Arc::new(PipelineSchemaService {
+        Ok(Arc::new(Self {
             tenant_id: tenant_id.clone(),
             meta: PipelineMetaService::with(tenant_id)?,
         }))

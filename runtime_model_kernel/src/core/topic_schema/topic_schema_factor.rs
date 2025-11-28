@@ -13,7 +13,7 @@ impl TopicSchemaFactorInner {
         let factor_name = factor.name.clone();
         let names = Arc::new(factor_name.split('.').map(String::from).collect());
 
-        TopicSchemaFactorInner {
+        Self {
             factor,
             factor_name,
             names,
@@ -21,7 +21,7 @@ impl TopicSchemaFactorInner {
     }
 
     pub fn replace_names(&self, names: Arc<Vec<String>>) -> Self {
-        TopicSchemaFactorInner {
+        Self {
             factor: self.factor.clone(),
             factor_name: self.factor_name.clone(),
             names,

@@ -10,11 +10,11 @@ pub struct TopicFactorParameter {
 
 impl TopicFactorParameter {
     pub fn init() -> Self {
-        TopicFactorParameter::new().kind(ParameterKind::Topic)
+        Self::new().kind(ParameterKind::Topic)
     }
 
     pub fn of(topic_id: TopicId, factor_id: FactorId) -> Self {
-        TopicFactorParameter::init()
+        Self::init()
             .topic_id(topic_id)
             .factor_id(factor_id)
     }

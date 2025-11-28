@@ -24,7 +24,7 @@ pub struct EmptyExpression {
 
 impl EmptyExpression {
     pub fn init() -> Self {
-        EmptyExpression::new().operator(ParameterExpressionOperator::Empty)
+        Self::new().operator(ParameterExpressionOperator::Empty)
     }
 
     pub fn to_expression(self) -> ParameterExpression {
@@ -44,7 +44,7 @@ pub struct NotEmptyExpression {
 
 impl NotEmptyExpression {
     pub fn init() -> Self {
-        NotEmptyExpression::new().operator(ParameterExpressionOperator::NotEmpty)
+        Self::new().operator(ParameterExpressionOperator::NotEmpty)
     }
 
     pub fn to_expression(self) -> ParameterExpression {
@@ -65,7 +65,7 @@ pub struct EqualsExpression {
 
 impl EqualsExpression {
     pub fn init() -> Self {
-        EqualsExpression::new().operator(ParameterExpressionOperator::Equals)
+        Self::new().operator(ParameterExpressionOperator::Equals)
     }
 
     pub fn to_expression(self) -> ParameterExpression {
@@ -86,7 +86,7 @@ pub struct NotEqualsExpression {
 
 impl NotEqualsExpression {
     pub fn init() -> Self {
-        NotEqualsExpression::new().operator(ParameterExpressionOperator::NotEquals)
+        Self::new().operator(ParameterExpressionOperator::NotEquals)
     }
 
     pub fn to_expression(self) -> ParameterExpression {
@@ -107,7 +107,7 @@ pub struct LessThanExpression {
 
 impl LessThanExpression {
     pub fn init() -> Self {
-        LessThanExpression::new().operator(ParameterExpressionOperator::Less)
+        Self::new().operator(ParameterExpressionOperator::Less)
     }
 
     pub fn to_expression(self) -> ParameterExpression {
@@ -128,7 +128,7 @@ pub struct LessThanOrEqualsExpression {
 
 impl LessThanOrEqualsExpression {
     pub fn init() -> Self {
-        LessThanOrEqualsExpression::new().operator(ParameterExpressionOperator::LessEquals)
+        Self::new().operator(ParameterExpressionOperator::LessEquals)
     }
 
     pub fn to_expression(self) -> ParameterExpression {
@@ -149,7 +149,7 @@ pub struct MoreThanExpression {
 
 impl MoreThanExpression {
     pub fn init() -> Self {
-        MoreThanExpression::new().operator(ParameterExpressionOperator::More)
+        Self::new().operator(ParameterExpressionOperator::More)
     }
 
     pub fn to_expression(self) -> ParameterExpression {
@@ -170,7 +170,7 @@ pub struct MoreThanOrEqualsExpression {
 
 impl MoreThanOrEqualsExpression {
     pub fn init() -> Self {
-        MoreThanOrEqualsExpression::new().operator(ParameterExpressionOperator::MoreEquals)
+        Self::new().operator(ParameterExpressionOperator::MoreEquals)
     }
 
     pub fn to_expression(self) -> ParameterExpression {
@@ -191,7 +191,7 @@ pub struct InExpression {
 
 impl InExpression {
     pub fn init() -> Self {
-        InExpression::new().operator(ParameterExpressionOperator::In)
+        Self::new().operator(ParameterExpressionOperator::In)
     }
 
     pub fn to_expression(self) -> ParameterExpression {
@@ -212,7 +212,7 @@ pub struct NotInExpression {
 
 impl NotInExpression {
     pub fn init() -> Self {
-        NotInExpression::new().operator(ParameterExpressionOperator::NotIn)
+        Self::new().operator(ParameterExpressionOperator::NotIn)
     }
 
     pub fn to_expression(self) -> ParameterExpression {

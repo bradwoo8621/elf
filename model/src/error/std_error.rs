@@ -55,14 +55,14 @@ impl StdErr {
     where
         M: Into<String>,
     {
-        Err(StdErr {
+        Err(Self {
             code,
             details: Some(StdErrDetails::Str(msg.into())),
         })
     }
 
     pub fn code_only<R>(code: &'static str) -> Result<R, Self> {
-        Err(StdErr {
+        Err(Self {
             code,
             details: None,
         })
@@ -73,14 +73,14 @@ impl StdErr {
     where
         M: Into<String>,
     {
-        Err(StdErr {
+        Err(Self {
             code: StdErrCode::Unknown.code(),
             details: Some(StdErrDetails::Str(msg.into())),
         })
     }
 
     pub fn accumulate<R>(details: Vec<StdErr>) -> StdR<R> {
-        Err(StdErr {
+        Err(Self {
             code: StdErrCode::Multiple.code(),
             details: Some(StdErrDetails::Sub(details)),
         })

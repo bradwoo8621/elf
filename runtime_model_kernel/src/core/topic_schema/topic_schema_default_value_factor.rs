@@ -14,7 +14,7 @@ pub struct TopicSchemaDefaultValueFactor {
 
 impl TopicSchemaDefaultValueFactor {
     pub fn new(inner: TopicSchemaFactorInner) -> Self {
-        let mut factor = TopicSchemaDefaultValueFactor {
+        let mut factor = Self {
             inner,
             default_value: None,
         };
@@ -91,7 +91,7 @@ pub struct TopicSchemaDefaultValueFactorGroup {
 
 impl TopicSchemaDefaultValueFactorGroup {
     pub fn new(inner: TopicSchemaDefaultValueFactorGroupInner) -> Self {
-        TopicSchemaDefaultValueFactorGroup { inner }
+        Self { inner }
     }
 
     pub fn init_default_value(&self, _data: &mut TopicData) {
@@ -105,7 +105,7 @@ impl TopicSchemaFactorGroup<'_, TopicSchemaDefaultValueFactor, TopicSchemaDefaul
     type Inner = TopicSchemaDefaultValueFactorGroupInner;
 
     fn new(name: Arc<String>, factors: Arc<Vec<Arc<TopicSchemaDefaultValueFactor>>>) -> Self {
-        TopicSchemaDefaultValueFactorGroup::new(TopicSchemaFactorGroupInner::new(name, factors))
+        Self::new(TopicSchemaFactorGroupInner::new(name, factors))
     }
 
     fn get_inner(&self) -> &TopicSchemaDefaultValueFactorGroupInner {

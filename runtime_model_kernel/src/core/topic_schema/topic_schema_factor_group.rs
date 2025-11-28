@@ -19,10 +19,10 @@ impl<F, G> TopicSchemaFactorGroupInner<F, G> {
             // not happened in practice
             (None, None)
         } else {
-            TopicSchemaFactorGroupInner::split_factors(factors)
+            Self::split_factors(factors)
         };
 
-        TopicSchemaFactorGroupInner {
+        Self {
             name,
             factors,
             groups,
@@ -101,7 +101,6 @@ pub trait TopicSchemaFactorGroup<'a, F, G> {
     type Inner: TopicSchemaFactorGroupInnerOp<F, G> + 'a;
 
     fn new(name: Arc<String>, factors: Arc<Vec<Arc<F>>>) -> Self;
-    // fn new(inner: Self::Inner) -> Self;
 
     fn get_inner(&self) -> &Self::Inner;
 

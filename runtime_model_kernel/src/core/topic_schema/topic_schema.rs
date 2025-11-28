@@ -20,7 +20,7 @@ pub struct TopicSchema {
 impl TopicSchema {
     pub fn new(topic: Topic) -> StdR<Self> {
         let arc_topic = ArcTopic::new(topic)?;
-        Ok(TopicSchema {
+        Ok(Self {
             flatten_factors: TopicSchemaFlattenFactorGroups::create(&arc_topic),
             date_or_time_factors: TopicSchemaDateOrTimeFactorGroups::create(&arc_topic),
             encrypt_factor_groups: TopicSchemaEncryptFactorGroups::create(&arc_topic),

@@ -24,7 +24,7 @@ pub struct ObjectiveEmptyExpression {
 
 impl ObjectiveEmptyExpression {
     pub fn init() -> Self {
-        ObjectiveEmptyExpression::new().operator(ObjectiveParameterExpressionOperator::Empty)
+        Self::new().operator(ObjectiveParameterExpressionOperator::Empty)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {
@@ -44,7 +44,7 @@ pub struct ObjectiveNotEmptyExpression {
 
 impl ObjectiveNotEmptyExpression {
     pub fn init() -> Self {
-        ObjectiveNotEmptyExpression::new().operator(ObjectiveParameterExpressionOperator::NotEmpty)
+        Self::new().operator(ObjectiveParameterExpressionOperator::NotEmpty)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {
@@ -65,7 +65,7 @@ pub struct ObjectiveEqualsExpression {
 
 impl ObjectiveEqualsExpression {
     pub fn init() -> Self {
-        ObjectiveEqualsExpression::new().operator(ObjectiveParameterExpressionOperator::Equals)
+        Self::new().operator(ObjectiveParameterExpressionOperator::Equals)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {
@@ -86,7 +86,7 @@ pub struct ObjectiveNotEqualsExpression {
 
 impl ObjectiveNotEqualsExpression {
     pub fn init() -> Self {
-        ObjectiveNotEqualsExpression::new()
+        Self::new()
             .operator(ObjectiveParameterExpressionOperator::NotEquals)
     }
 
@@ -108,7 +108,7 @@ pub struct ObjectiveLessThanExpression {
 
 impl ObjectiveLessThanExpression {
     pub fn init() -> Self {
-        ObjectiveLessThanExpression::new().operator(ObjectiveParameterExpressionOperator::Less)
+        Self::new().operator(ObjectiveParameterExpressionOperator::Less)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {
@@ -129,7 +129,7 @@ pub struct ObjectiveLessThanOrEqualsExpression {
 
 impl ObjectiveLessThanOrEqualsExpression {
     pub fn init() -> Self {
-        ObjectiveLessThanOrEqualsExpression::new()
+        Self::new()
             .operator(ObjectiveParameterExpressionOperator::LessEquals)
     }
 
@@ -151,7 +151,7 @@ pub struct ObjectiveMoreThanExpression {
 
 impl ObjectiveMoreThanExpression {
     pub fn init() -> Self {
-        ObjectiveMoreThanExpression::new().operator(ObjectiveParameterExpressionOperator::More)
+        Self::new().operator(ObjectiveParameterExpressionOperator::More)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {
@@ -172,7 +172,7 @@ pub struct ObjectiveMoreThanOrEqualsExpression {
 
 impl ObjectiveMoreThanOrEqualsExpression {
     pub fn init() -> Self {
-        ObjectiveMoreThanOrEqualsExpression::new()
+        Self::new()
             .operator(ObjectiveParameterExpressionOperator::MoreEquals)
     }
 
@@ -194,7 +194,7 @@ pub struct ObjectiveInExpression {
 
 impl ObjectiveInExpression {
     pub fn init() -> Self {
-        ObjectiveInExpression::new().operator(ObjectiveParameterExpressionOperator::In)
+        Self::new().operator(ObjectiveParameterExpressionOperator::In)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {
@@ -215,7 +215,7 @@ pub struct ObjectiveNotInExpression {
 
 impl ObjectiveNotInExpression {
     pub fn init() -> Self {
-        ObjectiveNotInExpression::new().operator(ObjectiveParameterExpressionOperator::NotIn)
+        Self::new().operator(ObjectiveParameterExpressionOperator::NotIn)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {
@@ -272,14 +272,14 @@ pub struct ObjectiveParameterJoint {
 
 impl ObjectiveParameterJoint {
     pub fn and(filters: Vec<ObjectiveParameterCondition>) -> Self {
-        ObjectiveParameterJoint {
+        Self {
             conj: Some(ObjectiveParameterJointType::And),
             filters: Some(filters),
         }
     }
 
     pub fn or(filters: Vec<ObjectiveParameterCondition>) -> Self {
-        ObjectiveParameterJoint {
+        Self {
             conj: Some(ObjectiveParameterJointType::Or),
             filters: Some(filters),
         }

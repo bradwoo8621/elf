@@ -12,7 +12,7 @@ pub struct TopicSchemaEncryptFactor {
 
 impl TopicSchemaEncryptFactor {
     pub fn new(inner: TopicSchemaFactorInner) -> Self {
-        TopicSchemaEncryptFactor { inner }
+        Self { inner }
     }
 
     pub fn encrypt_method(&self) -> &Option<Arc<FactorEncryptMethod>> {
@@ -44,7 +44,7 @@ pub struct TopicSchemaEncryptFactorGroup {
 
 impl TopicSchemaEncryptFactorGroup {
     pub fn new(inner: TopicSchemaEncryptFactorGroupInner) -> Self {
-        TopicSchemaEncryptFactorGroup { inner }
+        Self { inner }
     }
 
     pub fn encrypt(&self, _data: &mut TopicData) {
@@ -62,7 +62,7 @@ impl TopicSchemaFactorGroup<'_, TopicSchemaEncryptFactor, TopicSchemaEncryptFact
     type Inner = TopicSchemaEncryptFactorGroupInner;
 
     fn new(name: Arc<String>, factors: Arc<Vec<Arc<TopicSchemaEncryptFactor>>>) -> Self {
-        TopicSchemaEncryptFactorGroup::new(TopicSchemaFactorGroupInner::new(name, factors))
+        Self::new(TopicSchemaFactorGroupInner::new(name, factors))
     }
 
     fn get_inner(&self) -> &TopicSchemaEncryptFactorGroupInner {

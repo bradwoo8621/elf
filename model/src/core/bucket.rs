@@ -44,7 +44,7 @@ pub struct NumericValueBucket {
 
 impl NumericValueBucket {
     pub fn init() -> Self {
-        NumericValueBucket::new().r#type(BucketType::Value)
+        Self::new().r#type(BucketType::Value)
     }
 
     pub fn to_bucket(self) -> Bucket {
@@ -66,23 +66,23 @@ pub struct NumericValueMeasureBucket {
 
 impl NumericValueMeasureBucket {
     pub fn init() -> Self {
-        NumericValueMeasureBucket::new().r#type(BucketType::ValueMeasure)
+        Self::new().r#type(BucketType::ValueMeasure)
     }
 
     pub fn with_floor() -> Self {
-        NumericValueMeasureBucket::init().measure(MeasureMethod::Floor)
+        Self::init().measure(MeasureMethod::Floor)
     }
 
     pub fn with_residential_area() -> Self {
-        NumericValueMeasureBucket::init().measure(MeasureMethod::ResidentialArea)
+        Self::init().measure(MeasureMethod::ResidentialArea)
     }
 
     pub fn with_age() -> Self {
-        NumericValueMeasureBucket::init().measure(MeasureMethod::Age)
+        Self::init().measure(MeasureMethod::Age)
     }
 
     pub fn with_biz_scale() -> Self {
-        NumericValueMeasureBucket::init().measure(MeasureMethod::BizScale)
+        Self::init().measure(MeasureMethod::BizScale)
     }
 
     pub fn to_bucket(self) -> Bucket {
@@ -126,59 +126,59 @@ pub struct CategoryMeasureBucket {
 
 impl CategoryMeasureBucket {
     pub fn init() -> Self {
-        CategoryMeasureBucket::new().r#type(BucketType::CategoryMeasure)
+        Self::new().r#type(BucketType::CategoryMeasure)
     }
 
     pub fn with_continent() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::Continent)
+        Self::init().measure(MeasureMethod::Continent)
     }
 
     pub fn with_region() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::Region)
+        Self::init().measure(MeasureMethod::Region)
     }
 
     pub fn with_country() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::Country)
+        Self::init().measure(MeasureMethod::Country)
     }
 
     pub fn with_province() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::Province)
+        Self::init().measure(MeasureMethod::Province)
     }
 
     pub fn with_city() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::City)
+        Self::init().measure(MeasureMethod::City)
     }
 
     pub fn with_district() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::District)
+        Self::init().measure(MeasureMethod::District)
     }
 
     pub fn with_residence_type() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::ResidenceType)
+        Self::init().measure(MeasureMethod::ResidenceType)
     }
 
     pub fn with_gender() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::Gender)
+        Self::init().measure(MeasureMethod::Gender)
     }
 
     pub fn with_occupation() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::Occupation)
+        Self::init().measure(MeasureMethod::Occupation)
     }
 
     pub fn with_religion() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::Religion)
+        Self::init().measure(MeasureMethod::Religion)
     }
 
     pub fn with_nationality() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::Nationality)
+        Self::init().measure(MeasureMethod::Nationality)
     }
 
     pub fn with_biz_trade() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::BizTrade)
+        Self::init().measure(MeasureMethod::BizTrade)
     }
 
     pub fn with_boolean() -> Self {
-        CategoryMeasureBucket::init().measure(MeasureMethod::Boolean)
+        Self::init().measure(MeasureMethod::Boolean)
     }
 
     pub fn to_bucket(self) -> Bucket {
@@ -199,7 +199,7 @@ pub struct EnumMeasureBucket {
 
 impl EnumMeasureBucket {
     pub fn init() -> Self {
-        EnumMeasureBucket::new()
+        Self::new()
             .r#type(BucketType::EnumMeasure)
             .measure(MeasureMethod::Enum)
     }

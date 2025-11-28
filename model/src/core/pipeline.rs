@@ -81,7 +81,7 @@ pub struct AlarmAction {
 
 impl AlarmAction {
     pub fn init() -> Self {
-        AlarmAction::new().r#type(PipelineActionType::Alarm)
+        Self::new().r#type(PipelineActionType::Alarm)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -100,7 +100,7 @@ pub struct CopyToMemoryAction {
 
 impl CopyToMemoryAction {
     pub fn init() -> Self {
-        CopyToMemoryAction::new().r#type(PipelineActionType::CopyToMemory)
+        Self::new().r#type(PipelineActionType::CopyToMemory)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -118,7 +118,7 @@ pub struct WriteToExternalAction {
 
 impl WriteToExternalAction {
     pub fn init() -> Self {
-        WriteToExternalAction::new().r#type(PipelineActionType::WriteToExternal)
+        Self::new().r#type(PipelineActionType::WriteToExternal)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -140,7 +140,7 @@ pub struct ReadRowAction {
 
 impl ReadRowAction {
     pub fn init() -> Self {
-        ReadRowAction::new().r#type(PipelineActionType::ReadRow)
+        Self::new().r#type(PipelineActionType::ReadRow)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -162,7 +162,7 @@ pub struct ReadRowsAction {
 
 impl ReadRowsAction {
     pub fn init() -> Self {
-        ReadRowsAction::new().r#type(PipelineActionType::ReadRows)
+        Self::new().r#type(PipelineActionType::ReadRows)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -195,7 +195,7 @@ pub struct ReadFactorAction {
 
 impl ReadFactorAction {
     pub fn init() -> Self {
-        ReadFactorAction::new().r#type(PipelineActionType::ReadFactor)
+        Self::new().r#type(PipelineActionType::ReadFactor)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -219,7 +219,7 @@ pub struct ReadFactorsAction {
 
 impl ReadFactorsAction {
     pub fn init() -> Self {
-        ReadFactorsAction::new().r#type(PipelineActionType::ReadFactors)
+        Self::new().r#type(PipelineActionType::ReadFactors)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -241,7 +241,7 @@ pub struct ExistsAction {
 
 impl ExistsAction {
     pub fn init() -> Self {
-        ExistsAction::new().r#type(PipelineActionType::Exists)
+        Self::new().r#type(PipelineActionType::Exists)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -258,19 +258,19 @@ pub struct MappingFactor {
 
 impl MappingFactor {
     pub fn direct() -> Self {
-        MappingFactor::new().arithmetic(AggregateArithmetic::None)
+        Self::new().arithmetic(AggregateArithmetic::None)
     }
 
     pub fn sum() -> Self {
-        MappingFactor::new().arithmetic(AggregateArithmetic::Sum)
+        Self::new().arithmetic(AggregateArithmetic::Sum)
     }
 
     pub fn avg() -> Self {
-        MappingFactor::new().arithmetic(AggregateArithmetic::Avg)
+        Self::new().arithmetic(AggregateArithmetic::Avg)
     }
 
     pub fn count() -> Self {
-        MappingFactor::new().arithmetic(AggregateArithmetic::Count)
+        Self::new().arithmetic(AggregateArithmetic::Count)
     }
 }
 
@@ -301,7 +301,7 @@ pub struct InsertRowAction {
 
 impl InsertRowAction {
     pub fn init() -> Self {
-        InsertRowAction::new().r#type(PipelineActionType::InsertRow)
+        Self::new().r#type(PipelineActionType::InsertRow)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -324,7 +324,7 @@ pub struct InsertOrMergeRowAction {
 
 impl InsertOrMergeRowAction {
     pub fn init() -> Self {
-        InsertOrMergeRowAction::new().r#type(PipelineActionType::InsertOrMergeRow)
+        Self::new().r#type(PipelineActionType::InsertOrMergeRow)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -347,7 +347,7 @@ pub struct MergeRowAction {
 
 impl MergeRowAction {
     pub fn init() -> Self {
-        MergeRowAction::new().r#type(PipelineActionType::MergeRow)
+        Self::new().r#type(PipelineActionType::MergeRow)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -372,7 +372,7 @@ pub struct WriteFactorAction {
 
 impl WriteFactorAction {
     pub fn init() -> Self {
-        WriteFactorAction::new().r#type(PipelineActionType::WriteFactor)
+        Self::new().r#type(PipelineActionType::WriteFactor)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -392,7 +392,7 @@ pub struct DeleteRowAction {
 
 impl DeleteRowAction {
     pub fn init() -> Self {
-        DeleteRowAction::new().r#type(PipelineActionType::DeleteRow)
+        Self::new().r#type(PipelineActionType::DeleteRow)
     }
 
     pub fn to_action(self) -> PipelineAction {
@@ -412,7 +412,7 @@ pub struct DeleteRowsAction {
 
 impl DeleteRowsAction {
     pub fn init() -> Self {
-        DeleteRowsAction::new().r#type(PipelineActionType::DeleteRows)
+        Self::new().r#type(PipelineActionType::DeleteRows)
     }
 
     pub fn to_action(self) -> PipelineAction {

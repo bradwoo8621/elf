@@ -27,7 +27,7 @@ pub struct ObjectiveFactorOnIndicator {
 
 impl ObjectiveFactorOnIndicator {
     pub fn init() -> Self {
-        ObjectiveFactorOnIndicator::new().kind(ObjectiveFactorKind::Indicator)
+        Self::new().kind(ObjectiveFactorKind::Indicator)
     }
 
     pub fn to_factor(self) -> ObjectiveFactor {
@@ -45,7 +45,7 @@ pub struct ObjectiveFactorOnComputation {
 
 impl ObjectiveFactorOnComputation {
     pub fn init() -> Self {
-        ObjectiveFactorOnComputation::new().kind(ObjectiveFactorKind::Computed)
+        Self::new().kind(ObjectiveFactorKind::Computed)
     }
 
     pub fn to_factor(self) -> ObjectiveFactor {

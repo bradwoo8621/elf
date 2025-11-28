@@ -10,7 +10,7 @@ pub struct TopicDataService {
 impl TopicDataService {
     pub fn with(tenant_id: &TenantId) -> StdR<Arc<Self>> {
         // TODO maybe find from cache
-        Ok(Arc::new(TopicDataService {
+        Ok(Arc::new(Self {
             tenant_id: tenant_id.clone(),
             meta: TopicMetaService::with(&tenant_id)?,
         }))

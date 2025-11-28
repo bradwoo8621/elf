@@ -19,7 +19,7 @@ pub struct ObjectiveVariableOnValue {
 
 impl ObjectiveVariableOnValue {
     pub fn init() -> Self {
-        ObjectiveVariableOnValue::new().kind(ObjectiveVariableKind::SingleValue)
+        Self::new().kind(ObjectiveVariableKind::SingleValue)
     }
 
     pub fn to_variable(self) -> ObjectiveVariable {
@@ -37,7 +37,7 @@ pub struct ObjectiveVariableOnBucket {
 
 impl ObjectiveVariableOnBucket {
     pub fn init() -> Self {
-        ObjectiveVariableOnBucket::new().kind(ObjectiveVariableKind::Bucket)
+        Self::new().kind(ObjectiveVariableKind::Bucket)
     }
 
     pub fn to_variable(self) -> ObjectiveVariable {
@@ -57,7 +57,7 @@ pub struct ObjectiveVariableOnRange {
 
 impl ObjectiveVariableOnRange {
     pub fn init() -> Self {
-        ObjectiveVariableOnRange::new().kind(ObjectiveVariableKind::Range)
+        Self::new().kind(ObjectiveVariableKind::Range)
     }
 
     pub fn to_variable(self) -> ObjectiveVariable {

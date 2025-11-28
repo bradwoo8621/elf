@@ -18,7 +18,7 @@ pub struct HierarchyAid;
 
 impl HierarchyAid {
     pub fn new() -> Self {
-        HierarchyAid {}
+        Self {}
     }
 
     /// apply ancestor aid id to given data.\n

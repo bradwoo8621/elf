@@ -28,11 +28,11 @@ pub struct ReferObjectiveParameter {
 
 impl ReferObjectiveParameter {
     pub fn init() -> Self {
-        ReferObjectiveParameter::new().kind(ObjectiveParameterType::Refer)
+        Self::new().kind(ObjectiveParameterType::Refer)
     }
 
     pub fn of(uuid: FactorOrObjectiveFactorIdOrSubjectDatasetColumnId) -> Self {
-        ReferObjectiveParameter::init().uuid(uuid)
+        Self::init().uuid(uuid)
     }
 
     pub fn to_parameter(self) -> ObjectiveParameter {
@@ -48,11 +48,11 @@ pub struct ConstantObjectiveParameter {
 
 impl ConstantObjectiveParameter {
     pub fn init() -> Self {
-        ConstantObjectiveParameter::new().kind(ObjectiveParameterType::Constant)
+        Self::new().kind(ObjectiveParameterType::Constant)
     }
 
     pub fn of(value: String) -> Self {
-        ConstantObjectiveParameter::init().value(value)
+        Self::init().value(value)
     }
 
     pub fn to_parameter(self) -> ObjectiveParameter {
@@ -96,7 +96,7 @@ pub struct ObjectiveNoneParameter {
 
 impl ObjectiveNoneParameter {
     pub fn init() -> Self {
-        ObjectiveNoneParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::None)
     }
@@ -119,7 +119,7 @@ pub struct ObjectiveAddParameter {
 
 impl ObjectiveAddParameter {
     pub fn init() -> Self {
-        ObjectiveAddParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Add)
     }
@@ -142,7 +142,7 @@ pub struct ObjectiveSubtractParameter {
 
 impl ObjectiveSubtractParameter {
     pub fn init() -> Self {
-        ObjectiveSubtractParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Subtract)
     }
@@ -165,7 +165,7 @@ pub struct ObjectiveMultiplyParameter {
 
 impl ObjectiveMultiplyParameter {
     pub fn init() -> Self {
-        ObjectiveMultiplyParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Multiply)
     }
@@ -188,7 +188,7 @@ pub struct ObjectiveDivideParameter {
 
 impl ObjectiveDivideParameter {
     pub fn init() -> Self {
-        ObjectiveDivideParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Divide)
     }
@@ -211,7 +211,7 @@ pub struct ObjectiveModulusParameter {
 
 impl ObjectiveModulusParameter {
     pub fn init() -> Self {
-        ObjectiveModulusParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Modulus)
     }
@@ -236,7 +236,7 @@ pub struct ObjectiveYearOfParameter {
 
 impl ObjectiveYearOfParameter {
     pub fn init() -> Self {
-        ObjectiveYearOfParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::YearOf)
     }
@@ -261,7 +261,7 @@ pub struct ObjectiveHalfYearOfParameter {
 
 impl ObjectiveHalfYearOfParameter {
     pub fn init() -> Self {
-        ObjectiveHalfYearOfParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::HalfYearOf)
     }
@@ -286,7 +286,7 @@ pub struct ObjectiveQuarterOfParameter {
 
 impl ObjectiveQuarterOfParameter {
     pub fn init() -> Self {
-        ObjectiveQuarterOfParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::QuarterOf)
     }
@@ -311,7 +311,7 @@ pub struct ObjectiveMonthOfParameter {
 
 impl ObjectiveMonthOfParameter {
     pub fn init() -> Self {
-        ObjectiveMonthOfParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::MonthOf)
     }
@@ -336,7 +336,7 @@ pub struct ObjectiveWeekOfYearParameter {
 
 impl ObjectiveWeekOfYearParameter {
     pub fn init() -> Self {
-        ObjectiveWeekOfYearParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::WeekOfYear)
     }
@@ -361,7 +361,7 @@ pub struct ObjectiveWeekOfMonthParameter {
 
 impl ObjectiveWeekOfMonthParameter {
     pub fn init() -> Self {
-        ObjectiveWeekOfMonthParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::WeekOfMonth)
     }
@@ -386,7 +386,7 @@ pub struct ObjectiveDayOfMonthParameter {
 
 impl ObjectiveDayOfMonthParameter {
     pub fn init() -> Self {
-        ObjectiveDayOfMonthParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::DayOfMonth)
     }
@@ -411,7 +411,7 @@ pub struct ObjectiveDayOfWeekParameter {
 
 impl ObjectiveDayOfWeekParameter {
     pub fn init() -> Self {
-        ObjectiveDayOfWeekParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::DayOfWeek)
     }
@@ -436,7 +436,7 @@ pub struct ObjectiveRoundParameter {
 
 impl ObjectiveRoundParameter {
     pub fn init() -> Self {
-        ObjectiveRoundParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Round)
     }
@@ -461,7 +461,7 @@ pub struct ObjectiveFloorParameter {
 
 impl ObjectiveFloorParameter {
     pub fn init() -> Self {
-        ObjectiveFloorParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Floor)
     }
@@ -486,7 +486,7 @@ pub struct ObjectiveCeilParameter {
 
 impl ObjectiveCeilParameter {
     pub fn init() -> Self {
-        ObjectiveCeilParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Ceil)
     }
@@ -511,7 +511,7 @@ pub struct ObjectiveAbsParameter {
 
 impl ObjectiveAbsParameter {
     pub fn init() -> Self {
-        ObjectiveAbsParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Abs)
     }
@@ -534,7 +534,7 @@ pub struct ObjectiveMaxParameter {
 
 impl ObjectiveMaxParameter {
     pub fn init() -> Self {
-        ObjectiveMaxParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Max)
     }
@@ -557,7 +557,7 @@ pub struct ObjectiveMinParameter {
 
 impl ObjectiveMinParameter {
     pub fn init() -> Self {
-        ObjectiveMinParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Min)
     }
@@ -580,7 +580,7 @@ pub struct ObjectiveInterpolateParameter {
 
 impl ObjectiveInterpolateParameter {
     pub fn init() -> Self {
-        ObjectiveInterpolateParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::Interpolate)
     }
@@ -605,12 +605,12 @@ pub struct ObjectiveCaseThenParameterRoute {
 impl ObjectiveCaseThenParameterRoute {
     /// it is to create the default route (without condition), not the [Default::default]
     pub fn default() -> Self {
-        ObjectiveCaseThenParameterRoute::new().conditional(false)
+        Self::new().conditional(false)
     }
 
     /// it is to create the conditional route
     pub fn case(joint: ObjectiveParameterJoint) -> Self {
-        ObjectiveCaseThenParameterRoute::new()
+        Self::new()
             .conditional(true)
             .on(joint)
     }
@@ -625,7 +625,7 @@ pub struct ObjectiveCaseThenParameter {
 
 impl ObjectiveCaseThenParameter {
     pub fn init() -> Self {
-        ObjectiveCaseThenParameter::new()
+        Self::new()
             .kind(ObjectiveParameterType::Computed)
             .operator(ObjectiveFormulaOperator::CaseThen)
     }
@@ -681,11 +681,11 @@ pub struct BucketObjectiveParameter {
 
 impl BucketObjectiveParameter {
     pub fn init() -> Self {
-        BucketObjectiveParameter::new().kind(ObjectiveParameterType::Bucket)
+        Self::new().kind(ObjectiveParameterType::Bucket)
     }
 
     pub fn of(bucket_id: BucketId) -> Self {
-        BucketObjectiveParameter::init().bucket_id(bucket_id)
+        Self::init().bucket_id(bucket_id)
     }
 
     pub fn to_parameter(self) -> ObjectiveParameter {
@@ -701,7 +701,7 @@ pub struct TimeframeObjectiveParameter {
 
 impl TimeframeObjectiveParameter {
     pub fn init() -> Self {
-        TimeframeObjectiveParameter::new().kind(ObjectiveParameterType::Timeframe)
+        Self::new().kind(ObjectiveParameterType::Timeframe)
     }
 
     pub fn to_parameter(self) -> ObjectiveParameter {

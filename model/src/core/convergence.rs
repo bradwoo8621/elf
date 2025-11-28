@@ -50,7 +50,7 @@ pub struct ConvergenceTimeframeVariable {
 
 impl ConvergenceTimeframeVariable {
     pub fn init() -> Self {
-        ConvergenceTimeframeVariable::new().r#type(ConvergenceVariableType::Timeframe)
+        Self::new().r#type(ConvergenceVariableType::Timeframe)
     }
 
     pub fn to_variable(self) -> ConvergenceVariable {
@@ -69,7 +69,7 @@ pub struct ConvergenceBucketVariable {
 
 impl ConvergenceBucketVariable {
     pub fn init() -> Self {
-        ConvergenceBucketVariable::new().r#type(ConvergenceVariableType::Bucket)
+        Self::new().r#type(ConvergenceVariableType::Bucket)
     }
 
     pub fn to_variable(self) -> ConvergenceVariable {
@@ -88,7 +88,7 @@ pub struct ConvergenceFreeWalkVariable {
 
 impl ConvergenceFreeWalkVariable {
     pub fn init() -> Self {
-        ConvergenceFreeWalkVariable::new().r#type(ConvergenceVariableType::FreeWalk)
+        Self::new().r#type(ConvergenceVariableType::FreeWalk)
     }
 
     pub fn to_variable(self) -> ConvergenceVariable {

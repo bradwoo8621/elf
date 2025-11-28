@@ -17,7 +17,7 @@ pub struct AdaptTo {
 
 impl AdaptTo {
     pub fn new() -> Self {
-        AdaptTo {
+        Self {
             base_data_model: false,
             storable: false,
             audit: false,
@@ -535,7 +535,7 @@ impl AdaptTo {
         quote! {
             impl #struct_name {
                 pub fn new() -> Self {
-                    #struct_name {
+                    Self {
                         #(#init_name_fields)*
                         #init_new_fields
                     }

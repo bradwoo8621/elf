@@ -25,7 +25,7 @@ pub struct PipelineEntrypoint {
 
 impl PipelineEntrypoint {
     pub fn with(principal: Principal) -> Self {
-        PipelineEntrypoint {
+        Self {
             principal,
             pipeline_id: None,
             trace_id: None,

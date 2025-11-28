@@ -12,7 +12,7 @@ pub struct TopicSchemaDateOrTimeFactor {
 
 impl TopicSchemaDateOrTimeFactor {
     pub fn new(inner: TopicSchemaFactorInner) -> Self {
-        TopicSchemaDateOrTimeFactor { inner }
+        Self { inner }
     }
 }
 
@@ -40,7 +40,7 @@ pub struct TopicSchemaDateOrTimeFactorGroup {
 
 impl TopicSchemaDateOrTimeFactorGroup {
     pub fn new(inner: TopicSchemaDateOrTimeFactorGroupInner) -> Self {
-        TopicSchemaDateOrTimeFactorGroup { inner }
+        Self { inner }
     }
 
     /// try to cast the value to date or time, if it is not
@@ -55,7 +55,7 @@ impl TopicSchemaFactorGroup<'_, TopicSchemaDateOrTimeFactor, TopicSchemaDateOrTi
     type Inner = TopicSchemaDateOrTimeFactorGroupInner;
 
     fn new(name: Arc<String>, factors: Arc<Vec<Arc<TopicSchemaDateOrTimeFactor>>>) -> Self {
-        TopicSchemaDateOrTimeFactorGroup::new(TopicSchemaFactorGroupInner::new(name, factors))
+        Self::new(TopicSchemaFactorGroupInner::new(name, factors))
     }
 
     fn get_inner(&self) -> &TopicSchemaDateOrTimeFactorGroupInner {
