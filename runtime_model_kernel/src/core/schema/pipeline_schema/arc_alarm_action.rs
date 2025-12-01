@@ -21,7 +21,7 @@ impl ArcAlarmAction {
         let action_id = Self::or_empty_str(action.action_id);
         let on = Self::conditional(action.conditional, action.on, || {
             format!(
-                "Alarm action[{}] has no condition when conditional is true.",
+                "Alarm action[{}] must have condition when conditional is true.",
                 action_id
             )
         })?;

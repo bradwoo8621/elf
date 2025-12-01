@@ -1,6 +1,8 @@
-use crate::{ArcParameterJoint, RuntimeModelKernelErrorCode};
+use crate::{ArcParameter, ArcParameterJoint, RuntimeModelKernelErrorCode};
 use std::sync::Arc;
-use watchmen_model::{FactorId, ParameterJoint, StdErrorCode, StdR, StringUtils, TopicId};
+use watchmen_model::{
+    FactorId, Parameter, ParameterJoint, StdErrorCode, StdR, StringUtils, TenantId, TopicId,
+};
 
 pub trait ArcHelper {
     fn arc<V>(value: Option<V>) -> Option<Arc<V>> {
@@ -23,6 +25,52 @@ pub trait ArcHelper {
         }
     }
 
+    fn action_source<F, P>(source: Option<Parameter>, pos: F) -> StdR<Arc<ArcParameter>>
+    where
+        F: FnOnce() -> P,
+        P: Into<String>,
+    {
+        Self::must_then(source, ArcParameter::new_arc, || {
+            RuntimeModelKernelErrorCode::ActionSourceMissed
+                .msg(format!("{} must have a source.", pos().into()))
+        })
+    }
+
+    fn parameter_left(left: Option<Parameter>) -> StdR<Arc<ArcParameter>> {
+        Self::must_then(left, ArcParameter::new_arc, || {
+            RuntimeModelKernelErrorCode::ParameterLeftMissed.msg("Parameter must have a left.")
+        })
+    }
+
+    fn parameter_right(right: Option<Parameter>) -> StdR<Arc<ArcParameter>> {
+        Self::must_then(right, ArcParameter::new_arc, || {
+            RuntimeModelKernelErrorCode::ParameterRightMissed.msg("Parameter must have a right.")
+        })
+    }
+
+    fn action_by<F, P>(by: Option<ParameterJoint>, pos: F) -> StdR<Arc<ArcParameterJoint>>
+    where
+        F: FnOnce() -> P,
+        P: Into<String>,
+    {
+        Self::must_then(by, ArcParameterJoint::new_arc, || {
+            RuntimeModelKernelErrorCode::ConditionMissed
+                .msg(format!("{} must have a by.", pos().into()))
+        })
+    }
+
+    fn must_then<V, ArcV, F1, F2>(value: Option<V>, on_some: F1, on_none: F2) -> StdR<Arc<ArcV>>
+    where
+        F1: FnOnce(V) -> StdR<Arc<ArcV>>,
+        F2: FnOnce() -> StdR<Arc<ArcV>>,
+    {
+        if value.is_none() {
+            on_none()
+        } else {
+            on_some(value.unwrap())
+        }
+    }
+
     /// check topic id is not missing and not blank
     fn topic_id<F, P>(topic_id: Option<TopicId>, pos: F) -> StdR<Arc<TopicId>>
     where
@@ -37,7 +85,7 @@ pub trait ArcHelper {
             },
             || {
                 RuntimeModelKernelErrorCode::TopicIdIsBlank
-                    .msg(format!("{} cannot be blank.", pos().into()))
+                    .msg(format!("{}'s topic id cannot be blank.", pos().into()))
             },
         )
     }
@@ -56,13 +104,13 @@ pub trait ArcHelper {
             },
             || {
                 RuntimeModelKernelErrorCode::FactorIdIsBlank
-                    .msg(format!("{} cannot be blank.", pos().into()))
+                    .msg(format!("{}'s factor id cannot be blank.", pos().into()))
             },
         )
     }
 
     /// check name is not missing and not blank
-    fn name<F, P>(name: Option<FactorId>, pos: F) -> StdR<Arc<FactorId>>
+    fn name<F, P>(name: Option<String>, pos: F) -> StdR<Arc<String>>
     where
         F: Fn() -> P,
         P: Into<String>,
@@ -75,13 +123,13 @@ pub trait ArcHelper {
             },
             || {
                 RuntimeModelKernelErrorCode::NameIsBlank
-                    .msg(format!("{} cannot be blank.", pos().into()))
+                    .msg(format!("{}'s name cannot be blank.", pos().into()))
             },
         )
     }
 
     /// check tenant id is not missing and not blank
-    fn tenant_id<F, P>(tenant_id: Option<FactorId>, pos: F) -> StdR<Arc<FactorId>>
+    fn tenant_id<F, P>(tenant_id: Option<TenantId>, pos: F) -> StdR<Arc<TenantId>>
     where
         F: Fn() -> P,
         P: Into<String>,
@@ -94,7 +142,26 @@ pub trait ArcHelper {
             },
             || {
                 RuntimeModelKernelErrorCode::TenantIdIsBlank
-                    .msg(format!("{} cannot be blank.", pos().into()))
+                    .msg(format!("{}'s tenant id cannot be blank.", pos().into()))
+            },
+        )
+    }
+
+    /// check variable name is not missing and not blank
+    fn variable_name<F, P>(variable_name: Option<String>, pos: F) -> StdR<Arc<String>>
+    where
+        F: Fn() -> P,
+        P: Into<String>,
+    {
+        Self::not_blank(
+            variable_name,
+            || {
+                RuntimeModelKernelErrorCode::ActionVariableNameMissed
+                    .msg(format!("{} must have a variable name.", pos().into()))
+            },
+            || {
+                RuntimeModelKernelErrorCode::ActionVariableNameIsBlank
+                    .msg(format!("{}'s variable name cannot be blank.", pos().into()))
             },
         )
     }
@@ -119,7 +186,11 @@ pub trait ArcHelper {
         }
     }
 
-    fn must_vec<V, ArcV, F1, F2>(values: Option<Vec<V>>, arc: F1, on_empty: F2) -> StdR<Arc<Vec<Arc<ArcV>>>>
+    fn must_vec<V, ArcV, F1, F2>(
+        values: Option<Vec<V>>,
+        arc: F1,
+        on_empty: F2,
+    ) -> StdR<Arc<Vec<Arc<ArcV>>>>
     where
         F1: Fn(V) -> StdR<Arc<ArcV>>,
         F2: FnOnce() -> StdR<Arc<Vec<Arc<ArcV>>>>,
@@ -141,20 +212,21 @@ pub trait ArcHelper {
     /// check the given args:
     /// - [conditional] use default value [false] if given arg not presents,
     /// - [on] cannot be empty if [conditional] is [true]
-    fn conditional<F>(
+    fn conditional<F, P>(
         conditional: Option<bool>,
         on: Option<ParameterJoint>,
         msg: F,
     ) -> StdR<Option<Arc<ArcParameterJoint>>>
     where
-        F: FnOnce() -> String,
+        F: FnOnce() -> P,
+        P: Into<String>,
     {
         let conditional = conditional.unwrap_or(false);
         if conditional {
             if on.is_none() {
                 RuntimeModelKernelErrorCode::ConditionMissed.msg(msg())
             } else {
-                Ok(Some(ArcParameterJoint::new(on.unwrap())?))
+                Ok(Some(ArcParameterJoint::new_arc(on.unwrap())?))
             }
         } else {
             Ok(None)

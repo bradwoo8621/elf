@@ -1,8 +1,6 @@
-use crate::{ArcHelper, ArcParameterJoint, RuntimeModelKernelErrorCode};
+use crate::{ArcHelper, ArcParameterJoint};
 use std::sync::Arc;
-use watchmen_model::{
-    DeleteRowAction, PipelineActionId, PipelineActionType, StdErrorCode, StdR, TopicId,
-};
+use watchmen_model::{DeleteRowAction, PipelineActionId, PipelineActionType, StdR, TopicId};
 
 #[derive(Debug)]
 pub struct ArcDeleteRowAction {
@@ -22,16 +20,13 @@ impl ArcDeleteRowAction {
         let topic_id = Self::topic_id(action.topic_id, || {
             format!("Delete row action[{}]", action_id)
         })?;
-        if action.by.is_none() {
-            return RuntimeModelKernelErrorCode::ConditionMissed
-                .msg(format!("Delete row action[{}] has no by.", action_id));
-        }
+        let by = Self::action_by(action.by, || format!("Delete row action[{}]", action_id))?;
 
         Ok(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::DeleteRow),
             topic_id,
-            by: ArcParameterJoint::new(action.by.unwrap())?,
+            by,
         })
     }
 }

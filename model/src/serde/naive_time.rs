@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveTime};
+use chrono::NaiveTime;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
 
@@ -11,7 +11,7 @@ where
     D: Deserializer<'de>,
 {
     let s: &str = Deserialize::deserialize(deserializer)?;
-    let dt = DateTime::parse_from_str(s, "%H:%M:%S").map_err(Error::custom)?;
+    let dt = NaiveTime::parse_from_str(s, "%H:%M:%S").map_err(Error::custom)?;
 
-    Ok(dt.time())
+    Ok(dt)
 }

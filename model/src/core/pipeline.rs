@@ -170,7 +170,7 @@ impl ReadRowsAction {
     }
 }
 
-#[derive(Display, Serde, StrEnum)]
+#[derive(Display, Serde, Debug, StrEnum)]
 pub enum AggregateArithmetic {
     None,
     Count,
@@ -274,7 +274,7 @@ impl MappingFactor {
     }
 }
 
-#[derive(Display, Serde, StrEnum)]
+#[derive(Display, Serde, Debug, StrEnum)]
 pub enum AccumulateMode {
     /// add value in current data for insert
     /// subtract value in previous data, add value in current data for merge
@@ -290,7 +290,6 @@ pub enum AccumulateMode {
 
 #[adapt_model(storable)]
 pub struct InsertRowAction {
-    /// WriteTopicAction, MappingRow
     pub action_id: Option<PipelineActionId>,
     pub r#type: Option<PipelineActionType>,
     pub accumulate_mode: Option<AccumulateMode>,

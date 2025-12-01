@@ -17,28 +17,15 @@ impl ArcHelper for ArcPipelineUnit {}
 impl ArcPipelineUnit {
     pub fn new(unit: PipelineUnit) -> StdR<Arc<Self>> {
         let unit_id = Self::or_empty_str(unit.unit_id);
-
         // TIP a default name will be generated if there is no name on unit
         let name = Arc::new(unit.name.unwrap_or(String::from("unnamed-unit")));
-
-        if unit.r#do.is_none() {
-            return RuntimeModelKernelErrorCode::PipelineActionMissed
-                .msg(format!("Pipeline unit[{}] has no action.", unit_id));
-        }
-        let actions = unit.r#do.unwrap();
-        if actions.len() == 0 {
-            return RuntimeModelKernelErrorCode::PipelineActionMissed
-                .msg(format!("Pipeline unit[{}] has no action.", unit_id));
-        }
-        let mut arc_actions = vec![];
-        for action in actions {
-            arc_actions.push(ArcPipelineAction::new(action)?);
-        }
-        let arc_actions = Arc::new(arc_actions);
-
+        let arc_actions = Self::must_vec(unit.r#do, ArcPipelineAction::new, || {
+            RuntimeModelKernelErrorCode::PipelineActionMissed
+                .msg(format!("Pipeline unit[{}] must have action.", unit_id))
+        })?;
         let on = Self::conditional(unit.conditional, unit.on, || {
             format!(
-                "Pipeline unit[{}] has no condition when conditional is true.",
+                "Pipeline unit[{}] must have condition when conditional is true.",
                 unit_id
             )
         })?;

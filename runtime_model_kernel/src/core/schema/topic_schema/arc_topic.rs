@@ -38,7 +38,7 @@ impl ArcTopic {
         })?;
         let arc_factors = Self::must_vec(topic.factors, ArcFactor::new, || {
             RuntimeModelKernelErrorCode::TopicFactorMissed
-                .msg(format!("Topic[{}] has no factor.", name))
+                .msg(format!("Topic[{}] must have factor.", name))
         })?;
 
         Ok(Arc::new(Self {

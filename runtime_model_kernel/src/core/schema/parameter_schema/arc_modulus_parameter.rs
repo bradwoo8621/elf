@@ -1,0 +1,27 @@
+use crate::{ArcHelper, ArcParameter, RuntimeModelKernelErrorCode};
+use std::sync::Arc;
+use watchmen_model::{ModulusParameter, ParameterComputeType, ParameterKind, StdErrorCode, StdR};
+
+#[derive(Debug)]
+pub struct ArcModulusParameter {
+    pub kind: Arc<ParameterKind>,
+    pub r#type: Arc<ParameterComputeType>,
+    pub parameters: Arc<Vec<Arc<ArcParameter>>>,
+}
+
+impl ArcHelper for ArcModulusParameter {}
+
+impl ArcModulusParameter {
+    pub fn new(parameter: ModulusParameter) -> StdR<Self> {
+        let arc_parameters = Self::must_vec(parameter.parameters, ArcParameter::new_arc, || {
+            RuntimeModelKernelErrorCode::ComputedParametersMissed
+                .msg("Computed parameter[modulus] must have sub parameter.")
+        })?;
+
+        Ok(Self {
+            kind: Arc::new(ParameterKind::Computed),
+            r#type: Arc::new(ParameterComputeType::Modulus),
+            parameters: arc_parameters,
+        })
+    }
+}

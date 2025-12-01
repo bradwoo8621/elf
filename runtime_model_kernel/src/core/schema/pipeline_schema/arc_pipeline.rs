@@ -1,4 +1,6 @@
-use crate::{ArcHelper, ArcParameterJoint, ArcPipelineStage, RuntimeModelKernelErrorCode};
+use crate::{
+    ArcHelper, ArcParameterJoint, ArcPipelineStage, RuntimeModelKernelErrorCode,
+};
 use std::sync::Arc;
 use watchmen_model::{
     Pipeline, PipelineId, PipelineTriggerType, StdErrorCode, StdR, TenantId, TopicId,
@@ -15,67 +17,48 @@ pub struct ArcPipeline {
     pub conditional: bool,
     pub on: Option<Arc<ArcParameterJoint>>,
     pub tenant_id: Arc<TenantId>,
-    pub version: Option<u32>,
+    pub version: u32,
 }
 
 impl ArcHelper for ArcPipeline {}
 
 impl ArcPipeline {
     pub fn new(pipeline: Pipeline) -> StdR<Arc<Self>> {
-        if pipeline.pipeline_id.is_none() {
-            return RuntimeModelKernelErrorCode::PipelineIdMissed.msg("Pipeline must have an id.");
-        }
-
-        if pipeline.name.is_none() {
-            return RuntimeModelKernelErrorCode::NameMissed.msg("Pipeline must have a name.");
-        }
-        let name = Arc::new(pipeline.name.unwrap());
-
-        if pipeline.tenant_id.is_none() {
-            return RuntimeModelKernelErrorCode::NameMissed
-                .msg(format!("Topic[{}] has not tenant.", name));
-        }
-        let tenant_id = Arc::new(pipeline.tenant_id.unwrap());
+        let pipeline_id = Self::not_blank(
+            pipeline.pipeline_id,
+            || RuntimeModelKernelErrorCode::PipelineIdMissed.msg("Pipeline must have an id."),
+            || RuntimeModelKernelErrorCode::PipelineIdIsBlank.msg("Pipeline id cannot be blank."),
+        )?;
+        let name = Self::name(pipeline.name, || format!("Pipeline[{}]", pipeline_id))?;
+        let tenant_id =
+            Self::tenant_id(pipeline.tenant_id, || format!("Pipeline[{}]", pipeline_id))?;
         let topic_id = Self::topic_id(pipeline.topic_id, || format!("Pipeline[{}]", name))?;
-
-        if pipeline.r#type.is_none() {
-            return RuntimeModelKernelErrorCode::PipelineTypeMissed
-                .msg(format!("Pipeline[{}] has no type.", name));
-        }
-
-        if pipeline.stages.is_none() {
-            return RuntimeModelKernelErrorCode::PipelineStageMissed
-                .msg(format!("Pipeline[{}] has no stage.", name));
-        }
-        let stages = pipeline.stages.unwrap();
-        if stages.len() == 0 {
-            return RuntimeModelKernelErrorCode::PipelineStageMissed
-                .msg(format!("Pipeline[{}] has no stage.", name));
-        }
-        let mut arc_stages = vec![];
-        for stage in stages {
-            arc_stages.push(ArcPipelineStage::new(stage)?);
-        }
-        let arc_stages = Arc::new(arc_stages);
-
+        let r#type = Self::must(pipeline.r#type, || {
+            RuntimeModelKernelErrorCode::PipelineTypeMissed
+                .msg(format!("Pipeline[{}] must have a type.", pipeline_id))
+        })?;
+        let arc_stages = Self::must_vec(pipeline.stages, ArcPipelineStage::new, || {
+            RuntimeModelKernelErrorCode::PipelineStageMissed
+                .msg(format!("Pipeline[{}] must have stage.", pipeline_id))
+        })?;
         let on = Self::conditional(pipeline.conditional, pipeline.on, || {
             format!(
-                "Pipeline[{}] has no condition when conditional is true.",
+                "Pipeline[{}] must have condition when conditional is true.",
                 name
             )
         })?;
 
         Ok(Arc::new(Self {
-            pipeline_id: Arc::new(pipeline.pipeline_id.unwrap()),
+            pipeline_id,
             topic_id,
             name,
-            r#type: Arc::new(pipeline.r#type.unwrap()),
+            r#type,
             stages: arc_stages,
             enabled: pipeline.enabled.unwrap_or(true),
             conditional: on.is_some(),
             on,
             tenant_id,
-            version: pipeline.version,
+            version: pipeline.version.unwrap_or(0),
         }))
     }
 
