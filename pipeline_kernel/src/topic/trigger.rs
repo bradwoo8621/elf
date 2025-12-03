@@ -6,17 +6,13 @@ use watchmen_model::{
 };
 
 pub struct TopicTrigger {
-    previous: Option<Arc<TopicData>>,
-    current: Option<Arc<TopicData>>,
-    r#type: PipelineTriggerType,
-    internal_data_id: Arc<TopicDataId>,
+    pub previous: Option<Arc<TopicData>>,
+    pub current: Option<Arc<TopicData>>,
+    pub r#type: PipelineTriggerType,
+    pub internal_data_id: Arc<TopicDataId>,
 }
 
 impl TopicTrigger {
-    pub fn data_id(&self) -> TopicDataId {
-        self.internal_data_id.as_ref().clone()
-    }
-
     fn get_data_id(data: &TopicData) -> StdR<Arc<TopicDataId>> {
         let data_id = data.get(TopicDataColumnNames::Id.column_name());
         match data_id {

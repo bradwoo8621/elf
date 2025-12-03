@@ -1,5 +1,5 @@
 use crate::{
-    PipelineExecutionContext, PipelineExecutionLogMonitor, PipelineExecutor,
+    PipelineRunContext, PipelineExecutionLogMonitor, PipelineRunner,
     PipelineKernelErrorCode, TopicTrigger,
 };
 use std::ops::Deref;
@@ -117,13 +117,13 @@ impl PipelineTrigger {
     fn prepare_execution(
         &self,
         data: TopicData,
-    ) -> StdR<(TopicDataId, Option<PipelineExecutionContext>)> {
+    ) -> StdR<(TopicDataId, Option<PipelineRunContext>)> {
         let topic_trigger = self.save_trigger_data(data)?;
-        let topic_data_id = topic_trigger.data_id().clone();
+        let topic_data_id = topic_trigger.internal_data_id.deref().clone();
 
         let pipelines = self.load_pipelines()?;
         if let Some(pipelines) = pipelines {
-            let context = PipelineExecutionContext::new(self, topic_trigger, pipelines);
+            let context = PipelineRunContext::new(self, topic_trigger, pipelines);
             Ok((topic_data_id, Some(context)))
         } else {
             println!(
@@ -138,7 +138,7 @@ impl PipelineTrigger {
     pub fn execute(&self, data: TopicData) -> StdR<TopicDataId> {
         let (topic_data_id, context) = self.prepare_execution(data)?;
         if let Some(context) = context {
-            PipelineExecutor::execute(context)?;
+            PipelineRunner::execute(context)?;
         }
         Ok(topic_data_id)
     }
@@ -146,7 +146,7 @@ impl PipelineTrigger {
     pub async fn execute_async(&self, data: TopicData) -> StdR<TopicDataId> {
         let (topic_data_id, context) = self.prepare_execution(data)?;
         if let Some(context) = context {
-            PipelineExecutor::execute_async(context).await?;
+            PipelineRunner::execute_async(context).await?;
         }
         Ok(topic_data_id)
     }

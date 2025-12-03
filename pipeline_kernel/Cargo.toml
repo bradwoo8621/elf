@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+tokio = { version = "1.48", features = ["rt"] }
 watchmen_model = { path = "../model" }
 watchmen_auth = { path = "../auth" }
 watchmen_runtime_model_kernel = { path = "../runtime_model_kernel" }
