@@ -6,8 +6,8 @@ use watchmen_runtime_model_kernel::{PipelineSchema, TopicSchema};
 
 pub struct PipelineExecution {
     pub topic_schema: Arc<TopicSchema>,
-    pub topic_trigger: Arc<TopicTrigger>,
     pub pipeline_schema: Arc<PipelineSchema>,
+    pub topic_trigger: Arc<TopicTrigger>,
     // env
     pub principal: Arc<Principal>,
     pub trace_id: Arc<PipelineTriggerTraceId>,

@@ -4,32 +4,33 @@ use crate::{
     ArcMultiplyParameter, ArcNoneParameter, ArcQuarterOfParameter, ArcSubtractParameter,
     ArcWeekOfMonthParameter, ArcWeekOfYearParameter, ArcYearOfParameter,
 };
+use std::sync::Arc;
 use watchmen_model::{ComputedParameter, StdR};
 
 #[derive(Debug)]
 pub enum ArcComputedParameter {
-    None(ArcNoneParameter),
+    None(Arc<ArcNoneParameter>),
     // math operations
-    Add(ArcAddParameter),
-    Subtract(ArcSubtractParameter),
-    Multiply(ArcMultiplyParameter),
-    Divide(ArcDivideParameter),
-    Modulus(ArcModulusParameter),
+    Add(Arc<ArcAddParameter>),
+    Subtract(Arc<ArcSubtractParameter>),
+    Multiply(Arc<ArcMultiplyParameter>),
+    Divide(Arc<ArcDivideParameter>),
+    Modulus(Arc<ArcModulusParameter>),
     // date related operations
-    YearOf(ArcYearOfParameter),
-    HalfYearOf(ArcHalfYearOfParameter),
-    QuarterOf(ArcQuarterOfParameter),
-    MonthOf(ArcMonthOfParameter),
-    WeekOfYear(ArcWeekOfYearParameter),
-    WeekOfMonth(ArcWeekOfMonthParameter),
-    DayOfMonth(ArcDayOfMonthParameter),
-    DayOfWeek(ArcDayOfWeekParameter),
+    YearOf(Arc<ArcYearOfParameter>),
+    HalfYearOf(Arc<ArcHalfYearOfParameter>),
+    QuarterOf(Arc<ArcQuarterOfParameter>),
+    MonthOf(Arc<ArcMonthOfParameter>),
+    WeekOfYear(Arc<ArcWeekOfYearParameter>),
+    WeekOfMonth(Arc<ArcWeekOfMonthParameter>),
+    DayOfMonth(Arc<ArcDayOfMonthParameter>),
+    DayOfWeek(Arc<ArcDayOfWeekParameter>),
     // conditional operation
-    CaseThen(ArcCaseThenParameter),
+    CaseThen(Arc<ArcCaseThenParameter>),
 }
 
 impl ArcComputedParameter {
-    pub fn new(parameter: ComputedParameter) -> StdR<Self> {
+    pub fn new(parameter: ComputedParameter) -> StdR<Arc<Self>> {
         let arc_parameter = match parameter {
             ComputedParameter::None(p) => ArcComputedParameter::None(ArcNoneParameter::new(p)?),
             // math operations
@@ -77,6 +78,6 @@ impl ArcComputedParameter {
             }
         };
 
-        Ok(arc_parameter)
+        Ok(Arc::new(arc_parameter))
     }
 }

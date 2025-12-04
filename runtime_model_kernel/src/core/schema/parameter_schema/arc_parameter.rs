@@ -4,13 +4,13 @@ use watchmen_model::{Parameter, StdR};
 
 #[derive(Debug)]
 pub enum ArcParameter {
-    Topic(ArcTopicFactorParameter),
-    Constant(ArcConstantParameter),
-    Computed(ArcComputedParameter),
+    Topic(Arc<ArcTopicFactorParameter>),
+    Constant(Arc<ArcConstantParameter>),
+    Computed(Arc<ArcComputedParameter>),
 }
 
 impl ArcParameter {
-    pub fn new_arc(parameter: Parameter) -> StdR<Arc<Self>> {
+    pub fn new(parameter: Parameter) -> StdR<Arc<Self>> {
         let arc_parameter = match parameter {
             Parameter::Topic(p) => ArcParameter::Topic(ArcTopicFactorParameter::new(p)?),
             Parameter::Constant(p) => ArcParameter::Constant(ArcConstantParameter::new(p)?),

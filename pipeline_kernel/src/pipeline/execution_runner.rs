@@ -13,15 +13,11 @@ impl PipelineExecutionRunner {
     pub async fn run(execution: PipelineExecution) -> StdR<Option<Vec<PipelineExecution>>> {
         let compiled_pipeline =
             Self::find_pipeline_compile_service(&execution.principal.tenant_id)?
-                .compile(execution.pipeline_schema)?;
-
-        let topic_trigger = execution.topic_trigger;
+                .compile(execution.topic_schema, execution.pipeline_schema)?;
 
         compiled_pipeline
-            .execute(PipelineExecutable(
-                topic_trigger.internal_data_id.clone(),
-                topic_trigger.previous.clone(),
-                topic_trigger.current.clone(),
+            .execute(PipelineExecutable::new(
+                execution.topic_trigger,
                 execution.principal,
                 execution.trace_id,
                 execution.execution_log_monitor,

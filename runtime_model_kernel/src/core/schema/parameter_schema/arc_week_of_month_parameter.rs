@@ -14,20 +14,20 @@ pub struct ArcWeekOfMonthParameter {
 impl ArcHelper for ArcWeekOfMonthParameter {}
 
 impl ArcWeekOfMonthParameter {
-    pub fn new(parameter: WeekOfMonthParameter) -> StdR<Self> {
+    pub fn new(parameter: WeekOfMonthParameter) -> StdR<Arc<Self>> {
         let parameter = Self::must_then(
             parameter.parameter.map(|p| *p),
-            ArcParameter::new_arc,
+            ArcParameter::new,
             || {
                 RuntimeModelKernelErrorCode::ComputedParametersMissed
                     .msg("Computed parameter[week-of-month] must have sub parameter.")
             },
         )?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Computed),
             r#type: Arc::new(ParameterComputeType::WeekOfMonth),
             parameter,
-        })
+        }))
     }
 }

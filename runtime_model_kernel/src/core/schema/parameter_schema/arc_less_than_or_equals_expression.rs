@@ -12,14 +12,14 @@ pub struct ArcLessThanOrEqualsExpression {
 impl ArcHelper for ArcLessThanOrEqualsExpression {}
 
 impl ArcLessThanOrEqualsExpression {
-    pub fn new(exp: LessThanOrEqualsExpression) -> StdR<Self> {
+    pub fn new(exp: LessThanOrEqualsExpression) -> StdR<Arc<Self>> {
         let left = Self::parameter_left(exp.left)?;
         let right = Self::parameter_right(exp.right)?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             left,
             operator: Arc::new(ParameterExpressionOperator::LessEquals),
             right,
-        })
+        }))
     }
 }

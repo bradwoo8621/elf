@@ -4,8 +4,8 @@ use watchmen_model::{ParameterCondition, StdR};
 
 #[derive(Debug)]
 pub enum ArcParameterCondition {
-    Expression(ArcParameterExpression),
-    Joint(ArcParameterJoint),
+    Expression(Arc<ArcParameterExpression>),
+    Joint(Arc<ArcParameterJoint>),
 }
 
 impl ArcParameterCondition {

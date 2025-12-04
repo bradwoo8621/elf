@@ -1,6 +1,6 @@
 use crate::{
-    PipelineRunContext, PipelineExecutionLogMonitor, PipelineRunner,
-    PipelineKernelErrorCode, TopicTrigger,
+    PipelineExecutionLogMonitor, PipelineKernelErrorCode, PipelineRunContext, PipelineRunner,
+    TopicTrigger,
 };
 use std::ops::Deref;
 use std::sync::Arc;
@@ -94,7 +94,7 @@ impl PipelineTrigger {
             }
             _ => {
                 let pipelines = pipeline_meta_service
-                    .find_by_topic_and_pipeline_type(self.topic_schema.topic().topic_id.as_ref())?;
+                    .find_by_topic_and_pipeline_type(self.topic_schema.topic().topic_id.deref())?;
                 if let Some(pipelines) = pipelines {
                     let pipelines: Vec<Arc<PipelineSchema>> = pipelines
                         .into_iter()

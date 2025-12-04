@@ -12,20 +12,20 @@ pub struct ArcMonthOfParameter {
 impl ArcHelper for ArcMonthOfParameter {}
 
 impl ArcMonthOfParameter {
-    pub fn new(parameter: MonthOfParameter) -> StdR<Self> {
+    pub fn new(parameter: MonthOfParameter) -> StdR<Arc<Self>> {
         let parameter = Self::must_then(
             parameter.parameter.map(|p| *p),
-            ArcParameter::new_arc,
+            ArcParameter::new,
             || {
                 RuntimeModelKernelErrorCode::ComputedParametersMissed
                     .msg("Computed parameter[month-of] must have sub parameter.")
             },
         )?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Computed),
             r#type: Arc::new(ParameterComputeType::MonthOf),
             parameter,
-        })
+        }))
     }
 }

@@ -12,16 +12,16 @@ pub struct ArcNoneParameter {
 impl ArcHelper for ArcNoneParameter {}
 
 impl ArcNoneParameter {
-    pub fn new(parameter: NoneParameter) -> StdR<Self> {
-        let arc_parameters = Self::must_vec(parameter.parameters, ArcParameter::new_arc, || {
+    pub fn new(parameter: NoneParameter) -> StdR<Arc<Self>> {
+        let arc_parameters = Self::must_vec(parameter.parameters, ArcParameter::new, || {
             RuntimeModelKernelErrorCode::ComputedParametersMissed
                 .msg("Computed parameter[none] must have sub parameter.")
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Computed),
             r#type: Arc::new(ParameterComputeType::None),
             parameters: arc_parameters,
-        })
+        }))
     }
 }

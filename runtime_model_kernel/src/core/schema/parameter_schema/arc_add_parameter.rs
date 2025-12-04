@@ -12,16 +12,16 @@ pub struct ArcAddParameter {
 impl ArcHelper for ArcAddParameter {}
 
 impl ArcAddParameter {
-    pub fn new(parameter: AddParameter) -> StdR<Self> {
-        let arc_parameters = Self::must_vec(parameter.parameters, ArcParameter::new_arc, || {
+    pub fn new(parameter: AddParameter) -> StdR<Arc<Self>> {
+        let arc_parameters = Self::must_vec(parameter.parameters, ArcParameter::new, || {
             RuntimeModelKernelErrorCode::ComputedParametersMissed
                 .msg("Computed parameter[add] must have sub parameter.")
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Computed),
             r#type: Arc::new(ParameterComputeType::Add),
             parameters: arc_parameters,
-        })
+        }))
     }
 }

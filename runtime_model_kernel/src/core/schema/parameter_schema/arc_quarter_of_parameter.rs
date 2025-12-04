@@ -12,20 +12,20 @@ pub struct ArcQuarterOfParameter {
 impl ArcHelper for ArcQuarterOfParameter {}
 
 impl ArcQuarterOfParameter {
-    pub fn new(parameter: QuarterOfParameter) -> StdR<Self> {
+    pub fn new(parameter: QuarterOfParameter) -> StdR<Arc<Self>> {
         let parameter = Self::must_then(
             parameter.parameter.map(|p| *p),
-            ArcParameter::new_arc,
+            ArcParameter::new,
             || {
                 RuntimeModelKernelErrorCode::ComputedParametersMissed
                     .msg("Computed parameter[quarter-of] must have sub parameter.")
             },
         )?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Computed),
             r#type: Arc::new(ParameterComputeType::QuarterOf),
             parameter,
-        })
+        }))
     }
 }

@@ -12,14 +12,14 @@ pub struct ArcNotEqualsExpression {
 impl ArcHelper for ArcNotEqualsExpression {}
 
 impl ArcNotEqualsExpression {
-    pub fn new(exp: NotEqualsExpression) -> StdR<Self> {
+    pub fn new(exp: NotEqualsExpression) -> StdR<Arc<Self>> {
         let left = Self::parameter_left(exp.left)?;
         let right = Self::parameter_right(exp.right)?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             left,
             operator: Arc::new(ParameterExpressionOperator::NotEquals),
             right,
-        })
+        }))
     }
 }

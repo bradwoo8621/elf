@@ -8,20 +8,20 @@ use watchmen_model::{ParameterExpression, StdR};
 
 #[derive(Debug)]
 pub enum ArcParameterExpression {
-    Empty(ArcEmptyExpression),
-    NotEmpty(ArcNotEmptyExpression),
-    Equals(ArcEqualsExpression),
-    NotEquals(ArcNotEqualsExpression),
-    LessThan(ArcLessThanExpression),
-    LessThanOrEquals(ArcLessThanOrEqualsExpression),
-    MoreThan(ArcMoreThanExpression),
-    MoreThanOrEquals(ArcMoreThanOrEqualsExpression),
-    In(ArcInExpression),
-    NotIn(ArcNotInExpression),
+    Empty(Arc<ArcEmptyExpression>),
+    NotEmpty(Arc<ArcNotEmptyExpression>),
+    Equals(Arc<ArcEqualsExpression>),
+    NotEquals(Arc<ArcNotEqualsExpression>),
+    LessThan(Arc<ArcLessThanExpression>),
+    LessThanOrEquals(Arc<ArcLessThanOrEqualsExpression>),
+    MoreThan(Arc<ArcMoreThanExpression>),
+    MoreThanOrEquals(Arc<ArcMoreThanOrEqualsExpression>),
+    In(Arc<ArcInExpression>),
+    NotIn(Arc<ArcNotInExpression>),
 }
 
 impl ArcParameterExpression {
-    pub fn new(expression: ParameterExpression) -> StdR<Self> {
+    pub fn new(expression: ParameterExpression) -> StdR<Arc<Self>> {
         let arc_expression = match expression {
             ParameterExpression::Empty(exp) => {
                 ArcParameterExpression::Empty(ArcEmptyExpression::new(exp)?)
@@ -53,10 +53,6 @@ impl ArcParameterExpression {
             }
         };
 
-        Ok(arc_expression)
-    }
-
-    pub fn new_arc(expression: ParameterExpression) -> StdR<Arc<Self>> {
-        Ok(Arc::new(Self::new(expression)?))
+        Ok(Arc::new(arc_expression))
     }
 }

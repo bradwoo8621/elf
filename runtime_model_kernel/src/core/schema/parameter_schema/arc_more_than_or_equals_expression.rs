@@ -12,14 +12,14 @@ pub struct ArcMoreThanOrEqualsExpression {
 impl ArcHelper for ArcMoreThanOrEqualsExpression {}
 
 impl ArcMoreThanOrEqualsExpression {
-    pub fn new(exp: MoreThanOrEqualsExpression) -> StdR<Self> {
+    pub fn new(exp: MoreThanOrEqualsExpression) -> StdR<Arc<Self>> {
         let left = Self::parameter_left(exp.left)?;
         let right = Self::parameter_right(exp.right)?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             left,
             operator: Arc::new(ParameterExpressionOperator::MoreEquals),
             right,
-        })
+        }))
     }
 }

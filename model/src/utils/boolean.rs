@@ -6,6 +6,8 @@ pub trait BooleanUtils {
 }
 
 impl BooleanUtils for String {
+    /// [true, t, yes, y, not 0 number] -> true
+    /// [false, f, no, n, number 0] -> false
     fn to_bool(&self) -> bool {
         let val = &self.to_lowercase();
         let val = val.as_str();

@@ -11,7 +11,7 @@ pub struct ArcParameterJoint {
 impl ArcHelper for ArcParameterJoint {}
 
 impl ArcParameterJoint {
-    pub fn new(joint: ParameterJoint) -> StdR<Self> {
+    pub fn new(joint: ParameterJoint) -> StdR<Arc<Self>> {
         let joint_type = Self::must(joint.joint_type, || {
             RuntimeModelKernelErrorCode::ParameterJointTypeMissed
                 .msg("Parameter joint must have filter.")
@@ -21,13 +21,9 @@ impl ArcParameterJoint {
                 .msg("Parameter joint must have filter.")
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             joint_type,
             filters: arc_filters,
-        })
-    }
-
-    pub fn new_arc(joint: ParameterJoint) -> StdR<Arc<Self>> {
-        Ok(Arc::new(Self::new(joint)?))
+        }))
     }
 }

@@ -1,7 +1,7 @@
 use crate::CompiledPipeline;
 use std::sync::Arc;
 use watchmen_model::{StdR, TenantId};
-use watchmen_runtime_model_kernel::PipelineSchema;
+use watchmen_runtime_model_kernel::{PipelineSchema, TopicSchema};
 
 pub struct PipelineCompileService {
     tenant_id: TenantId,
@@ -15,7 +15,14 @@ impl PipelineCompileService {
         }))
     }
 
-    pub fn compile(&self, schema: Arc<PipelineSchema>) -> StdR<Arc<CompiledPipeline>> {
-        Ok(Arc::new(CompiledPipeline::compile(schema)?))
+    pub fn compile(
+        &self,
+        topic_schema: Arc<TopicSchema>,
+        pipeline_schema: Arc<PipelineSchema>,
+    ) -> StdR<Arc<CompiledPipeline>> {
+        Ok(Arc::new(CompiledPipeline::compile(
+            topic_schema,
+            pipeline_schema,
+        )?))
     }
 }

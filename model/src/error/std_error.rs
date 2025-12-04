@@ -17,6 +17,7 @@ pub trait StdErrorCode {
 
 pub enum StdErrCode {
     DecimalParse,
+    ValuesNotComparable,
     /// with multiple sub errors
     Multiple,
     Unknown,
@@ -26,6 +27,7 @@ impl StdErrorCode for StdErrCode {
     fn code(&self) -> &'static str {
         match self {
             StdErrCode::DecimalParse => "STDE-00001",
+            StdErrCode::ValuesNotComparable => "STDE-00002",
             StdErrCode::Multiple => "STDE-99998",
             StdErrCode::Unknown => "STDE-99999",
         }

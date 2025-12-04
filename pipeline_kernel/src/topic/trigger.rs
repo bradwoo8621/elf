@@ -5,6 +5,7 @@ use watchmen_model::{
     TopicDataValue,
 };
 
+/// will be used in the execution of multiple pipelines.
 pub struct TopicTrigger {
     pub previous: Option<Arc<TopicData>>,
     pub current: Option<Arc<TopicData>>,

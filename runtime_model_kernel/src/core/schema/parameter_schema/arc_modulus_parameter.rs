@@ -12,16 +12,16 @@ pub struct ArcModulusParameter {
 impl ArcHelper for ArcModulusParameter {}
 
 impl ArcModulusParameter {
-    pub fn new(parameter: ModulusParameter) -> StdR<Self> {
-        let arc_parameters = Self::must_vec(parameter.parameters, ArcParameter::new_arc, || {
+    pub fn new(parameter: ModulusParameter) -> StdR<Arc<Self>> {
+        let arc_parameters = Self::must_vec(parameter.parameters, ArcParameter::new, || {
             RuntimeModelKernelErrorCode::ComputedParametersMissed
                 .msg("Computed parameter[modulus] must have sub parameter.")
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Computed),
             r#type: Arc::new(ParameterComputeType::Modulus),
             parameters: arc_parameters,
-        })
+        }))
     }
 }

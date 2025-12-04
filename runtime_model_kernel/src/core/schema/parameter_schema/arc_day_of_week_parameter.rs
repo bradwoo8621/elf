@@ -12,20 +12,20 @@ pub struct ArcDayOfWeekParameter {
 impl ArcHelper for ArcDayOfWeekParameter {}
 
 impl ArcDayOfWeekParameter {
-    pub fn new(parameter: DayOfWeekParameter) -> StdR<Self> {
+    pub fn new(parameter: DayOfWeekParameter) -> StdR<Arc<Self>> {
         let parameter = Self::must_then(
             parameter.parameter.map(|p| *p),
-            ArcParameter::new_arc,
+            ArcParameter::new,
             || {
                 RuntimeModelKernelErrorCode::ComputedParametersMissed
                     .msg("Computed parameter[day-of-week] must have sub parameter.")
             },
         )?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Computed),
             r#type: Arc::new(ParameterComputeType::DayOfWeek),
             parameter,
-        })
+        }))
     }
 }

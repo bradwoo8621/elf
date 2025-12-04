@@ -21,7 +21,7 @@ impl ArcCaseThenParameterRoute {
             route.on,
             || "Case then route must have condition when conditional is true.",
         )?;
-        let parameter = Self::must_then(route.parameter, ArcParameter::new_arc, || {
+        let parameter = Self::must_then(route.parameter, ArcParameter::new, || {
             RuntimeModelKernelErrorCode::CaseThenRouteParameterMissed
                 .msg("Case then route must have sub parameter.")
         })?;
@@ -44,7 +44,7 @@ pub struct ArcCaseThenParameter {
 impl ArcHelper for ArcCaseThenParameter {}
 
 impl ArcCaseThenParameter {
-    pub fn new(parameter: CaseThenParameter) -> StdR<Self> {
+    pub fn new(parameter: CaseThenParameter) -> StdR<Arc<Self>> {
         if parameter.parameters.is_none() {
             return RuntimeModelKernelErrorCode::ComputedParametersMissed
                 .msg("Computed parameter[case-then] must have sub parameter.");
@@ -82,10 +82,10 @@ impl ArcCaseThenParameter {
         }
         let arc_parameters = Arc::new(arc_parameters);
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Computed),
             r#type: Arc::new(ParameterComputeType::CaseThen),
             parameters: arc_parameters,
-        })
+        }))
     }
 }

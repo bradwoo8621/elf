@@ -1,5 +1,6 @@
 mod compile_service;
 mod compiled;
+mod compiled_parameter;
 mod entrypoint;
 mod execution;
 mod execution_log_monitor;
@@ -9,6 +10,7 @@ mod runner;
 mod trigger;
 
 pub use compiled::*;
+pub use compiled_parameter::*;
 pub use entrypoint::*;
 pub use execution::*;
 pub use execution_log_monitor::*;

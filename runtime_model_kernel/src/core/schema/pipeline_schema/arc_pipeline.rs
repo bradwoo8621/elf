@@ -1,6 +1,4 @@
-use crate::{
-    ArcHelper, ArcParameterJoint, ArcPipelineStage, RuntimeModelKernelErrorCode,
-};
+use crate::{ArcHelper, ArcParameterJoint, ArcPipelineStage, RuntimeModelKernelErrorCode};
 use std::sync::Arc;
 use watchmen_model::{
     Pipeline, PipelineId, PipelineTriggerType, StdErrorCode, StdR, TenantId, TopicId,
@@ -14,7 +12,6 @@ pub struct ArcPipeline {
     pub r#type: Arc<PipelineTriggerType>,
     pub stages: Arc<Vec<Arc<ArcPipelineStage>>>,
     pub enabled: bool,
-    pub conditional: bool,
     pub on: Option<Arc<ArcParameterJoint>>,
     pub tenant_id: Arc<TenantId>,
     pub version: u32,
@@ -55,7 +52,6 @@ impl ArcPipeline {
             r#type,
             stages: arc_stages,
             enabled: pipeline.enabled.unwrap_or(true),
-            conditional: on.is_some(),
             on,
             tenant_id,
             version: pipeline.version.unwrap_or(0),
@@ -67,6 +63,6 @@ impl ArcPipeline {
     }
 
     pub fn is_conditional(&self) -> bool {
-        self.conditional
+        self.on.is_some()
     }
 }

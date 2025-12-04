@@ -11,7 +11,7 @@ pub struct ArcConstantParameter {
 impl ArcHelper for ArcConstantParameter {}
 
 impl ArcConstantParameter {
-    pub fn new(parameter: ConstantParameter) -> StdR<Self> {
+    pub fn new(parameter: ConstantParameter) -> StdR<Arc<Self>> {
         let value = Self::not_blank(
             parameter.value,
             || {
@@ -24,9 +24,9 @@ impl ArcConstantParameter {
             },
         )?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Constant),
             value,
-        })
+        }))
     }
 }

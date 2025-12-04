@@ -12,14 +12,14 @@ pub struct ArcEqualsExpression {
 impl ArcHelper for ArcEqualsExpression {}
 
 impl ArcEqualsExpression {
-    pub fn new(exp: EqualsExpression) -> StdR<Self> {
+    pub fn new(exp: EqualsExpression) -> StdR<Arc<Self>> {
         let left = Self::parameter_left(exp.left)?;
         let right = Self::parameter_right(exp.right)?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             left,
             operator: Arc::new(ParameterExpressionOperator::Equals),
             right,
-        })
+        }))
     }
 }

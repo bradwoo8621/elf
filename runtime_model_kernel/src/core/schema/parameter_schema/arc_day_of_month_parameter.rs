@@ -14,20 +14,20 @@ pub struct ArcDayOfMonthParameter {
 impl ArcHelper for ArcDayOfMonthParameter {}
 
 impl ArcDayOfMonthParameter {
-    pub fn new(parameter: DayOfMonthParameter) -> StdR<Self> {
+    pub fn new(parameter: DayOfMonthParameter) -> StdR<Arc<Self>> {
         let parameter = Self::must_then(
             parameter.parameter.map(|p| *p),
-            ArcParameter::new_arc,
+            ArcParameter::new,
             || {
                 RuntimeModelKernelErrorCode::ComputedParametersMissed
                     .msg("Computed parameter[day-of-month] must have sub parameter.")
             },
         )?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Computed),
             r#type: Arc::new(ParameterComputeType::DayOfMonth),
             parameter,
-        })
+        }))
     }
 }

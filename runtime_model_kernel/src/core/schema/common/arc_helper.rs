@@ -30,20 +30,20 @@ pub trait ArcHelper {
         F: FnOnce() -> P,
         P: Into<String>,
     {
-        Self::must_then(source, ArcParameter::new_arc, || {
+        Self::must_then(source, ArcParameter::new, || {
             RuntimeModelKernelErrorCode::ActionSourceMissed
                 .msg(format!("{} must have a source.", pos().into()))
         })
     }
 
     fn parameter_left(left: Option<Parameter>) -> StdR<Arc<ArcParameter>> {
-        Self::must_then(left, ArcParameter::new_arc, || {
+        Self::must_then(left, ArcParameter::new, || {
             RuntimeModelKernelErrorCode::ParameterLeftMissed.msg("Parameter must have a left.")
         })
     }
 
     fn parameter_right(right: Option<Parameter>) -> StdR<Arc<ArcParameter>> {
-        Self::must_then(right, ArcParameter::new_arc, || {
+        Self::must_then(right, ArcParameter::new, || {
             RuntimeModelKernelErrorCode::ParameterRightMissed.msg("Parameter must have a right.")
         })
     }
@@ -53,7 +53,7 @@ pub trait ArcHelper {
         F: FnOnce() -> P,
         P: Into<String>,
     {
-        Self::must_then(by, ArcParameterJoint::new_arc, || {
+        Self::must_then(by, ArcParameterJoint::new, || {
             RuntimeModelKernelErrorCode::ConditionMissed
                 .msg(format!("{} must have a by.", pos().into()))
         })
@@ -226,7 +226,7 @@ pub trait ArcHelper {
             if on.is_none() {
                 RuntimeModelKernelErrorCode::ConditionMissed.msg(msg())
             } else {
-                Ok(Some(ArcParameterJoint::new_arc(on.unwrap())?))
+                Ok(Some(ArcParameterJoint::new(on.unwrap())?))
             }
         } else {
             Ok(None)

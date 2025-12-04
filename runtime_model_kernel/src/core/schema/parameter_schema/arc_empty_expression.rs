@@ -11,12 +11,12 @@ pub struct ArcEmptyExpression {
 impl ArcHelper for ArcEmptyExpression {}
 
 impl ArcEmptyExpression {
-    pub fn new(exp: EmptyExpression) -> StdR<Self> {
+    pub fn new(exp: EmptyExpression) -> StdR<Arc<Self>> {
         let left = Self::parameter_left(exp.left)?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             left,
             operator: Arc::new(ParameterExpressionOperator::Empty),
-        })
+        }))
     }
 }
