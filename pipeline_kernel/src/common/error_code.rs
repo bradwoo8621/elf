@@ -1,6 +1,7 @@
 use watchmen_model::StdErrorCode;
 
 pub enum PipelineKernelErrorCode {
+    // trigger
     TriggerCodeMissed,
     TriggerCodeIsBlank,
     TriggerTypeMissed,
@@ -10,13 +11,17 @@ pub enum PipelineKernelErrorCode {
     TriggerTenantIdMissed,
     TriggerTenantIdIsBlank,
     TriggerTenantIdMismatchPrincipal,
-    TopicDataIdNotFound,
-    TopicDataIdTypeNotSupported,
     TriggerTypeNotSupportedOnRaw,
     TriggerPipelineIdIsBlank,
     TriggerTraceIdIsBlank,
     TriggerTypeMismatchPipeline,
-    TriggerPipelineNotFound
+    TriggerPipelineNotFound,
+    // topic data
+    TopicDataIdNotFound,
+    TopicDataIdTypeNotSupported,
+    CurrentTopicDataMissed,
+    // schema
+    FactorNotFound,
 }
 
 impl StdErrorCode for PipelineKernelErrorCode {
@@ -31,13 +36,17 @@ impl StdErrorCode for PipelineKernelErrorCode {
             PipelineKernelErrorCode::TriggerTenantIdMissed => "PLKN-00007",
             PipelineKernelErrorCode::TriggerTenantIdIsBlank => "PLKN-00008",
             PipelineKernelErrorCode::TriggerTenantIdMismatchPrincipal => "PLKN-00009",
-            PipelineKernelErrorCode::TopicDataIdNotFound => "PLKN-000010",
-            PipelineKernelErrorCode::TopicDataIdTypeNotSupported => "PLKN-000011",
-            PipelineKernelErrorCode::TriggerTypeNotSupportedOnRaw => "PLKN-000012",
-            PipelineKernelErrorCode::TriggerPipelineIdIsBlank => "PLKN-000013",
-            PipelineKernelErrorCode::TriggerTraceIdIsBlank => "PLKN-000014",
-            PipelineKernelErrorCode::TriggerTypeMismatchPipeline => "PLKN-000015",
-            PipelineKernelErrorCode::TriggerPipelineNotFound => "PLKN-000016",
+            PipelineKernelErrorCode::TriggerTypeNotSupportedOnRaw => "PLKN-000010",
+            PipelineKernelErrorCode::TriggerPipelineIdIsBlank => "PLKN-000011",
+            PipelineKernelErrorCode::TriggerTraceIdIsBlank => "PLKN-000012",
+            PipelineKernelErrorCode::TriggerTypeMismatchPipeline => "PLKN-000013",
+            PipelineKernelErrorCode::TriggerPipelineNotFound => "PLKN-000014",
+
+            PipelineKernelErrorCode::TopicDataIdNotFound => "PLKN-000100",
+            PipelineKernelErrorCode::TopicDataIdTypeNotSupported => "PLKN-000101",
+            PipelineKernelErrorCode::CurrentTopicDataMissed => "PLKN-000102",
+
+            PipelineKernelErrorCode::FactorNotFound => "PLKN-000200",
         }
     }
 }

@@ -9,6 +9,7 @@ mod run_context;
 mod runner;
 mod trigger;
 
+pub use compile_service::*;
 pub use compiled::*;
 pub use compiled_in_memory_parameter::*;
 pub use entrypoint::*;

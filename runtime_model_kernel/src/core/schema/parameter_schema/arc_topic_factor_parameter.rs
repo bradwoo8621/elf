@@ -13,8 +13,8 @@ impl ArcHelper for ArcTopicFactorParameter {}
 
 impl ArcTopicFactorParameter {
     pub fn new(parameter: TopicFactorParameter) -> StdR<Arc<Self>> {
-        let topic_id = Self::topic_id(parameter.topic_id, || "Topic factor parameter[{}]")?;
-        let factor_id = Self::factor_id(parameter.factor_id, || "Topic factor parameter[{}]")?;
+        let topic_id = Self::topic_id(parameter.topic_id, || "Topic factor parameter")?;
+        let factor_id = Self::factor_id(parameter.factor_id, || "Topic factor parameter")?;
 
         Ok(Arc::new(Self {
             kind: Arc::new(ParameterKind::Topic),

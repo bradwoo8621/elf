@@ -22,13 +22,13 @@ impl CompiledLessThanOrEqualsExpression {
 impl InMemoryParameterCondition for CompiledLessThanOrEqualsExpression {
     fn is_true(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         self.left
-            .value_from(variables)
-            .is_less_than_or_equals(self.right.value_from(variables))
+            .value_from(variables)?
+            .is_less_than_or_equals(self.right.value_from(variables)?)
     }
 
     fn is_false(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         self.left
-            .value_from(variables)
-            .is_more_than(self.right.value_from(variables))
+            .value_from(variables)?
+            .is_more_than(self.right.value_from(variables)?)
     }
 }

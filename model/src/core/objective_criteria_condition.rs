@@ -1,4 +1,4 @@
-use crate::{BaseDataModel, ObjectiveParameter, Storable};
+use crate::{BaseDataModel, ObjectiveParameter, StdErrCode, StdErrorCode, StdR, Storable};
 use serde::{Deserialize, Serialize};
 use watchmen_model_marco::{adapt_model, Display, Serde, StrEnum, VariousStructTypes};
 
@@ -86,8 +86,7 @@ pub struct ObjectiveNotEqualsExpression {
 
 impl ObjectiveNotEqualsExpression {
     pub fn init() -> Self {
-        Self::new()
-            .operator(ObjectiveParameterExpressionOperator::NotEquals)
+        Self::new().operator(ObjectiveParameterExpressionOperator::NotEquals)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {
@@ -129,8 +128,7 @@ pub struct ObjectiveLessThanOrEqualsExpression {
 
 impl ObjectiveLessThanOrEqualsExpression {
     pub fn init() -> Self {
-        Self::new()
-            .operator(ObjectiveParameterExpressionOperator::LessEquals)
+        Self::new().operator(ObjectiveParameterExpressionOperator::LessEquals)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {
@@ -172,8 +170,7 @@ pub struct ObjectiveMoreThanOrEqualsExpression {
 
 impl ObjectiveMoreThanOrEqualsExpression {
     pub fn init() -> Self {
-        Self::new()
-            .operator(ObjectiveParameterExpressionOperator::MoreEquals)
+        Self::new().operator(ObjectiveParameterExpressionOperator::MoreEquals)
     }
 
     pub fn to_expression(self) -> ObjectiveParameterExpression {

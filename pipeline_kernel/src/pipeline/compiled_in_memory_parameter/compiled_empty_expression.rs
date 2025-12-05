@@ -19,10 +19,10 @@ impl CompiledEmptyExpression {
 
 impl InMemoryParameterCondition for CompiledEmptyExpression {
     fn is_true(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
-        Ok(self.left.value_from(variables).is_empty())
+        Ok(self.left.value_from(variables)?.is_empty())
     }
 
     fn is_false(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
-        Ok(self.left.value_from(variables).is_not_empty())
+        Ok(self.left.value_from(variables)?.is_not_empty())
     }
 }

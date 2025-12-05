@@ -23,14 +23,14 @@ impl InMemoryParameterCondition for CompiledEqualsExpression {
     fn is_true(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         Ok(self
             .left
-            .value_from(variables)
-            .is_same_as(self.right.value_from(variables)))
+            .value_from(variables)?
+            .is_same_as(self.right.value_from(variables)?))
     }
 
     fn is_false(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         Ok(self
             .left
-            .value_from(variables)
-            .is_not_same_as(self.right.value_from(variables)))
+            .value_from(variables)?
+            .is_not_same_as(self.right.value_from(variables)?))
     }
 }

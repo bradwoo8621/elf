@@ -1,6 +1,7 @@
+use crate::PipelineKernelErrorCode;
 use std::collections::HashMap;
 use std::sync::Arc;
-use watchmen_model::TopicData;
+use watchmen_model::{StdErrorCode, StdR, TopicData};
 
 pub struct PipelineExecutionVariables {
     pub previous_data: Option<Arc<TopicData>>,
@@ -18,6 +19,16 @@ impl PipelineExecutionVariables {
             current_data: current,
             variables: HashMap::new(),
             variables_from: HashMap::new(),
+        }
+    }
+
+    /// get current topic data.
+    /// raise error when current data not exists
+    pub fn get_current_data(&self) -> StdR<&Arc<TopicData>> {
+        match &self.current_data {
+            Some(current_data) => Ok(current_data),
+            _ => PipelineKernelErrorCode::CurrentTopicDataMissed
+                .msg("Current trigger data is missed."),
         }
     }
 }

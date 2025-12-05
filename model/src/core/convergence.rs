@@ -1,7 +1,7 @@
 use crate::serde::option_naive_datetime;
 use crate::{
-    Auditable, BaseDataModel, BucketId, ObjectiveId, ObjectiveTargetId, OptimisticLock, Storable,
-    TenantBasedTuple, TenantId, Tuple, UserGroupId, UserId,
+    Auditable, BaseDataModel, BucketId, ObjectiveId, ObjectiveTargetId, OptimisticLock, StdErrCode,
+    StdErrorCode, StdR, Storable, TenantBasedTuple, TenantId, Tuple, UserGroupId, UserId,
 };
 use serde::{Deserialize, Serialize};
 use watchmen_model_marco::{adapt_model, Display, Serde, StrEnum, VariousStructTypes};

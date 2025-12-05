@@ -22,13 +22,13 @@ impl CompiledInExpression {
 impl InMemoryParameterCondition for CompiledInExpression {
     fn is_true(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         self.left
-            .value_from(variables)
-            .is_in(self.right.value_from(variables))
+            .value_from(variables)?
+            .is_in(self.right.value_from(variables)?)
     }
 
     fn is_false(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         self.left
-            .value_from(variables)
-            .is_not_in(self.right.value_from(variables))
+            .value_from(variables)?
+            .is_not_in(self.right.value_from(variables)?)
     }
 }

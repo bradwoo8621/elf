@@ -1,6 +1,6 @@
 use crate::{
-	CompiledComputedParameter, CompiledConstantParameter, CompiledTopicFactorParameter,
-	InMemoryParameter, PipelineExecutionVariables,
+    CompiledComputedParameter, CompiledConstantParameter, CompiledTopicFactorParameter,
+    InMemoryParameter, PipelineExecutionVariables,
 };
 use std::ops::Deref;
 use std::sync::Arc;
@@ -30,7 +30,10 @@ impl CompiledParameter {
 }
 
 impl InMemoryParameter for CompiledParameter {
-    fn value_from(&self, variables: &PipelineExecutionVariables) -> &TopicDataValue {
+    fn value_from<'a>(
+        &self,
+        variables: &'a PipelineExecutionVariables,
+    ) -> StdR<&'a TopicDataValue> {
         match self {
             CompiledParameter::Topic(v) => v.value_from(variables),
             CompiledParameter::Constant(v) => v.value_from(variables),

@@ -1,12 +1,12 @@
 use crate::CompiledPipeline;
 use std::sync::Arc;
-use watchmen_model::{StdR, TenantId};
-use watchmen_runtime_model_kernel::{PipelineSchema, TopicSchema};
+use watchmen_model::StdR;
+use watchmen_runtime_model_kernel::{PipelineSchema, PipelineService, TopicSchema};
 
 pub struct PipelineCompileService {}
 
 impl PipelineCompileService {
-    pub fn with(tenant_id: &TenantId) -> StdR<Arc<Self>> {
+    fn new() -> StdR<Arc<Self>> {
         // TODO maybe find from cache
         Ok(Arc::new(Self {}))
     }
@@ -22,3 +22,11 @@ impl PipelineCompileService {
         )?))
     }
 }
+
+pub trait PipelineCompilationProvider {
+    fn compilation() -> StdR<Arc<PipelineCompileService>> {
+        PipelineCompileService::new()
+    }
+}
+
+impl PipelineCompilationProvider for PipelineService {}

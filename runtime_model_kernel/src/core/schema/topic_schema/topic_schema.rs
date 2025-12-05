@@ -1,11 +1,13 @@
 use crate::{
-    ArcTopic, HierarchyAid, TopicSchemaDateOrTimeFactorGroup, TopicSchemaDateOrTimeFactorGroups,
-    TopicSchemaDefaultValueFactorGroup, TopicSchemaDefaultValueFactorGroups,
-    TopicSchemaEncryptFactorGroup, TopicSchemaEncryptFactorGroups, TopicSchemaFactorGroups,
-    TopicSchemaFlattenFactorGroup, TopicSchemaFlattenFactorGroups,
+    ArcFactor, ArcTopic, HierarchyAid, TopicSchemaDateOrTimeFactorGroup,
+    TopicSchemaDateOrTimeFactorGroups, TopicSchemaDefaultValueFactorGroup,
+    TopicSchemaDefaultValueFactorGroups, TopicSchemaEncryptFactorGroup,
+    TopicSchemaEncryptFactorGroups, TopicSchemaFactorGroups, TopicSchemaFlattenFactorGroup,
+    TopicSchemaFlattenFactorGroups,
 };
+use std::ops::Deref;
 use std::sync::Arc;
-use watchmen_model::{StdR, Topic, TopicCode, TopicData, TopicId, VoidR};
+use watchmen_model::{FactorId, StdR, Topic, TopicCode, TopicData, TopicId, VoidR};
 
 /// The schema of a topic, including various factor groups.
 /// all factor fields are optional, depending on whether the topic has the corresponding factors.
@@ -39,6 +41,22 @@ impl TopicSchema {
 
     pub fn name(&self) -> &Arc<TopicCode> {
         &self.topic().name
+    }
+
+    pub fn factor_by_id(&self, factor_id: &FactorId) -> Option<&ArcFactor> {
+        self.topic()
+            .factors
+            .iter()
+            .find(|f| f.factor_id.deref() == factor_id)
+            .map(|f| f.deref())
+    }
+
+    pub fn factor_by_name(&self, factor_name: &String) -> Option<&ArcFactor> {
+        self.topic()
+            .factors
+            .iter()
+            .find(|f| f.name.deref() == factor_name)
+            .map(|f| f.deref())
     }
 
     fn should_init_default_values(&self) -> bool {

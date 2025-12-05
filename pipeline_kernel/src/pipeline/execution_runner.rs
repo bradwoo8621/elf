@@ -1,19 +1,13 @@
-use crate::pipeline::compile_service::PipelineCompileService;
-use crate::{PipelineExecutable, PipelineExecution};
-use std::sync::Arc;
-use watchmen_model::{StdR, TenantId};
+use crate::{PipelineCompilationProvider, PipelineExecutable, PipelineExecution};
+use watchmen_model::StdR;
+use watchmen_runtime_model_kernel::PipelineService;
 
 pub struct PipelineExecutionRunner {}
 
 impl PipelineExecutionRunner {
-    fn find_pipeline_compile_service(tenant_id: &TenantId) -> StdR<Arc<PipelineCompileService>> {
-        Ok(PipelineCompileService::with(tenant_id)?)
-    }
-
     pub async fn run(execution: PipelineExecution) -> StdR<Option<Vec<PipelineExecution>>> {
-        let compiled_pipeline =
-            Self::find_pipeline_compile_service(&execution.principal.tenant_id)?
-                .compile(execution.topic_schema, execution.pipeline_schema)?;
+        let compiled_pipeline = PipelineService::compilation()?
+            .compile(execution.topic_schema, execution.pipeline_schema)?;
 
         compiled_pipeline
             .execute(PipelineExecutable::new(

@@ -1,6 +1,6 @@
 use crate::{
     BaseDataModel, BucketId, FactorOrObjectiveFactorIdOrSubjectDatasetColumnId,
-    ObjectiveParameterJoint, Storable,
+    ObjectiveParameterJoint, StdErrCode, StdErrorCode, StdR, Storable,
 };
 use serde::{Deserialize, Serialize};
 use watchmen_model_marco::{adapt_model, Display, Serde, StrEnum, VariousStructTypes};
@@ -610,9 +610,7 @@ impl ObjectiveCaseThenParameterRoute {
 
     /// it is to create the conditional route
     pub fn case(joint: ObjectiveParameterJoint) -> Self {
-        Self::new()
-            .conditional(true)
-            .on(joint)
+        Self::new().conditional(true).on(joint)
     }
 }
 
