@@ -2,7 +2,7 @@ use crate::{
     CompiledParameter, InMemoryParameter, InMemoryParameterCondition, PipelineExecutionVariables,
 };
 use std::sync::Arc;
-use watchmen_model::StdR;
+use watchmen_model::{StdR, TenantId};
 use watchmen_runtime_model_kernel::ArcInExpression;
 
 pub struct CompiledInExpression {
@@ -11,10 +11,10 @@ pub struct CompiledInExpression {
 }
 
 impl CompiledInExpression {
-    pub fn new(exp: Arc<ArcInExpression>) -> StdR<Self> {
+    pub fn new(exp: &Arc<ArcInExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         Ok(CompiledInExpression {
-            left: CompiledParameter::new(exp.left.clone())?,
-            right: CompiledParameter::new(exp.right.clone())?,
+            left: CompiledParameter::new(&exp.left, tenant_id)?,
+            right: CompiledParameter::new(&exp.right, tenant_id)?,
         })
     }
 }

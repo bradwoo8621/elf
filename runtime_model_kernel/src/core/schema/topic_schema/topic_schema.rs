@@ -7,7 +7,7 @@ use crate::{
 };
 use std::ops::Deref;
 use std::sync::Arc;
-use watchmen_model::{FactorId, StdR, Topic, TopicCode, TopicData, TopicId, VoidR};
+use watchmen_model::{FactorId, StdR, TenantId, Topic, TopicCode, TopicData, TopicId, VoidR};
 
 /// The schema of a topic, including various factor groups.
 /// all factor fields are optional, depending on whether the topic has the corresponding factors.
@@ -57,6 +57,10 @@ impl TopicSchema {
             .iter()
             .find(|f| f.name.deref() == factor_name)
             .map(|f| f.deref())
+    }
+
+    pub fn tenant_id(&self) -> &Arc<TenantId> {
+        &self.topic().tenant_id
     }
 
     fn should_init_default_values(&self) -> bool {

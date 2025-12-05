@@ -1,6 +1,6 @@
 use crate::{CompiledParameterJoint, InMemoryParameterCondition, PipelineExecutionVariables};
 use std::sync::Arc;
-use watchmen_model::StdR;
+use watchmen_model::{StdR, TenantId};
 use watchmen_runtime_model_kernel::ArcParameterJoint;
 
 /// in-memory check
@@ -10,10 +10,13 @@ pub struct CompiledConditional {
 }
 
 impl CompiledConditional {
-    pub fn new(conditional: Option<Arc<ArcParameterJoint>>) -> StdR<Self> {
+    pub fn new(
+        conditional: &Option<Arc<ArcParameterJoint>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         Ok(if let Some(conditional) = &conditional {
             CompiledConditional {
-                inner: Some(CompiledParameterJoint::new(conditional.clone())?),
+                inner: Some(CompiledParameterJoint::new(conditional, tenant_id)?),
             }
         } else {
             CompiledConditional { inner: None }

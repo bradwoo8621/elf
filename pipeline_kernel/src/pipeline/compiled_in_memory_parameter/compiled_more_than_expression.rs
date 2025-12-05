@@ -2,7 +2,7 @@ use crate::{
     CompiledParameter, InMemoryParameter, InMemoryParameterCondition, PipelineExecutionVariables,
 };
 use std::sync::Arc;
-use watchmen_model::StdR;
+use watchmen_model::{StdR, TenantId};
 use watchmen_runtime_model_kernel::ArcMoreThanExpression;
 
 pub struct CompiledMoreThanExpression {
@@ -11,10 +11,10 @@ pub struct CompiledMoreThanExpression {
 }
 
 impl CompiledMoreThanExpression {
-    pub fn new(exp: Arc<ArcMoreThanExpression>) -> StdR<Self> {
+    pub fn new(exp: &Arc<ArcMoreThanExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         Ok(CompiledMoreThanExpression {
-            left: CompiledParameter::new(exp.left.clone())?,
-            right: CompiledParameter::new(exp.right.clone())?,
+            left: CompiledParameter::new(&exp.left, tenant_id)?,
+            right: CompiledParameter::new(&exp.right, tenant_id)?,
         })
     }
 }

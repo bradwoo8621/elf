@@ -6,7 +6,7 @@ use crate::{
 };
 use std::ops::Deref;
 use std::sync::Arc;
-use watchmen_model::StdR;
+use watchmen_model::{StdR, TenantId};
 use watchmen_runtime_model_kernel::ArcParameterExpression;
 
 pub enum CompiledParameterExpression {
@@ -23,32 +23,32 @@ pub enum CompiledParameterExpression {
 }
 
 impl CompiledParameterExpression {
-    pub fn new(value: Arc<ArcParameterExpression>) -> StdR<Self> {
+    pub fn new(value: &Arc<ArcParameterExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         match value.deref() {
-            ArcParameterExpression::Empty(v) => CompiledEmptyExpression::new(v.clone())
+            ArcParameterExpression::Empty(v) => CompiledEmptyExpression::new(v, tenant_id)
                 .map(|p| CompiledParameterExpression::Empty(p)),
-            ArcParameterExpression::NotEmpty(v) => CompiledNotEmptyExpression::new(v.clone())
+            ArcParameterExpression::NotEmpty(v) => CompiledNotEmptyExpression::new(v, tenant_id)
                 .map(|p| CompiledParameterExpression::NotEmpty(p)),
-            ArcParameterExpression::Equals(v) => CompiledEqualsExpression::new(v.clone())
+            ArcParameterExpression::Equals(v) => CompiledEqualsExpression::new(v, tenant_id)
                 .map(|p| CompiledParameterExpression::Equals(p)),
-            ArcParameterExpression::NotEquals(v) => CompiledNotEqualsExpression::new(v.clone())
+            ArcParameterExpression::NotEquals(v) => CompiledNotEqualsExpression::new(v, tenant_id)
                 .map(|p| CompiledParameterExpression::NotEquals(p)),
-            ArcParameterExpression::LessThan(v) => CompiledLessThanExpression::new(v.clone())
+            ArcParameterExpression::LessThan(v) => CompiledLessThanExpression::new(v, tenant_id)
                 .map(|p| CompiledParameterExpression::LessThan(p)),
             ArcParameterExpression::LessThanOrEquals(v) => {
-                CompiledLessThanOrEqualsExpression::new(v.clone())
+                CompiledLessThanOrEqualsExpression::new(v, tenant_id)
                     .map(|p| CompiledParameterExpression::LessThanOrEquals(p))
             }
-            ArcParameterExpression::MoreThan(v) => CompiledMoreThanExpression::new(v.clone())
+            ArcParameterExpression::MoreThan(v) => CompiledMoreThanExpression::new(v, tenant_id)
                 .map(|p| CompiledParameterExpression::MoreThan(p)),
             ArcParameterExpression::MoreThanOrEquals(v) => {
-                CompiledMoreThanOrEqualsExpression::new(v.clone())
+                CompiledMoreThanOrEqualsExpression::new(v, tenant_id)
                     .map(|p| CompiledParameterExpression::MoreThanOrEquals(p))
             }
             ArcParameterExpression::In(v) => {
-                CompiledInExpression::new(v.clone()).map(|p| CompiledParameterExpression::In(p))
+                CompiledInExpression::new(v, tenant_id).map(|p| CompiledParameterExpression::In(p))
             }
-            ArcParameterExpression::NotIn(v) => CompiledNotInExpression::new(v.clone())
+            ArcParameterExpression::NotIn(v) => CompiledNotInExpression::new(v, tenant_id)
                 .map(|p| CompiledParameterExpression::NotIn(p)),
         }
     }

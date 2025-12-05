@@ -4,7 +4,7 @@ use crate::{
 };
 use std::ops::Deref;
 use std::sync::Arc;
-use watchmen_model::{StdR, TopicDataValue};
+use watchmen_model::{StdR, TenantId, TopicDataValue};
 use watchmen_runtime_model_kernel::ArcParameter;
 
 pub enum CompiledParameter {
@@ -14,16 +14,16 @@ pub enum CompiledParameter {
 }
 
 impl CompiledParameter {
-    pub fn new(value: Arc<ArcParameter>) -> StdR<Self> {
+    pub fn new(value: &Arc<ArcParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         match value.deref() {
             ArcParameter::Topic(v) => {
-                CompiledTopicFactorParameter::new(v.clone()).map(|p| CompiledParameter::Topic(p))
+                CompiledTopicFactorParameter::new(v, tenant_id).map(|p| CompiledParameter::Topic(p))
             }
             ArcParameter::Constant(v) => {
-                CompiledConstantParameter::new(v.clone()).map(|p| CompiledParameter::Constant(p))
+                CompiledConstantParameter::new(v, tenant_id).map(|p| CompiledParameter::Constant(p))
             }
             ArcParameter::Computed(v) => {
-                CompiledComputedParameter::new(v.clone()).map(|p| CompiledParameter::Computed(p))
+                CompiledComputedParameter::new(v, tenant_id).map(|p| CompiledParameter::Computed(p))
             }
         }
     }

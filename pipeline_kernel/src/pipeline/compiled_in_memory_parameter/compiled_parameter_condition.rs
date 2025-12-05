@@ -4,7 +4,7 @@ use crate::{
 };
 use std::ops::Deref;
 use std::sync::Arc;
-use watchmen_model::StdR;
+use watchmen_model::{StdR, TenantId};
 use watchmen_runtime_model_kernel::ArcParameterCondition;
 
 pub enum CompiledParameterCondition {
@@ -13,13 +13,12 @@ pub enum CompiledParameterCondition {
 }
 
 impl CompiledParameterCondition {
-    pub fn new(value: Arc<ArcParameterCondition>) -> StdR<Self> {
+    pub fn new(value: &Arc<ArcParameterCondition>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         match value.deref() {
-            ArcParameterCondition::Expression(v) => CompiledParameterExpression::new(v.clone())
+            ArcParameterCondition::Expression(v) => CompiledParameterExpression::new(v, tenant_id)
                 .map(|p| CompiledParameterCondition::Expression(p)),
-            ArcParameterCondition::Joint(v) => {
-                CompiledParameterJoint::new(v.clone()).map(|p| CompiledParameterCondition::Joint(p))
-            }
+            ArcParameterCondition::Joint(v) => CompiledParameterJoint::new(v, tenant_id)
+                .map(|p| CompiledParameterCondition::Joint(p)),
         }
     }
 }

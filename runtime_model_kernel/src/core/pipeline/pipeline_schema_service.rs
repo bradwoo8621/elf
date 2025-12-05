@@ -1,6 +1,6 @@
 use crate::{PipelineMetaProvider, PipelineSchema};
 use std::sync::Arc;
-use watchmen_model::{PipelineId, StdR, TopicId};
+use watchmen_model::{PipelineId, StdR, TenantId, TopicId};
 
 /// TODO pipeline meta service using tenant and it's meta datasource (or the global meta datasource)
 ///  to find out pipeline meta.
@@ -15,8 +15,8 @@ impl PipelineSchemaService {
         Ok(Arc::new(Self {}))
     }
 
-    pub fn by_pipeline_id(&self, pipeline_id: &PipelineId) -> StdR<Option<Arc<PipelineSchema>>> {
-        let pipeline = Self::meta()?.by_pipeline_id(pipeline_id)?;
+    pub fn by_pipeline_id(&self, pipeline_id: &PipelineId, tenant_id: &TenantId) -> StdR<Option<Arc<PipelineSchema>>> {
+        let pipeline = Self::meta()?.by_pipeline_id(pipeline_id, tenant_id)?;
         if let Some(pipeline) = pipeline {
             let schema = PipelineSchema::new(pipeline)?;
             Ok(Some(Arc::new(schema)))
@@ -25,8 +25,8 @@ impl PipelineSchemaService {
         }
     }
 
-    pub fn by_topic_id(&self, topic_id: &TopicId) -> StdR<Option<Vec<Arc<PipelineSchema>>>> {
-        let pipelines = Self::meta()?.by_topic_id(topic_id)?;
+    pub fn by_topic_id(&self, topic_id: &TopicId, tenant_id: &TenantId) -> StdR<Option<Vec<Arc<PipelineSchema>>>> {
+        let pipelines = Self::meta()?.by_topic_id(topic_id, tenant_id)?;
         match pipelines {
             Some(pipelines) => {
                 let mut schemas = vec![];

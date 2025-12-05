@@ -1,6 +1,6 @@
 use crate::ArcPipeline;
 use std::sync::Arc;
-use watchmen_model::{Pipeline, PipelineTriggerType, StdR};
+use watchmen_model::{Pipeline, PipelineTriggerType, StdR, TenantId};
 
 pub struct PipelineSchema {
     inner: Arc<ArcPipeline>,
@@ -23,5 +23,9 @@ impl PipelineSchema {
 
     pub fn r#type(&self) -> &Arc<PipelineTriggerType> {
         &self.pipeline().r#type
+    }
+
+    pub fn tenant_id(&self) -> &Arc<TenantId> {
+        &self.pipeline().tenant_id
     }
 }

@@ -710,6 +710,8 @@ pub trait TopicDataUtils {
     fn value_of(&self, property: &TopicDataProperty) -> StdR<&TopicDataValue>;
 }
 
+static EMPTY_VEC: TopicDataValue = TopicDataValue::Vec(Vec::new());
+
 impl TopicDataUtils for TopicData {
     fn value_of(&self, property: &TopicDataProperty) -> StdR<&TopicDataValue> {
         match property {
@@ -721,8 +723,7 @@ impl TopicDataUtils for TopicData {
                 let data = self.get(&names[0]);
                 if data.is_none() {
                     if *array {
-                        return Ok(&TopicDataValue::Vec(vec![]));
-                        // return Ok(&TopicDataValue::None);
+                        return Ok(&EMPTY_VEC);
                     } else {
                         return Ok(&TopicDataValue::None);
                     }

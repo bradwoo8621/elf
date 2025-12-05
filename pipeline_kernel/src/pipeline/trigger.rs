@@ -67,7 +67,8 @@ impl PipelineTrigger {
     fn load_pipelines(&self) -> StdR<Option<Vec<Arc<PipelineSchema>>>> {
         let pipelines = match &self.pipeline_id {
             Some(pipeline_id) => {
-                let pipeline = PipelineService::schema()?.by_pipeline_id(&pipeline_id)?;
+                let pipeline = PipelineService::schema()?
+                    .by_pipeline_id(&pipeline_id, &self.principal.tenant_id)?;
                 if let Some(pipeline) = pipeline {
                     let r#type = pipeline.r#type();
                     if *r#type.deref() != self.r#type {
@@ -86,8 +87,10 @@ impl PipelineTrigger {
                 }
             }
             _ => {
-                let pipelines = PipelineService::schema()?
-                    .by_topic_id(self.topic_schema.topic().topic_id.deref())?;
+                let pipelines = PipelineService::schema()?.by_topic_id(
+                    self.topic_schema.topic().topic_id.deref(),
+                    &self.principal.tenant_id,
+                )?;
                 if let Some(pipelines) = pipelines {
                     let pipelines: Vec<Arc<PipelineSchema>> = pipelines
                         .into_iter()

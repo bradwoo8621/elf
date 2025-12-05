@@ -1,12 +1,12 @@
 use crate::{InMemoryParameter, PipelineExecutionVariables};
 use std::sync::Arc;
-use watchmen_model::{StdR, TopicDataValue};
+use watchmen_model::{StdR, TenantId, TopicDataValue};
 use watchmen_runtime_model_kernel::ArcComputedParameter;
 
 pub struct CompiledComputedParameter {}
 
 impl CompiledComputedParameter {
-    pub fn new(_parameter: Arc<ArcComputedParameter>) -> StdR<Self> {
+    pub fn new(_parameter: &Arc<ArcComputedParameter>, _tenant_id: &Arc<TenantId>) -> StdR<Self> {
         Ok(CompiledComputedParameter {})
     }
 }

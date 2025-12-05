@@ -1,7 +1,7 @@
 use crate::{CompiledParameterCondition, InMemoryParameterCondition, PipelineExecutionVariables};
 use std::ops::Deref;
 use std::sync::Arc;
-use watchmen_model::{ParameterJointType, StdR};
+use watchmen_model::{ParameterJointType, StdR, TenantId};
 use watchmen_runtime_model_kernel::ArcParameterJoint;
 
 /// in-memory check
@@ -11,10 +11,10 @@ pub struct CompiledParameterJoint {
 }
 
 impl CompiledParameterJoint {
-    pub fn new(value: Arc<ArcParameterJoint>) -> StdR<Self> {
+    pub fn new(value: &Arc<ArcParameterJoint>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         let mut conditions = vec![];
         for filter in value.filters.deref() {
-            conditions.push(CompiledParameterCondition::new(filter.clone())?)
+            conditions.push(CompiledParameterCondition::new(filter, tenant_id)?)
         }
 
         Ok(CompiledParameterJoint {

@@ -14,7 +14,8 @@ impl CompiledPipeline {
         topic_schema: Arc<TopicSchema>,
         pipeline_schema: Arc<PipelineSchema>,
     ) -> StdR<Self> {
-        let conditional = CompiledConditional::new(pipeline_schema.pipeline().on.clone())?;
+        let pipeline = pipeline_schema.pipeline();
+        let conditional = CompiledConditional::new(&pipeline.on, &pipeline.tenant_id)?;
 
         Ok(Self {
             topic: topic_schema,
