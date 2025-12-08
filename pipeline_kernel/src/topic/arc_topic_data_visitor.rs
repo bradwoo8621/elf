@@ -1,5 +1,6 @@
-use crate::{ArcTopicData, ArcTopicDataValue};
+use crate::{ArcTopicData, ArcTopicDataValue, PipelineKernelErrorCode};
 use bigdecimal::{BigDecimal, FromPrimitive};
+use std::fmt::Debug;
 use std::ops::Deref;
 use std::sync::{Arc, LazyLock};
 use watchmen_model::{StdErrCode, StdErrorCode, StdR, VariablePredefineFunctions};
@@ -31,6 +32,26 @@ impl TopicDataProperty {
 
 pub trait TopicDataUtils {
     fn value_of(&self, property: &TopicDataProperty) -> StdR<Arc<ArcTopicDataValue>>;
+
+    fn decimal_parse_error<R>(&self, name: &String, current_name: &String) -> StdR<R>
+    where
+        Self: Debug,
+    {
+        StdErrCode::DecimalParse.msg(format!(
+            "Cannot retrieve[key={}, current={}] as decimal from [{:?}].",
+            name, current_name, &self
+        ))
+    }
+
+    fn function_not_supported<R>(&self, name: &String, current_name: &String) -> StdR<R>
+    where
+        Self: Debug,
+    {
+        PipelineKernelErrorCode::VariableFuncNotSupported.msg(format!(
+            "Cannot retrieve[key={}, current={}] as decimal from [{:?}].",
+            name, current_name, &self
+        ))
+    }
 }
 
 static ARC__TOPIC_VALUE__NONE: LazyLock<Arc<ArcTopicDataValue>, fn() -> Arc<ArcTopicDataValue>> =
@@ -74,27 +95,18 @@ impl TopicDataUtils for ArcTopicData {
                                     return if let Some(value) = BigDecimal::from_usize(vec.len()) {
                                         Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(value))))
                                     } else {
-                                        StdErrCode::DecimalParse.msg(format!(
-                                            "Cannot retrieve[key={}, current={}] as decimal from [{:?}].",
-                                            name, current_name, data
-                                        ))
+                                        self.decimal_parse_error(name, current_name)
                                     };
                                 }
                                 ArcTopicDataValue::Map(map) => {
                                     return if let Some(value) = BigDecimal::from_usize(map.len()) {
                                         Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(value))))
                                     } else {
-                                        StdErrCode::DecimalParse.msg(format!(
-                                            "Cannot retrieve[key={}, current={}] as decimal from [{:?}].",
-                                            name, current_name, data
-                                        ))
+                                        self.decimal_parse_error(name, current_name)
                                     };
                                 }
                                 _ => {
-                                    return StdErrCode::VariableFuncNotSupported.msg(format!(
-                                        "Cannot retrieve[key={}, current={}] from [{:?}].",
-                                        name, current_name, data
-                                    ));
+                                    return self.function_not_supported(name, current_name);
                                 }
                             },
                             VariablePredefineFunctions::Length => {}

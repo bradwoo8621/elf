@@ -20,6 +20,8 @@ pub enum PipelineKernelErrorCode {
     TopicDataIdNotFound,
     TopicDataIdTypeNotSupported,
     CurrentTopicDataMissed,
+    ValuesNotComparable,
+    VariableFuncNotSupported,
     // schema
     FactorNotFound,
 }
@@ -36,17 +38,19 @@ impl StdErrorCode for PipelineKernelErrorCode {
             PipelineKernelErrorCode::TriggerTenantIdMissed => "PLKN-00007",
             PipelineKernelErrorCode::TriggerTenantIdIsBlank => "PLKN-00008",
             PipelineKernelErrorCode::TriggerTenantIdMismatchPrincipal => "PLKN-00009",
-            PipelineKernelErrorCode::TriggerTypeNotSupportedOnRaw => "PLKN-000010",
-            PipelineKernelErrorCode::TriggerPipelineIdIsBlank => "PLKN-000011",
-            PipelineKernelErrorCode::TriggerTraceIdIsBlank => "PLKN-000012",
-            PipelineKernelErrorCode::TriggerTypeMismatchPipeline => "PLKN-000013",
-            PipelineKernelErrorCode::TriggerPipelineNotFound => "PLKN-000014",
+            PipelineKernelErrorCode::TriggerTypeNotSupportedOnRaw => "PLKN-00010",
+            PipelineKernelErrorCode::TriggerPipelineIdIsBlank => "PLKN-00011",
+            PipelineKernelErrorCode::TriggerTraceIdIsBlank => "PLKN-00012",
+            PipelineKernelErrorCode::TriggerTypeMismatchPipeline => "PLKN-00013",
+            PipelineKernelErrorCode::TriggerPipelineNotFound => "PLKN-00014",
 
-            PipelineKernelErrorCode::TopicDataIdNotFound => "PLKN-000100",
-            PipelineKernelErrorCode::TopicDataIdTypeNotSupported => "PLKN-000101",
-            PipelineKernelErrorCode::CurrentTopicDataMissed => "PLKN-000102",
+            PipelineKernelErrorCode::TopicDataIdNotFound => "PLKN-00100",
+            PipelineKernelErrorCode::TopicDataIdTypeNotSupported => "PLKN-00101",
+            PipelineKernelErrorCode::CurrentTopicDataMissed => "PLKN-00102",
+            PipelineKernelErrorCode::ValuesNotComparable => "PLKN-00103",
+            PipelineKernelErrorCode::VariableFuncNotSupported => "PLKN-00104",
 
-            PipelineKernelErrorCode::FactorNotFound => "PLKN-000200",
+            PipelineKernelErrorCode::FactorNotFound => "PLKN-00200",
         }
     }
 }

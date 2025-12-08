@@ -1,10 +1,10 @@
-use crate::ArcTopicDataValue;
+use crate::{ArcTopicDataValue, PipelineKernelErrorCode};
 use bigdecimal::{BigDecimal, One, Zero};
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use std::ops::Deref;
 use std::str::FromStr;
 use std::sync::Arc;
-use watchmen_model::{DateTimeUtils, NumericUtils, StdErrCode, StdErrorCode, StdR};
+use watchmen_model::{DateTimeUtils, NumericUtils, StdErrorCode, StdR};
 
 impl ArcTopicDataValue {
     /// check itself is [None] or not
@@ -323,7 +323,7 @@ impl ArcTopicDataValue {
     }
 
     fn must_compare_between_num_or_datetime<R>(&self, another: &ArcTopicDataValue) -> StdR<R> {
-        StdErrCode::ValuesNotComparable.msg(
+        PipelineKernelErrorCode::ValuesNotComparable.msg(
             format!("Comparison of [none|str|decimal|date|time|datetime] are supported, current are [one={:?}, another={:?}].",
                     Self::display_in_error(self), Self::display_in_error(another)), )
     }
@@ -641,7 +641,7 @@ impl ArcTopicDataValue {
                     .map(|s| ArcTopicDataValue::Str(Arc::new(s.to_string())))
                     .any(|another_value| self.is_same_as(&another_value)))
             }
-            _ => StdErrCode::ValuesNotComparable.msg(
+            _ => PipelineKernelErrorCode::ValuesNotComparable.msg(
                 format!("Comparison of [none|str|decimal|date|time|datetime] are supported, current are [one={:?}, another={:?}].",
                         Self::display_in_error(self), Self::display_in_error(another)))
         }
