@@ -7,7 +7,7 @@ pub fn serialize<S: Serializer>(
     serializer: S,
 ) -> Result<S::Ok, S::Error> {
     match time {
-        Some(time) => serializer.serialize_str(&time.format("%Y-%m-%dT%H:%M:%S").to_string()),
+        Some(time) => serializer.serialize_str(&time.format("%Y-%m-%d %H:%M:%S").to_string()),
         _ => serializer.serialize_none(),
     }
 }
@@ -19,7 +19,7 @@ where
     let s: Option<&str> = Option::deserialize(deserializer)?;
     if let Some(s) = s {
         Ok(Some(
-            NaiveDateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S").map_err(Error::custom)?,
+            NaiveDateTime::parse_from_str(s, "%Y-%m-%d %H:%M:%S").map_err(Error::custom)?,
         ))
     } else {
         Ok(None)

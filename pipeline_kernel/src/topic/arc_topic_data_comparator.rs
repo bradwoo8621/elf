@@ -4,7 +4,7 @@ use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use std::ops::Deref;
 use std::str::FromStr;
 use std::sync::Arc;
-use watchmen_model::{DateTimeUtils, NumericUtils, StdErrorCode, StdR};
+use watchmen_model::{DateTimeUtils, NumericUtils, StdErrorCode, StdR, StringConverter};
 
 impl ArcTopicDataValue {
     /// check itself is [None] or not
@@ -312,8 +312,8 @@ impl ArcTopicDataValue {
         match value {
             ArcTopicDataValue::None => String::from("none"),
             ArcTopicDataValue::Str(v) => v.to_string(),
-            ArcTopicDataValue::Num(v) => v.to_plain_string(),
-            ArcTopicDataValue::Bool(v) => String::from(if *v { "true" } else { "false" }),
+            ArcTopicDataValue::Num(v) => String::from_decimal(v),
+            ArcTopicDataValue::Bool(v) => String::from_bool(v),
             ArcTopicDataValue::Date(v) => v.to_string(),
             ArcTopicDataValue::Time(v) => v.to_string(),
             ArcTopicDataValue::DateTime(v) => v.to_string(),
@@ -358,6 +358,10 @@ impl ArcTopicDataValue {
     ///    - 6.2. another is string, less than another to time,
     ///    - 6.3. error,
     /// 7. error.
+    ///
+    /// Note according to #4.1 and #5.1, for datetime type, the time part is not involved in the value comparison.
+    /// Therefore, it is possible that a situation occurs where,
+    /// for example, "2025-12-09 11:00:00" [is not less than] "2025-12-09 12:00:00".
     pub fn is_less_than(&self, another: &ArcTopicDataValue) -> StdR<bool> {
         match self {
             ArcTopicDataValue::None => {

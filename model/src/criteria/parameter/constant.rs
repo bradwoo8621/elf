@@ -5,15 +5,50 @@ use watchmen_model_marco::{adapt_model, Display, Serde, StrEnum};
 #[pattern = "ampersand-prefix"]
 pub enum VariablePredefineFunctions {
     // Sequence functions
+    /// get next sequence number, [only in-memory]
     NextSeq,
     // Aggregation functions
+    /// count of vec or map, [only in-memory]
     Count,
     // String functions
+    /// chars count of string or decimal (to string)
     Length,
+    /// alias of [Length]
+    Len,
+    Slice,
+    /// alias of [Slice]
+    Substr,
+    Find,
+    Index,
+    StartsWith,
+    /// alias of [StartsWith]
+    #[display = "&startswith"]
+    Startswith,
+    EndsWith,
+    /// alias of [EndsWith]
+    #[display = "&endswith"]
+    Endswith,
+    Strip,
+    /// alias of [Strip]
+    Trim,
+    Replace,
+    ReplaceFirst,
+    Upper,
+    Lower,
+    Contains,
+    Split,
+    /// join the elements of vec to a string, [only in-memory]
     Join,
     // Statistical functions
+    /// get a distinct vec, [only in-memory]
+    Distinct,
+    /// sum of elements of vec, [only in-memory]
     Sum,
+    /// avg of elements of vec, [only in-memory]
+    Avg,
+    /// max of elements of vec, [only in-memory]
     Max,
+    /// min of elements of vec, [only in-memory]
     Min,
     // Retrieve value from previous trigger data
     #[display = "&old"]
