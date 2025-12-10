@@ -4,7 +4,9 @@ use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use std::ops::Deref;
 use std::str::FromStr;
 use std::sync::Arc;
-use watchmen_model::{DateTimeUtils, NumericUtils, StdErrorCode, StdR, StringConverter};
+use watchmen_model::{
+    DateTimeUtils, NumericUtils, StdErrCode, StdErrorCode, StdR, StringConverter, StringUtils,
+};
 
 impl ArcTopicDataValue {
     /// check itself is [None] or not
@@ -56,6 +58,27 @@ impl ArcTopicDataValue {
                 }
             }
             _ => Err(self),
+        }
+    }
+
+    pub fn try_to_decimal(&self) -> StdR<Arc<BigDecimal>> {
+        match self {
+            ArcTopicDataValue::Num(decimal) => Ok(decimal.clone()),
+            ArcTopicDataValue::None => {
+                StdErrCode::DecimalParse.msg("Cannot convert none to decimal")
+            }
+            ArcTopicDataValue::Str(str) => {
+                if str.is_blank() {
+                    StdErrCode::DecimalParse.msg("Cannot convert blank string to decimal")
+                } else if let Ok(decimal) = str.to_decimal() {
+                    Ok(Arc::new(decimal))
+                } else {
+                    StdErrCode::DecimalParse.msg(format!("Cannot convert [{}] to decimal", str))
+                }
+            }
+            other => {
+                StdErrCode::DecimalParse.msg(format!("Cannot convert [{:?}] to decimal", other))
+            }
         }
     }
 
@@ -365,7 +388,7 @@ impl ArcTopicDataValue {
     pub fn is_less_than(&self, another: &ArcTopicDataValue) -> StdR<bool> {
         match self {
             ArcTopicDataValue::None => {
-                if another.is_none() {
+                if another.is_none_or_empty_str() {
                     // 1.1
                     Ok(false)
                 } else if another.is_num().is_ok() || another.is_datetime_related() {
@@ -497,7 +520,10 @@ impl ArcTopicDataValue {
     pub fn is_more_than(&self, another: &ArcTopicDataValue) -> StdR<bool> {
         match self {
             ArcTopicDataValue::None => {
-                if another.is_none() || another.is_num().is_ok() || another.is_datetime_related() {
+                if another.is_none_or_empty_str()
+                    || another.is_num().is_ok()
+                    || another.is_datetime_related()
+                {
                     // 1.1, 1.2
                     Ok(false)
                 } else {

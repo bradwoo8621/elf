@@ -1,5 +1,5 @@
-use crate::{ArcTopicData, ArcTopicDataValue, ArcTopicDataVecValueMinmax, PipelineKernelErrorCode};
-use bigdecimal::{BigDecimal, FromPrimitive};
+use crate::{ArcTopicData, ArcTopicDataValue, Minmax, PipelineKernelErrorCode};
+use bigdecimal::{BigDecimal, FromPrimitive, Zero};
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::ops::Deref;
@@ -44,7 +44,6 @@ impl ArcTopicDataValue {
     where
         // decimal parse error
         DecimalParseErr: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
-        // functions not supported
         NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
     {
         match self {
@@ -67,15 +66,14 @@ impl ArcTopicDataValue {
     where
         // decimal parse error
         DecimalParseErr: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
-        // functions not supported
         NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
     {
         match self {
             ArcTopicDataValue::Str(str) => BigDecimal::from_usize(str.chars().count())
                 .map(|value| Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(value)))))
                 .unwrap_or(decimal_parse_err()),
-            ArcTopicDataValue::Num(num) => {
-                BigDecimal::from_usize(String::from_decimal(num).chars().count())
+            ArcTopicDataValue::Num(decimal) => {
+                BigDecimal::from_usize(String::from_decimal(decimal).chars().count())
                     .map(|value| Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(value)))))
                     .unwrap_or(decimal_parse_err())
             }
@@ -85,13 +83,12 @@ impl ArcTopicDataValue {
 
     /// distinct elements, can be applied on vec only
     /// for each element in vec,
-    /// - str, num, datetime, date, time -> with the same type and value will be distinct,
+    /// - str, decimal, datetime, date, time -> with the same type and value will be distinct,
     /// - bool -> maximum 2: true and false,
     /// - none -> maximum 1
     /// - vec, map -> cannot be removed as duplicates and are always added to the result.
     pub fn distinct<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
     where
-        // functions not supported
         NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
     {
         match self {
@@ -117,9 +114,9 @@ impl ArcTopicDataValue {
                                 false
                             }
                         }
-                        ArcTopicDataValue::Num(num) => {
-                            if !decimal_values.contains_key(num) {
-                                decimal_values.insert(num.clone(), 1);
+                        ArcTopicDataValue::Num(decimal) => {
+                            if !decimal_values.contains_key(decimal) {
+                                decimal_values.insert(decimal.clone(), 1);
                                 true
                             } else {
                                 false
@@ -190,7 +187,6 @@ impl ArcTopicDataValue {
         not_support: NotSupport,
     ) -> StdR<Arc<ArcTopicDataValue>>
     where
-        // functions not supported
         NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
     {
         match self {
@@ -205,8 +201,8 @@ impl ArcTopicDataValue {
                             ArcTopicDataValue::Str(str) => {
                                 segments.push(str.to_string());
                             }
-                            ArcTopicDataValue::Num(num) => {
-                                segments.push(String::from_decimal(num.deref()));
+                            ArcTopicDataValue::Num(decimal) => {
+                                segments.push(String::from_decimal(decimal.deref()));
                             }
                             ArcTopicDataValue::Bool(bool) => {
                                 segments.push(String::from_bool(bool));
@@ -233,13 +229,13 @@ impl ArcTopicDataValue {
         }
     }
 
-    /// get the min value of vec elements, only decimal/datetime/date/time/none can be compared
-    /// - if there is no element in vec, returns none.
+    /// get the min value of vec elements, only decimal/datetime/date/time can be compared
+    /// - if there is no element in vec, returns none,
+    /// - none or empty string ignored,
     /// - all elements must, can be converted to one single type,
     /// - if there are datetime and date, returns date.
     pub fn min<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
     where
-        // functions not supported
         NotSupport: Fn() -> StdErr,
     {
         match self {
@@ -248,9 +244,53 @@ impl ArcTopicDataValue {
         }
     }
 
+    /// refer to [min], but only decimal and string
+    pub fn min_decimal<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    where
+        NotSupport: Fn() -> StdErr,
+    {
+        match self {
+            ArcTopicDataValue::Vec(vec) => vec.min_decimal_value(not_support),
+            _ => Err(not_support()),
+        }
+    }
+
+    /// refer to [min], but only date
+    pub fn min_date<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    where
+        NotSupport: Fn() -> StdErr,
+    {
+        match self {
+            ArcTopicDataValue::Vec(vec) => vec.min_date_value(not_support),
+            _ => Err(not_support()),
+        }
+    }
+
+    /// refer to [min], but only datetime and date
+    pub fn min_datetime<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    where
+        NotSupport: Fn() -> StdErr,
+    {
+        match self {
+            ArcTopicDataValue::Vec(vec) => vec.min_datetime_value(not_support),
+            _ => Err(not_support()),
+        }
+    }
+
+    /// refer to [min], but only time
+    pub fn min_time<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    where
+        NotSupport: Fn() -> StdErr,
+    {
+        match self {
+            ArcTopicDataValue::Vec(vec) => vec.min_time_value(not_support),
+            _ => Err(not_support()),
+        }
+    }
+
+    /// refer to [min]
     pub fn max<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
     where
-        // functions not supported
         NotSupport: Fn() -> StdErr,
     {
         match self {
@@ -259,26 +299,122 @@ impl ArcTopicDataValue {
         }
     }
 
-    pub fn sum<NotSupport>(&self, _not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    /// refer to [max], but only decimal and string
+    pub fn max_decimal<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
     where
-        // functions not supported
-        NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
+        NotSupport: Fn() -> StdErr,
     {
-        todo!("implement sum for ArcTopicDataValue")
+        match self {
+            ArcTopicDataValue::Vec(vec) => vec.max_decimal_value(not_support),
+            _ => Err(not_support()),
+        }
     }
 
-    pub fn avg<NotSupport>(&self, _not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    /// refer to [max], but only date
+    pub fn max_date<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
     where
-        // functions not supported
+        NotSupport: Fn() -> StdErr,
+    {
+        match self {
+            ArcTopicDataValue::Vec(vec) => vec.max_date_value(not_support),
+            _ => Err(not_support()),
+        }
+    }
+
+    /// refer to [max], but only datetime and date
+    pub fn max_datetime<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    where
+        NotSupport: Fn() -> StdErr,
+    {
+        match self {
+            ArcTopicDataValue::Vec(vec) => vec.max_datetime_value(not_support),
+            _ => Err(not_support()),
+        }
+    }
+
+    /// refer to [max], but only time
+    pub fn max_time<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    where
+        NotSupport: Fn() -> StdErr,
+    {
+        match self {
+            ArcTopicDataValue::Vec(vec) => vec.max_time_value(not_support),
+            _ => Err(not_support()),
+        }
+    }
+
+    /// none and empty string are treated as 0
+    /// return 0 when there is no elements.
+    pub fn sum<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    where
         NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
     {
-        todo!("implement avg for ArcTopicDataValue")
+        match self {
+            ArcTopicDataValue::Vec(vec) => {
+                let mut sum: BigDecimal = BigDecimal::zero();
+                for value in vec.iter() {
+                    match value.deref() {
+                        ArcTopicDataValue::None => continue,
+                        ArcTopicDataValue::Str(str) => {
+                            if !str.is_empty() {
+                                let decimal = value.try_to_decimal()?;
+                                sum = sum + decimal.deref();
+                            }
+                        }
+                        _ => {
+                            let decimal = value.try_to_decimal()?;
+                            sum = sum + decimal.deref();
+                        }
+                    }
+                }
+                Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(sum))))
+            }
+            _ => not_support(),
+        }
+    }
+
+    /// none and empty string are treated as 0, not count
+    /// return 0 when there is no elements.
+    pub fn avg<NotSupport>(&self, not_support: NotSupport) -> StdR<Arc<ArcTopicDataValue>>
+    where
+        NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
+    {
+        match self {
+            ArcTopicDataValue::Vec(vec) => {
+                if vec.is_empty() {
+                    return Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(
+                        BigDecimal::zero(),
+                    ))));
+                }
+
+                let mut sum: BigDecimal = BigDecimal::zero();
+                let mut count = 0;
+
+                for value in vec.iter() {
+                    match value.deref() {
+                        ArcTopicDataValue::None => continue,
+                        ArcTopicDataValue::Str(str) => {
+                            if !str.is_empty() {
+                                let decimal = value.try_to_decimal()?;
+                                sum = sum + decimal.deref();
+                                count = count + 1;
+                            }
+                        }
+                        _ => {
+                            let decimal = value.try_to_decimal()?;
+                            sum = sum + decimal.deref();
+                            count = count + 1;
+                        }
+                    }
+                }
+                Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(sum / count))))
+            }
+            _ => not_support(),
+        }
     }
 }
 
-pub trait TopicDataUtils {
-    fn value_of(&self, property: &TopicDataProperty) -> StdR<Arc<ArcTopicDataValue>>;
-
+trait TopicDataUtilsBase {
     fn decimal_parse_error<R>(&self, name: &String, current_name: &String) -> StdR<R>
     where
         Self: Debug,
@@ -307,7 +443,59 @@ pub trait TopicDataUtils {
     }
 }
 
+impl TopicDataUtilsBase for ArcTopicData {}
+
+pub trait TopicDataUtils {
+    fn value_of_func(
+        &self,
+        value: &Arc<ArcTopicDataValue>,
+        func: VariablePredefineFunctions,
+        name: &String,
+        current_name: &String,
+    ) -> StdR<Arc<ArcTopicDataValue>>;
+
+    fn value_of(&self, property: &TopicDataProperty) -> StdR<Arc<ArcTopicDataValue>>;
+}
+
 impl TopicDataUtils for ArcTopicData {
+    fn value_of_func(
+        &self,
+        value: &Arc<ArcTopicDataValue>,
+        func: VariablePredefineFunctions,
+        name: &String,
+        current_name: &String,
+    ) -> StdR<Arc<ArcTopicDataValue>> {
+        let decimal_parse_err = || || self.decimal_parse_error(name, current_name);
+        let not_support = || || self.function_not_supported(name, current_name);
+        let not_support_e = || || self.err_function_not_supported(name, current_name);
+
+        match func {
+            VariablePredefineFunctions::Count => value.count(decimal_parse_err(), not_support()),
+            VariablePredefineFunctions::Length | VariablePredefineFunctions::Len => {
+                value.length(decimal_parse_err(), not_support())
+            }
+            VariablePredefineFunctions::Join => value.join(",", not_support()),
+            VariablePredefineFunctions::Distinct => value.distinct(not_support()),
+            VariablePredefineFunctions::Min => value.min(not_support_e()),
+            VariablePredefineFunctions::MinNum => value.min_decimal(not_support_e()),
+            VariablePredefineFunctions::MinDate => value.min_date(not_support_e()),
+            VariablePredefineFunctions::MinDatetime | VariablePredefineFunctions::MinDt => {
+                value.min_datetime(not_support_e())
+            }
+            VariablePredefineFunctions::MinTime => value.min_time(not_support_e()),
+            VariablePredefineFunctions::Max => value.max(not_support_e()),
+            VariablePredefineFunctions::MaxNum => value.max_decimal(not_support_e()),
+            VariablePredefineFunctions::MaxDate => value.max_date(not_support_e()),
+            VariablePredefineFunctions::MaxDatetime | VariablePredefineFunctions::MaxDt => {
+                value.max_datetime(not_support_e())
+            }
+            VariablePredefineFunctions::MaxTime => value.max_time(not_support_e()),
+            VariablePredefineFunctions::Sum => value.sum(not_support()),
+            VariablePredefineFunctions::Avg => value.avg(not_support()),
+            _ => not_support()(),
+        }
+    }
+
     fn value_of(&self, property: &TopicDataProperty) -> StdR<Arc<ArcTopicDataValue>> {
         match property {
             TopicDataProperty::Str((name, _)) => {
@@ -335,46 +523,8 @@ impl TopicDataUtils for ArcTopicData {
                 while current_index <= remain_count {
                     let current_name = &names[current_index];
                     if let Some(func) = VariablePredefineFunctions::try_parse(current_name) {
-                        match func {
-                            VariablePredefineFunctions::Count => {
-                                return data.count(
-                                    || self.decimal_parse_error(name, current_name),
-                                    || self.function_not_supported(name, current_name),
-                                );
-                            }
-                            VariablePredefineFunctions::Length
-                            | VariablePredefineFunctions::Len => {
-                                return data.length(
-                                    || self.decimal_parse_error(name, current_name),
-                                    || self.function_not_supported(name, current_name),
-                                );
-                            }
-                            VariablePredefineFunctions::Join => {
-                                return data
-                                    .join(",", || self.function_not_supported(name, current_name));
-                            }
-                            VariablePredefineFunctions::Distinct => {
-                                return data
-                                    .distinct(|| self.function_not_supported(name, current_name));
-                            }
-                            VariablePredefineFunctions::Min => {
-                                return data
-                                    .min(|| self.err_function_not_supported(name, current_name));
-                            }
-                            VariablePredefineFunctions::Max => {
-                                return data
-                                    .max(|| self.err_function_not_supported(name, current_name));
-                            }
-                            VariablePredefineFunctions::Sum => {
-                                return data
-                                    .sum(|| self.function_not_supported(name, current_name));
-                            }
-                            VariablePredefineFunctions::Avg => {
-                                return data
-                                    .avg(|| self.function_not_supported(name, current_name));
-                            }
-                            _ => {}
-                        }
+                        // func exactly matched always is the last part, so return directly
+                        return self.value_of_func(data, func, name, current_name);
                     } else {
                     }
                 }

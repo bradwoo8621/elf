@@ -48,8 +48,28 @@ pub enum VariablePredefineFunctions {
     Avg,
     /// max of elements of vec, [only in-memory]
     Max,
+    /// max decimal elements of vec, [only in-memory]
+    MaxNum,
+    /// max date of elements of vec, [only in-memory]
+    MaxDate,
+    /// max date time of elements of vec, [only in-memory]
+    MaxDatetime,
+    /// alias of [MaxDatetime]
+    MaxDt,
+    /// max time of elements of vec, [only in-memory]
+    MaxTime,
     /// min of elements of vec, [only in-memory]
     Min,
+    /// min decimal elements of vec, [only in-memory]
+    MinNum,
+    /// min date of elements of vec, [only in-memory]
+    MinDate,
+    /// min date time of elements of vec, [only in-memory]
+    MinDatetime,
+    /// alias of [MinDatetime]
+    MinDt,
+    /// min time of elements of vec, [only in-memory]
+    MinTime,
     // Retrieve value from previous trigger data
     #[display = "&old"]
     FromPreviousTriggerData,
