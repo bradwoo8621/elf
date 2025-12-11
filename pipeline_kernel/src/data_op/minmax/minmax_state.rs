@@ -273,13 +273,7 @@ impl MinmaxState {
 
 /// get result
 impl MinmaxState {
-    pub(crate) fn get_result<NotSupport>(
-        &self,
-        not_support: &NotSupport,
-    ) -> StdR<Arc<ArcTopicDataValue>>
-    where
-        NotSupport: Fn() -> StdErr,
-    {
+    pub fn get_result(&self) -> StdR<Arc<ArcTopicDataValue>> {
         if self.has_decimal {
             Ok(Arc::new(ArcTopicDataValue::Num(
                 self.min_decimal.as_ref().unwrap().clone(),
@@ -298,8 +292,8 @@ impl MinmaxState {
             )))
         } else {
             // no decimal/datetime/date/time/string,
-            // function is not supported, since don't know how to compare
-            Err(not_support())
+            // all none or empty string
+            Ok(Arc::new(ArcTopicDataValue::None))
         }
     }
 }

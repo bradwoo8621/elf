@@ -1,37 +1,9 @@
-use crate::{ArcTopicData, ArcTopicDataValue, Minmax, PipelineKernelErrorCode};
+use crate::{ArcTopicDataValue, Minmax};
 use bigdecimal::{BigDecimal, FromPrimitive, Zero};
 use std::collections::HashMap;
-use std::fmt::Debug;
 use std::ops::Deref;
 use std::sync::Arc;
-use watchmen_model::{
-    StdErr, StdErrCode, StdErrorCode, StdR, StringConverter, VariablePredefineFunctions,
-};
-
-pub enum TopicDataProperty {
-    /// 0. property name,
-    /// 1. is array or not
-    Str((String, bool)),
-    /// 0. property name,
-    /// 1. names split by [.],
-    /// 2. is array or not
-    Vec((String, Vec<String>, bool)),
-}
-
-impl TopicDataProperty {
-    ///
-    pub fn of(property: &String, array: bool) -> Self {
-        if property.contains('.') {
-            TopicDataProperty::Vec((
-                property.clone(),
-                property.split('.').map(|s| s.to_string()).collect(),
-                array,
-            ))
-        } else {
-            TopicDataProperty::Str((property.clone(), array))
-        }
-    }
-}
+use watchmen_model::{StdErr, StdR, StringConverter};
 
 impl ArcTopicDataValue {
     /// try to count, can only apply to vec or map
@@ -410,127 +382,6 @@ impl ArcTopicDataValue {
                 Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(sum / count))))
             }
             _ => not_support(),
-        }
-    }
-}
-
-trait TopicDataUtilsBase {
-    fn decimal_parse_error<R>(&self, name: &String, current_name: &String) -> StdR<R>
-    where
-        Self: Debug,
-    {
-        StdErrCode::DecimalParse.msg(format!(
-            "Cannot retrieve[key={}, current={}] as decimal from [{:?}].",
-            name, current_name, &self
-        ))
-    }
-
-    fn function_not_supported<R>(&self, name: &String, current_name: &String) -> StdR<R>
-    where
-        Self: Debug,
-    {
-        Err(self.err_function_not_supported(name, current_name))
-    }
-
-    fn err_function_not_supported(&self, name: &String, current_name: &String) -> StdErr
-    where
-        Self: Debug,
-    {
-        PipelineKernelErrorCode::VariableFuncNotSupported.e_msg(format!(
-            "Cannot retrieve[key={}, current={}] as decimal from [{:?}].",
-            name, current_name, &self
-        ))
-    }
-}
-
-impl TopicDataUtilsBase for ArcTopicData {}
-
-pub trait TopicDataUtils {
-    fn value_of_func(
-        &self,
-        value: &Arc<ArcTopicDataValue>,
-        func: VariablePredefineFunctions,
-        name: &String,
-        current_name: &String,
-    ) -> StdR<Arc<ArcTopicDataValue>>;
-
-    fn value_of(&self, property: &TopicDataProperty) -> StdR<Arc<ArcTopicDataValue>>;
-}
-
-impl TopicDataUtils for ArcTopicData {
-    fn value_of_func(
-        &self,
-        value: &Arc<ArcTopicDataValue>,
-        func: VariablePredefineFunctions,
-        name: &String,
-        current_name: &String,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        let decimal_parse_err = || || self.decimal_parse_error(name, current_name);
-        let not_support = || || self.function_not_supported(name, current_name);
-        let not_support_e = || || self.err_function_not_supported(name, current_name);
-
-        match func {
-            VariablePredefineFunctions::Count => value.count(decimal_parse_err(), not_support()),
-            VariablePredefineFunctions::Length | VariablePredefineFunctions::Len => {
-                value.length(decimal_parse_err(), not_support())
-            }
-            VariablePredefineFunctions::Join => value.join(",", not_support()),
-            VariablePredefineFunctions::Distinct => value.distinct(not_support()),
-            VariablePredefineFunctions::Min => value.min(not_support_e()),
-            VariablePredefineFunctions::MinNum => value.min_decimal(not_support_e()),
-            VariablePredefineFunctions::MinDate => value.min_date(not_support_e()),
-            VariablePredefineFunctions::MinDatetime | VariablePredefineFunctions::MinDt => {
-                value.min_datetime(not_support_e())
-            }
-            VariablePredefineFunctions::MinTime => value.min_time(not_support_e()),
-            VariablePredefineFunctions::Max => value.max(not_support_e()),
-            VariablePredefineFunctions::MaxNum => value.max_decimal(not_support_e()),
-            VariablePredefineFunctions::MaxDate => value.max_date(not_support_e()),
-            VariablePredefineFunctions::MaxDatetime | VariablePredefineFunctions::MaxDt => {
-                value.max_datetime(not_support_e())
-            }
-            VariablePredefineFunctions::MaxTime => value.max_time(not_support_e()),
-            VariablePredefineFunctions::Sum => value.sum(not_support()),
-            VariablePredefineFunctions::Avg => value.avg(not_support()),
-            _ => not_support()(),
-        }
-    }
-
-    fn value_of(&self, property: &TopicDataProperty) -> StdR<Arc<ArcTopicDataValue>> {
-        match property {
-            TopicDataProperty::Str((name, _)) => {
-                // use none if name not exists, never mind the array or not
-                let value = self.get(name).clone();
-                if value.is_some() {
-                    Ok(value.unwrap().clone())
-                } else {
-                    Ok(Arc::new(ArcTopicDataValue::None))
-                }
-            }
-            TopicDataProperty::Vec((name, names, array)) => {
-                let data = self.get(&names[0]);
-                if data.is_none() {
-                    return if *array {
-                        Ok(Arc::new(ArcTopicDataValue::Vec(vec![].into())))
-                    } else {
-                        Ok(Arc::new(ArcTopicDataValue::None))
-                    };
-                }
-
-                let mut data = data.unwrap();
-                let mut remain_count = names.len() - 1;
-                let mut current_index = 1;
-                while current_index <= remain_count {
-                    let current_name = &names[current_index];
-                    if let Some(func) = VariablePredefineFunctions::try_parse(current_name) {
-                        // func exactly matched always is the last part, so return directly
-                        return self.value_of_func(data, func, name, current_name);
-                    } else {
-                    }
-                }
-
-                Ok(Arc::new(ArcTopicDataValue::None))
-            }
         }
     }
 }

@@ -35,6 +35,7 @@ pub trait StdErrorCode {
 pub enum StdErrCode {
     DecimalParse,
     StrEnumParse,
+    VariableFunctionParse,
     /// with multiple sub errors
     Multiple,
     Unknown,
@@ -45,6 +46,7 @@ impl StdErrorCode for StdErrCode {
         match self {
             StdErrCode::DecimalParse => "STDE-00001",
             StdErrCode::StrEnumParse => "STDE-00002",
+            StdErrCode::VariableFunctionParse => "STDE-00003",
 
             StdErrCode::Multiple => "STDE-99998",
             StdErrCode::Unknown => "STDE-99999",

@@ -35,7 +35,7 @@ impl TopicSchema {
         &self.inner
     }
 
-    pub fn id(&self) -> &Arc<TopicId> {
+    pub fn topic_id(&self) -> &Arc<TopicId> {
         &self.topic().topic_id
     }
 

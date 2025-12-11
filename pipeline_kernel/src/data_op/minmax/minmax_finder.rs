@@ -87,7 +87,7 @@ impl MinmaxFinderBase for &Arc<Vec<Arc<ArcTopicDataValue>>> {
                 }
 
                 string_elements(&mut minmax, &not_support)?;
-                minmax.get_result(&not_support)
+                minmax.get_result()
             })
     }
 }

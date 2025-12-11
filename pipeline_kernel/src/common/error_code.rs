@@ -22,8 +22,10 @@ pub enum PipelineKernelErrorCode {
     CurrentTopicDataMissed,
     ValuesNotComparable,
     VariableFuncNotSupported,
+    IncorrectDataPath,
     // schema
     FactorNotFound,
+    TopicDataPropertySegmentMissed,
 }
 
 impl StdErrorCode for PipelineKernelErrorCode {
@@ -49,8 +51,10 @@ impl StdErrorCode for PipelineKernelErrorCode {
             PipelineKernelErrorCode::CurrentTopicDataMissed => "PLKN-00102",
             PipelineKernelErrorCode::ValuesNotComparable => "PLKN-00103",
             PipelineKernelErrorCode::VariableFuncNotSupported => "PLKN-00104",
+            PipelineKernelErrorCode::IncorrectDataPath => "PLKN-00105",
 
             PipelineKernelErrorCode::FactorNotFound => "PLKN-00200",
+            PipelineKernelErrorCode::TopicDataPropertySegmentMissed => "PLKN-00201",
         }
     }
 }

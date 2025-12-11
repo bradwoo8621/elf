@@ -123,9 +123,9 @@ impl PipelineTrigger {
             Ok((topic_data_id, Some(context)))
         } else {
             println!(
-                "No pipeline needs to be triggered by topic[id={}, name={}].",
-                self.topic_schema.id(),
-                self.topic_schema.name()
+	            "No pipeline needs to be triggered by topic[id={}, name={}].",
+	            self.topic_schema.topic_id(),
+	            self.topic_schema.name()
             );
             Ok((topic_data_id, None))
         }

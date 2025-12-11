@@ -331,7 +331,7 @@ impl ArcTopicDataValue {
         !self.is_same_as(another)
     }
 
-    pub(crate) fn display_in_error(value: &ArcTopicDataValue) -> String {
+    pub fn display_in_error(value: &ArcTopicDataValue) -> String {
         match value {
             ArcTopicDataValue::None => String::from("none"),
             ArcTopicDataValue::Str(v) => v.to_string(),

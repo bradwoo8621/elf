@@ -124,8 +124,7 @@ impl Minmax for &Arc<Vec<Arc<ArcTopicDataValue>>> {
 
 #[cfg(test)]
 mod tests {
-    use crate::topic::minmax::minmax::{MinmaxCompare, MinmaxState};
-    use crate::{ArcTopicDataValue, Minmax, PipelineKernelErrorCode};
+    use crate::{ArcTopicDataValue, Minmax, MinmaxCompare, MinmaxState, PipelineKernelErrorCode};
     use bigdecimal::BigDecimal;
     use chrono::{NaiveDate, NaiveDateTime};
     use std::ops::Deref;
