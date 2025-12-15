@@ -44,9 +44,7 @@ impl<'a> VariablePredefineFunctionCaller<'a> {
         let not_support = || self.function_not_supported();
         let not_support_e = || self.err_function_not_supported();
 
-        let segment = self.segment;
-        let func = segment.func;
-        match func {
+        match self.segment.func {
             VariablePredefineFunctions::NextSeq => todo!("variable predefine function[&nextSeq]"),
             VariablePredefineFunctions::Count => value.count(decimal_parse_err, not_support),
             VariablePredefineFunctions::Length | VariablePredefineFunctions::Len => {
@@ -94,6 +92,9 @@ impl<'a> VariablePredefineFunctionCaller<'a> {
                 value.max_datetime(not_support_e)
             }
             VariablePredefineFunctions::MaxTime => value.max_time(not_support_e),
+            VariablePredefineFunctions::FromCurrentContext => {
+                todo!("variable predefine function[&cur]")
+            }
             VariablePredefineFunctions::FromPreviousTriggerData => {
                 todo!("variable predefine function[&old]")
             }
