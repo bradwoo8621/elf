@@ -108,7 +108,8 @@ impl DataPathBuilder {
                     // function starts, must after one of [.,({], or is start of whole path
                     if current_str.is_blank() {
                         // blank string before function name, ignored
-                        current_str.clear()
+                        current_str.clear();
+                        current_str.push('&');
                     } else {
                         // no content allowed before function name in this segment
                         return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
@@ -117,7 +118,7 @@ impl DataPathBuilder {
                         ));
                     }
                     // try to parse function name,
-                    // the next char of function name should be whitespace or one of [.,({] or is end of whole path
+                    // the next char of function name should be whitespace or one of .,({ or is end of whole path
                     // TODO
                 }
                 _ => current_str.push(c),

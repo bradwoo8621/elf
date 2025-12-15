@@ -1,13 +1,10 @@
 use crate::{
-    BaseDataModel, CharsMatch, Parameter, ParameterKind, StdErrCode, StdErrorCode, StdR, Storable,
+    BaseDataModel, Parameter, ParameterKind, StdErrCode, StdErrorCode, StdR, Storable,
 };
-use std::clone::Clone;
-use std::sync::{Arc, LazyLock};
 use watchmen_model_marco::{adapt_model, Display, Serde, StrEnum};
 
 #[derive(Display, Serde, StrEnum)]
 #[pattern = "ampersand-prefix"]
-#[chars_match]
 pub enum VariablePredefineFunctions {
     // Sequence functions
     /// get next sequence number, [only in-memory]
@@ -89,15 +86,6 @@ pub enum VariablePredefineFunctions {
     Now,
 }
 
-pub static VARIABLE_PREDEFINE_FUNCTIONS_CHARS_MATCH: LazyLock<Arc<CharsMatch>> =
-    LazyLock::new(|| {
-        Arc::new(
-            VariablePredefineFunctions::create_chars_match()
-                .of(&'&')
-                .clone(),
-        )
-    });
-
 /// string stands for an expression to retrieve some value
 /// might include function calls, see [VariablePredefineFunctions]
 #[adapt_model(storable)]
@@ -117,18 +105,5 @@ impl ConstantParameter {
 
     pub fn to_parameter(self) -> Parameter {
         Parameter::Constant(self)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::VARIABLE_PREDEFINE_FUNCTIONS_CHARS_MATCH;
-
-    #[test]
-    fn test() {
-        let chars_match = &VARIABLE_PREDEFINE_FUNCTIONS_CHARS_MATCH;
-        assert!(chars_match.matches(&vec!['n', 'o']));
-        assert!(chars_match.matches(&vec!['n', 'o', 'w']));
-        assert_eq!(chars_match.matches(&vec!['n', 'o', 'w', '1']), false);
     }
 }

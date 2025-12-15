@@ -1,4 +1,4 @@
-use crate::utils::{get_display_value, get_pattern, get_pattern_fn, need_chars_match};
+use crate::utils::{get_display_value, get_pattern, get_pattern_fn};
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::quote;
@@ -33,34 +33,6 @@ pub fn impl_str_enum(item: TokenStream) -> TokenStream {
             }
         });
 
-        let chars_match = if need_chars_match(&input.attrs) {
-            let variant3 = variants.iter().map(|(_, variant_str)| {
-                quote! {
-                    #variant_str,
-                }
-            });
-            quote! {
-                pub fn create_chars_match() -> CharsMatch {
-                    let mut root = CharsMatch::Next(std::collections::HashMap::new());
-                    let values = vec![#(#variant3)*];
-                    for value in values {
-                        let mut current = &mut root;
-                        for c in value.chars() {
-                            match current {
-                                CharsMatch::Next(map) => {
-                                    current = map.entry(c).or_insert(CharsMatch::Next(std::collections::HashMap::new()));
-                                }
-                                _ => unreachable!(),
-                            }
-                        }
-                    }
-                    root
-                }
-            }
-        } else {
-            quote! {}
-        };
-
         let expanded = quote! {
             impl #name {
                 pub fn parse<S>(str: S) -> StdR<Self>
@@ -82,8 +54,6 @@ pub fn impl_str_enum(item: TokenStream) -> TokenStream {
                         _ => None,
                     }
                 }
-
-                #chars_match
             }
         };
 

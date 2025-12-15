@@ -109,7 +109,7 @@ pub fn impl_various_struct_types_form_enum(item: TokenStream) -> TokenStream {
 /// Prove that this enumeration defines a set of string constants.
 /// and implements it with a parse function to transform string to enum
 /// variant name transform refer to [impl_display_for_enum]
-#[proc_macro_derive(StrEnum, attributes(pattern, display, chars_match))]
+#[proc_macro_derive(StrEnum, attributes(pattern, display))]
 pub fn impl_str_enum_form_enum(item: TokenStream) -> TokenStream {
     impl_str_enum(item)
 }

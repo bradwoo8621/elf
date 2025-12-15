@@ -25,14 +25,3 @@ pub fn get_pattern(attrs: &Vec<Attribute>) -> VariantStrPattern {
     }
     VariantStrPattern::CamelCaseToKebabAndLower
 }
-
-pub fn need_chars_match(attrs: &Vec<Attribute>) -> bool {
-    for attr in attrs {
-        if let Meta::Path(meta) = &attr.meta {
-            if meta.is_ident("chars_match") {
-                return true;
-            }
-        }
-    }
-    false
-}
