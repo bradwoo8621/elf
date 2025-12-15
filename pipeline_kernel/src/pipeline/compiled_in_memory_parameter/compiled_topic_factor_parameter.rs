@@ -1,6 +1,6 @@
 use crate::{
-    ArcTopicDataValue, DataPath, DataPathBuilder, InMemoryParameter, PipelineExecutionVariables,
-    PipelineKernelErrorCode, DataVisitor,
+    ArcTopicDataValue, DataPath, DataVisitor, InMemoryParameter, PipelineExecutionVariables,
+    PipelineKernelErrorCode,
 };
 use std::ops::Deref;
 use std::sync::Arc;
@@ -21,7 +21,7 @@ impl CompiledTopicFactorParameter {
                     &parameter.factor_id, &parameter.topic_id
                 ));
             }
-            Some(factor) => DataPathBuilder::from_factor(factor, topic_schema.deref())?,
+            Some(factor) => DataPath::from_factor(factor, topic_schema.deref())?,
         };
 
         Ok(CompiledTopicFactorParameter { path })

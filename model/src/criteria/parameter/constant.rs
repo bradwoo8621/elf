@@ -1,6 +1,4 @@
-use crate::{
-    BaseDataModel, Parameter, ParameterKind, StdErrCode, StdErrorCode, StdR, Storable,
-};
+use crate::{BaseDataModel, Parameter, ParameterKind, StdErrCode, StdErrorCode, StdR, Storable};
 use watchmen_model_marco::{adapt_model, Display, Serde, StrEnum};
 
 #[derive(Display, Serde, StrEnum)]
@@ -40,6 +38,8 @@ pub enum VariablePredefineFunctions {
     Lower,
     Contains,
     Split,
+    // concat anything to string
+    Concat,
     /// join the elements of vec to a string, [only in-memory]
     Join,
     // Statistical functions
@@ -73,6 +73,9 @@ pub enum VariablePredefineFunctions {
     MinDt,
     /// min time of elements of vec, [only in-memory]
     MinTime,
+    // Retrieve value from current context, include variables and current trigger data
+    #[display = "&cur"]
+    FromCurrentContext,
     // Retrieve value from previous trigger data
     #[display = "&old"]
     FromPreviousTriggerData,

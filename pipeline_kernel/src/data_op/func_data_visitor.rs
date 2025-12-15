@@ -44,7 +44,9 @@ impl<'a> VariablePredefineFunctionCaller<'a> {
         let not_support = || self.function_not_supported();
         let not_support_e = || self.err_function_not_supported();
 
-        match &self.segment.func {
+        let segment = self.segment;
+        let func = segment.func;
+        match func {
             VariablePredefineFunctions::NextSeq => todo!("variable predefine function[&nextSeq]"),
             VariablePredefineFunctions::Count => value.count(decimal_parse_err, not_support),
             VariablePredefineFunctions::Length | VariablePredefineFunctions::Len => {
@@ -73,6 +75,7 @@ impl<'a> VariablePredefineFunctionCaller<'a> {
             VariablePredefineFunctions::Lower => todo!("variable predefine function[&lower]"),
             VariablePredefineFunctions::Contains => todo!("variable predefine function[&contains]"),
             VariablePredefineFunctions::Split => todo!("variable predefine function[&split]"),
+            VariablePredefineFunctions::Concat => todo!("variable predefine function[&concat]"),
             VariablePredefineFunctions::Join => value.join(",", not_support),
             VariablePredefineFunctions::Distinct => value.distinct(not_support),
             VariablePredefineFunctions::Sum => value.sum(not_support),
