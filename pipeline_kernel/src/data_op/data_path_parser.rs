@@ -46,12 +46,18 @@ impl DataPath {
     /// and fail fast
     pub fn from_str(path: &str) -> StdR<DataPath> {
         let all_chars = path.chars().collect();
-        let mut state = PathParser::by_path(path, &all_chars);
-        state.parse()?;
+        let mut parser = PathParser::by_path(path, &all_chars);
+        parser.parse()?;
 
         Ok(DataPath {
             path: path.to_string(),
-            segments: state.segments,
+            segments: parser.segments,
         })
     }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test() {}
 }

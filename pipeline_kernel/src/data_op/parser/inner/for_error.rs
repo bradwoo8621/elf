@@ -50,6 +50,13 @@ impl ParserInnerState<'_> {
         ))
     }
 
+    pub fn incorrect_wrapped_path<R>(&self, start_char_index: usize) -> StdR<R> {
+        PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
+            "Incorrect data path[{}], caused by the closing \"}}\" is not matched, the opening \"{{\" is at index [{}].",
+            self.full_path, start_char_index
+        ))
+    }
+
     pub fn unknown_error<R>(&self) -> StdR<R> {
         StdErrCode::Unknown.msg("Unknown error occurred during data path parsing.")
     }

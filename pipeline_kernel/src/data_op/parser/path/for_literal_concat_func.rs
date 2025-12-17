@@ -118,6 +118,7 @@ impl PathParser<'_> {
             inner: ParserInnerState {
                 full_path: self.inner.full_path,
                 all_chars: self.inner.all_chars,
+                // skip the "{"
                 char_index: self.inner.char_index + 1,
                 in_memory_chars: String::new(),
             },
