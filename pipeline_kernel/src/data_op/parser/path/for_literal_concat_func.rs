@@ -16,10 +16,10 @@ impl PathParser<'_> {
 
         if inner.in_memory_chars_is_not_empty() {
             // get char before in-memory chars
-            (inner.char_index - inner.in_memory_chars_count() - 1) as i64
+            inner.char_index as i64 - inner.in_memory_chars_count() as i64 - 1
         } else {
             // get char before "{"
-            (inner.char_index - 1) as i64
+            inner.char_index as i64 - 1
         }
     }
 

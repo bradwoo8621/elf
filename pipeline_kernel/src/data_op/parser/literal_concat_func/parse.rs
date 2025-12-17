@@ -65,6 +65,8 @@ impl LiteralConcatFuncParser<'_> {
                         .inner
                         .consume_char_into_memory_and_move_char_index_to_next(*char),
                 }
+            } else {
+                break;
             }
         }
         self.consume_in_memory_chars_as_str()?;

@@ -56,8 +56,54 @@ impl DataPath {
     }
 }
 
+#[allow(non_snake_case)]
 #[cfg(test)]
 mod tests {
+    use crate::{DataPath, DataPathSegment};
+
+    fn assert_plain(segment: &DataPathSegment, value: &str) {
+        assert!(matches!(segment, DataPathSegment::Plain(_)));
+        match segment {
+            DataPathSegment::Plain(path) => {
+                assert_eq!(path.path, value);
+                assert_eq!(path.is_vec, None);
+            }
+            _ => {}
+        }
+    }
+
     #[test]
-    fn test() {}
+    fn test__a() {
+        let path = DataPath::from_str("a").unwrap();
+        assert_eq!(path.path, "a");
+        assert_eq!(path.segments.len(), 1);
+        assert_plain(&path.segments[0], "a");
+    }
+
+    #[test]
+    fn test__a_b() {
+        let path = DataPath::from_str("a.b").unwrap();
+        assert_eq!(path.path, "a.b");
+        assert_eq!(path.segments.len(), 2);
+        assert_plain(&path.segments[0], "a");
+        assert_plain(&path.segments[1], "b");
+    }
+
+    #[test]
+    fn test__a_b_c() {
+        let path = DataPath::from_str("a.b.c").unwrap();
+        assert_eq!(path.path, "a.b.c");
+        assert_eq!(path.segments.len(), 3);
+        assert_plain(&path.segments[0], "a");
+        assert_plain(&path.segments[1], "b");
+        assert_plain(&path.segments[2], "c");
+    }
+
+    #[test]
+    fn r#test__lb_a_rb() {
+        let path = DataPath::from_str("{a}").unwrap();
+        assert_eq!(path.path, "{a}");
+        assert_eq!(path.segments.len(), 1);
+        assert!(matches!(&path.segments[0], DataPathSegment::Func(_)));
+    }
 }

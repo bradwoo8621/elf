@@ -39,7 +39,9 @@ impl PathParser<'_> {
             } else {
                 // reach the end of chars,
                 // consume the chars in-memory as plain path
-                self.consume_in_memory_chars_as_plain_path(false)?;
+                if self.inner.in_memory_chars_is_not_empty() {
+                    self.consume_in_memory_chars_as_plain_path(false)?;
+                }
                 break;
             }
         }
@@ -63,7 +65,10 @@ impl PathParser<'_> {
                     // start of sub path
                     '{' => self.consume_literal_concat_function()?,
                     // end
-                    '}' => break,
+                    '}' => {
+                        self.consume_in_memory_chars_as_plain_path(true)?;
+                        break;
+                    }
                     // segment end
                     '.' => self.consume_in_memory_chars_as_plain_path(true)?,
                     ',' => self.inner.incorrect_comma()?,
