@@ -126,14 +126,14 @@ impl PathParser<'_> {
         };
         literal_concat_func_parser.parse()?;
         // hand back
+        // copy char index to current state
+        self.inner.char_index = literal_concat_func_parser.inner.char_index;
         // reset the concat function path
         concat.path = self.inner.full_path
             [(index_of_char_before + 1) as usize..self.inner.char_index]
             .to_string();
         // copy params to concat function
         concat.params = Some(literal_concat_func_parser.params);
-        // copy char index to current state
-        self.inner.char_index = literal_concat_func_parser.inner.char_index;
 
         // append the concat function to segments
         self.append_segment(DataPathSegment::Func(concat));

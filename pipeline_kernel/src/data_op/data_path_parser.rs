@@ -59,7 +59,8 @@ impl DataPath {
 #[allow(non_snake_case)]
 #[cfg(test)]
 mod tests {
-    use crate::{DataPath, DataPathSegment};
+    use crate::{DataPath, DataPathSegment, FuncDataPathParam};
+    use watchmen_model::VariablePredefineFunctions;
 
     fn assert_plain(segment: &DataPathSegment, value: &str) {
         assert!(matches!(segment, DataPathSegment::Plain(_)));
@@ -105,5 +106,27 @@ mod tests {
         assert_eq!(path.path, "{a}");
         assert_eq!(path.segments.len(), 1);
         assert!(matches!(&path.segments[0], DataPathSegment::Func(_)));
+        match &path.segments[0] {
+            DataPathSegment::Func(func_path) => {
+                assert_eq!(func_path.path, "{a}");
+                assert!(matches!(
+                    &func_path.func,
+                    VariablePredefineFunctions::Concat
+                ));
+                assert!(func_path.params.is_some());
+                if let Some(params) = &func_path.params {
+                    assert_eq!(params.len(), 1);
+                    assert!(matches!(&params[0], FuncDataPathParam::Plain(_)));
+                    match &params[0] {
+                        FuncDataPathParam::Plain(plain_path) => {
+                            assert_eq!(plain_path.path, "a");
+                            assert_eq!(plain_path.is_vec, None);
+                        },
+                        _ => {}
+                    }
+                }
+            }
+            _ => {}
+        }
     }
 }
