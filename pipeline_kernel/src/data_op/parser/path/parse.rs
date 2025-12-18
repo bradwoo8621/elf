@@ -97,7 +97,7 @@ impl PathParser<'_> {
                         .consume_char_into_memory_and_move_char_index_to_next(*char),
                 };
             } else {
-                // reach the end of chars,
+                // reach the end, no char anymore
                 // consume the chars in-memory as plain path
                 self.consume_in_memory_chars_before_end()?;
                 break;
@@ -163,7 +163,7 @@ impl PathParser<'_> {
                         .consume_char_into_memory_and_move_char_index_to_next(*char),
                 };
             } else {
-                // reach the end of chars,
+                // reach the end, no char anymore
                 // consume the chars in-memory as plain path
                 return self.inner.incorrect_wrapped_path(index_of_left_brace);
             }

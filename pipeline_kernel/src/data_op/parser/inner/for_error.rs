@@ -3,20 +3,28 @@ use watchmen_model::{StdErrCode, StdErrorCode, StdR};
 
 /// report error
 impl ParserInnerState<'_> {
+    fn error<S, R>(&self, msg: S) -> StdR<R>
+    where
+        S: Into<String>,
+    {
+        PipelineKernelErrorCode::IncorrectDataPath.msg(msg)
+    }
+
     pub fn incorrect_empty_path<R>(&self) -> StdR<R> {
-        PipelineKernelErrorCode::IncorrectDataPath
-            .msg("Incorrect data path, caused by not content determined.")
+        self.error("Incorrect data path, caused by not content determined.")
     }
 
     pub fn incorrect_char_at_previous_index<R>(&self, char: &char) -> StdR<R> {
-        PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
+        self.error(format!(
             "Incorrect data path[{}], caused by incorrect {} at index[{}].",
-            self.full_path, char, self.char_index - 1
+            self.full_path,
+            char,
+            self.char_index - 1
         ))
     }
 
     fn incorrect_char_at_index<R>(&self, reason: &str) -> StdR<R> {
-        PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
+        self.error(format!(
             "Incorrect data path[{}], caused by incorrect {} at index[{}].",
             self.full_path, reason, self.char_index
         ))
@@ -56,16 +64,72 @@ impl ParserInnerState<'_> {
         start_char_index: usize,
         end_char_index: usize,
     ) -> StdR<R> {
-        PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
+        self.error(format!(
             "Incorrect data path[{}], caused by blank segment at index[{}, {}].",
             self.full_path, start_char_index, end_char_index
         ))
     }
 
     pub fn incorrect_wrapped_path<R>(&self, start_char_index: usize) -> StdR<R> {
-        PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
+        self.error(format!(
             "Incorrect data path[{}], caused by the closing \"}}\" is not matched, the opening \"{{\" is at index [{}].",
             self.full_path, start_char_index
+        ))
+    }
+
+    pub fn incorrect_function_name_char<R>(&self, char: char) -> StdR<R> {
+        self.error(format!(
+            "Incorrect data path[{}], caused by disallowed char[{}] in function name at index[{}].",
+            self.full_path, char, self.char_index
+        ))
+    }
+
+    pub fn incorrect_empty_function_name<R>(&self, start_char_index: usize) -> StdR<R> {
+        self.error(format!(
+            "Incorrect data path[{}], caused by empty function name at index[{}].",
+            self.full_path, start_char_index
+        ))
+    }
+
+    pub fn incorrect_function_name<R>(
+        &self,
+        start_char_index: usize,
+        end_char_index: usize,
+    ) -> StdR<R> {
+        self.error(format!(
+            "Incorrect data path[{}], caused by unrecognized function name[{}] at index[{}, {}].",
+            self.full_path,
+            self.full_path[start_char_index..end_char_index].to_string(),
+            start_char_index,
+            end_char_index
+        ))
+    }
+
+    pub fn incorrect_function_no_param<R>(
+        &self,
+        start_char_index: usize,
+        end_char_index: usize,
+    ) -> StdR<R> {
+        self.error(format!(
+            "Incorrect data path[{}], caused by function[{}] must have parameter(s) at index[{}, {}].",
+            self.full_path,
+            self.full_path[start_char_index..end_char_index].to_string(),
+            start_char_index,
+            end_char_index
+        ))
+    }
+
+    pub fn incorrect_function_has_context<R>(
+        &self,
+        start_char_index: usize,
+        end_char_index: usize,
+    ) -> StdR<R> {
+        self.error(format!(
+            "Incorrect data path[{}], caused by function[{}] cannot have context at index[{}, {}].",
+            self.full_path,
+            self.full_path[start_char_index..end_char_index].to_string(),
+            start_char_index,
+            end_char_index
         ))
     }
 

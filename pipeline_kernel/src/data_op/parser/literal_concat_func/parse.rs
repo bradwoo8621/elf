@@ -66,6 +66,7 @@ impl LiteralConcatFuncParser<'_> {
                         .consume_char_into_memory_and_move_char_index_to_next(*char),
                 }
             } else {
+                // reach the end, no char anymore
                 break;
             }
         }
