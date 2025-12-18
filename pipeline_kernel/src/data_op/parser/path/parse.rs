@@ -4,20 +4,21 @@ use watchmen_model::StdR;
 /// consume path
 impl PathParser<'_> {
     /// try to consume in-memory chars when dot met.
-    /// - not allowed:
-    ///   - continuous dots,
+    /// not allowed:
+    /// - continuous dots,
+    /// - start of path,
     ///   - after left parenthesis,
     ///   - after left brace,
     ///   - after ampersand,
-    ///   - start of qualified path
+    ///   - after comma,
+    ///   - not content before.
     fn consume_in_memory_chars_before_dot(&mut self) -> StdR<()> {
         if self.inner.in_memory_chars_is_empty() {
             // check the previous char
             // all chars were consumed already
             if let Some(previous_char) = self.inner.previous_char() {
                 match previous_char {
-                    // continuous dots, after left parenthesis, left brace, ampersand are not allowed
-                    '.' | '(' | '{' | '&' => self.inner.incorrect_dot(),
+                    '.' | '(' | '{' | '&' | ',' => self.inner.incorrect_dot(),
                     _ => {
                         self.inner.move_char_index_to_next();
                         Ok(())
@@ -32,6 +33,14 @@ impl PathParser<'_> {
         }
     }
 
+    /// try to consume in-memory chars when path end met.
+    /// now allowed:
+    /// - after dot,
+    /// - after left parenthesis, handled by []
+    /// - after left brace,
+    /// - after ampersand,
+    /// - after comma,
+    /// - no content before
     fn consume_in_memory_chars_before_end(&mut self) -> StdR<()> {
         if self.inner.in_memory_chars_is_empty() {
             // all chars were consumed already
@@ -39,7 +48,9 @@ impl PathParser<'_> {
             if let Some(previous_char) = self.inner.previous_char() {
                 match previous_char {
                     // no content after dot
-                    '.' => self.inner.incorrect_dot(),
+                    '.' | '(' | '{' | '&' | ',' => {
+                        self.inner.incorrect_char_at_previous_index(previous_char)
+                    }
                     _ => Ok(()),
                 }
             } else {

@@ -8,6 +8,13 @@ impl ParserInnerState<'_> {
             .msg("Incorrect data path, caused by not content determined.")
     }
 
+    pub fn incorrect_char_at_previous_index<R>(&self, char: &char) -> StdR<R> {
+        PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
+            "Incorrect data path[{}], caused by incorrect {} at index[{}].",
+            self.full_path, char, self.char_index - 1
+        ))
+    }
+
     fn incorrect_char_at_index<R>(&self, reason: &str) -> StdR<R> {
         PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
             "Incorrect data path[{}], caused by incorrect {} at index[{}].",
