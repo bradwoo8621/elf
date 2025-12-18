@@ -15,11 +15,12 @@ impl PathParser<'_> {
     fn consume_in_memory_chars_before_dot(&mut self) -> StdR<()> {
         if self.inner.in_memory_chars_is_empty() {
             // check the previous char
-            // all chars were consumed already
             if let Some(previous_char) = self.inner.previous_char() {
                 match previous_char {
+                    // dot is not allowed as start of path
                     '.' | '(' | '{' | '&' | ',' => self.inner.incorrect_dot(),
                     _ => {
+                        // previous chars already consumed, simply move index to next
                         self.inner.move_char_index_to_next();
                         Ok(())
                     }
@@ -43,18 +44,18 @@ impl PathParser<'_> {
     /// - no content before
     fn consume_in_memory_chars_before_end(&mut self) -> StdR<()> {
         if self.inner.in_memory_chars_is_empty() {
-            // all chars were consumed already
             // check the previous char
             if let Some(previous_char) = self.inner.previous_char() {
                 match previous_char {
-                    // no content after dot
+                    // previous char is start of something, and not ends yet
                     '.' | '(' | '{' | '&' | ',' => {
                         self.inner.incorrect_char_at_previous_index(previous_char)
                     }
+                    // previous chars already consumed
                     _ => Ok(()),
                 }
             } else {
-                // no char before end, dot cannot be the first char
+                // no char before end, empty path is not allowed
                 self.inner.incorrect_empty_path()
             }
         } else {
@@ -106,6 +107,31 @@ impl PathParser<'_> {
         Ok(())
     }
 
+    /// called by [parse_till_right_brace] only.
+    fn consume_in_memory_chars_before_right_brace(&mut self) -> StdR<()> {
+        if self.inner.in_memory_chars_is_empty() {
+            // check the previous char
+            if let Some(previous_char) = self.inner.previous_char() {
+                match previous_char {
+                    // previous char is start of something, and not ends yet
+                    '.' | '(' | '&' | ',' => self.inner.incorrect_right_brace(),
+                    '{' | _ => {
+                        // is an empty wrapped path or previous chars already consumed
+                        // simply move index to next
+                        self.inner.move_char_index_to_next();
+                        Ok(())
+                    }
+                }
+            } else {
+                // no char before right brace, it cannot be the first char
+                // never happen there always a "{" to trigger the caller function
+                self.inner.incorrect_right_brace()
+            }
+        } else {
+            self.consume_in_memory_chars_as_plain_path(true)
+        }
+    }
+
     /// basically very similar to the standard parse. The differences are as follows:
     /// - parsing ends when a [}] is encountered.
     /// - if the string is completely consumed without encountering a [}], an error is reported.
@@ -123,8 +149,7 @@ impl PathParser<'_> {
                     '{' => self.consume_literal_concat_function()?,
                     // end
                     '}' => {
-                        // TODO in-memory chars could be empty, which leads error
-                        self.consume_in_memory_chars_as_plain_path(true)?;
+                        self.consume_in_memory_chars_before_right_brace()?;
                         break;
                     }
                     // segment end
