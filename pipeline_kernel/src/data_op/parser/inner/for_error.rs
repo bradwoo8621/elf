@@ -1,5 +1,5 @@
 use crate::{ParserInnerState, PipelineKernelErrorCode};
-use watchmen_model::{StdErrCode, StdErrorCode, StdR};
+use watchmen_model::{StdErrCode, StdErrorCode, StdR, VariablePredefineFunctions};
 
 /// report error
 impl ParserInnerState<'_> {
@@ -151,6 +151,23 @@ impl ParserInnerState<'_> {
         self.error(format!(
             "Incorrect data path[{}], caused by the closing \")\" is not matched, the opening \"(\" is at index [{}].",
             self.full_path, start_char_index
+        ))
+    }
+
+    pub fn incorrect_function_param_over_max_count<R>(
+        &self,
+        func: &VariablePredefineFunctions,
+        start_char_index: usize,
+        end_char_index: usize,
+        max_count: usize,
+    ) -> StdR<R> {
+        self.error(format!(
+            "Incorrect data path[{}], caused by function[{}] can accept a maximum of {} parameters at index[{}, {}].",
+            self.full_path,
+            func.to_string(),
+            max_count,
+            start_char_index,
+            end_char_index
         ))
     }
 

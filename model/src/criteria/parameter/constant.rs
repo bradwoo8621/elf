@@ -97,13 +97,13 @@ impl VariablePredefineFunctions {
     /// - [&cur],
     /// - [&old],
     /// - [&now]
-    pub fn context_disallowed(&self) -> bool {
+    pub fn require_context(&self) -> bool {
         match self {
             VariablePredefineFunctions::NextSeq
             | VariablePredefineFunctions::FromCurrentContext
             | VariablePredefineFunctions::FromPreviousTriggerData
-            | VariablePredefineFunctions::Now => true,
-            _ => false,
+            | VariablePredefineFunctions::Now => false,
+            _ => true,
         }
     }
 
@@ -169,8 +169,8 @@ impl VariablePredefineFunctions {
     /// the returned count doesn't count in the context parameter.
     /// e.g. [a.&length] is same as [&length(a)], the max params count is 0,
     /// e.g. [a.&minNum(b, c, ...)], [&minNum(a, b, c, ...)], any parameters are accepted.
-    pub fn max_param_count(&self) -> i64 {
-        match self {
+    pub fn max_param_count(&self) -> Option<usize> {
+        let count = match self {
             VariablePredefineFunctions::NextSeq => 0,
             VariablePredefineFunctions::Count => 0,
             VariablePredefineFunctions::Length => 0,
@@ -219,7 +219,8 @@ impl VariablePredefineFunctions {
             VariablePredefineFunctions::MoveDate => 1,
             VariablePredefineFunctions::DateFormat => 1,
             VariablePredefineFunctions::Now => 0,
-        }
+        };
+        (count != -1).then_some(count as usize)
     }
 }
 

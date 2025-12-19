@@ -3,21 +3,34 @@ use watchmen_model::StdR;
 
 impl FuncParser<'_> {
     fn parse_param(&mut self) -> StdR<()> {
+        // TODO
         Ok(())
     }
 
-    /// - param parsed,
-    /// - no param content detected, to check the function can accept following in current parameter index,
-    ///   - empty string,
-    ///   - none,
-    /// - whitespaces chars in memory, to check the function can accept following in current parameter index,
-    ///   - blank string,
-    ///   - empty string,
-    ///   - none.
     fn end_param(&mut self) -> StdR<()> {
+        // TODO
         // move to next char, skip the ")" or ","
         self.inner.move_char_index_to_next();
         Ok(())
+    }
+
+    fn end_param_before_right_parenthesis(
+        &mut self,
+        index_of_left_parenthesis: usize,
+        param_index: usize,
+    ) -> StdR<()> {
+        self.check_param_count_before_right_parenthesis(index_of_left_parenthesis, param_index)?;
+        self.end_param()
+    }
+
+    /// it is not the last parameter of function, there is one more parameter will be parsed after comma.
+    fn end_param_before_comma(
+        &mut self,
+        index_of_left_parenthesis: usize,
+        param_index: usize,
+    ) -> StdR<()> {
+        self.check_param_count_before_comma(index_of_left_parenthesis, param_index)?;
+        self.end_param()
     }
 
     fn finalize_content(&mut self) -> StdR<()> {
@@ -44,7 +57,8 @@ impl FuncParser<'_> {
     pub fn parse(&mut self) -> StdR<()> {
         let index_of_left_parenthesis = self.inner.char_index - 1;
 
-        let mut param_index = 0;
+        // total parsed parameter count
+        let mut param_index: usize = 0;
         let mut whitespace_met = true;
         loop {
             if let Some(char) = self.inner.current_char() {
@@ -62,11 +76,18 @@ impl FuncParser<'_> {
                     '(' => self.inner.incorrect_left_parenthesis()?,
                     // end of parameters
                     ')' => {
-                        self.end_param()?;
+                        self.end_param_before_right_parenthesis(
+                            index_of_left_parenthesis,
+                            param_index,
+                        )?;
+                        param_index += 1;
                         break;
                     }
                     // end of parameter
-                    ',' => self.end_param()?,
+                    ',' => {
+                        self.end_param_before_comma(index_of_left_parenthesis, param_index)?;
+                        param_index += 1;
+                    }
                     // \s, ignore.
                     // in python version, whitespaces after function name is allowed, compatible logic here
                     ' ' | '\t' | '\r' | '\n' | '\x0C' | '\x0B' => {

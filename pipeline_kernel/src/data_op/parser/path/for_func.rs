@@ -81,6 +81,14 @@ impl PathParser<'_> {
         }
 
         let func = self.consume_in_memory_chars_as_func_name()?;
+        // check has context and allowable
+        let has_context = !self.segments.is_empty();
+        if !func.require_context() && has_context {
+            return self
+                .inner
+                .incorrect_function_has_context(start_index_of_func, self.inner.char_index);
+        }
+
         if will_start_params {
             // continue parsing function
             let mut func_parser = FuncParser {
@@ -91,9 +99,10 @@ impl PathParser<'_> {
                     char_index: self.inner.char_index + 1,
                     in_memory_chars: String::new(),
                 },
+                start_char_index_of_func: start_index_of_func,
                 func,
                 params: vec![],
-                with_context: !self.segments.is_empty()
+                with_context: !self.segments.is_empty(),
             };
             func_parser.parse()?;
             // hand back
@@ -110,15 +119,12 @@ impl PathParser<'_> {
                 },
             }));
         } else {
-            // no params followed
-            if func.max_param_count() > 0 {
+            // no params followed, then raise error when
+            // - if at least 1 parameter required,
+            // - has no context and not context disallowed, which means context
+            let min_param_count = func.min_param_count();
+            if min_param_count > 0 || !has_context {
                 return self.inner.incorrect_function_no_param(
-                    self.inner.char_index - func.to_string().len(),
-                    self.inner.char_index,
-                );
-            }
-            if func.context_disallowed() && !self.segments.is_empty() {
-                return self.inner.incorrect_function_has_context(
                     self.inner.char_index - func.to_string().len(),
                     self.inner.char_index,
                 );
