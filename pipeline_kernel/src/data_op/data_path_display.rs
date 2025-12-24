@@ -103,8 +103,8 @@ impl Display for DataPath {
                 .join(",\n");
             write!(
                 f,
-                "DataPath[chars_count={}, segments=[\n{}\n]]",
-                self.path.end_index(),
+                "DataPath[{}, segments=[\n{}\n]]",
+                self.path,
                 segments_str
             )
         }
