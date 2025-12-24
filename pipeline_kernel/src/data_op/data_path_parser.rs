@@ -558,5 +558,53 @@ mod tests {
 
             println!("[a.&slice(,)] parse to {}", path)
         }
+
+        #[test]
+        fn test__a_sliceLPWsCWsRP() {
+            println!("test__a_sliceLPNonCNonRP");
+
+            let path = DataPath::from_str("a.&slice(   ,   )").unwrap();
+            assert_eq!(path.path.to_string(), "a.&slice(   ,   )");
+            assert_eq!(path.path.start_index(), 0);
+            assert_eq!(path.path.end_index(), 17);
+            assert_eq!(path.segments.len(), 2);
+            assert_plain_segment(&path.segments[0], "a");
+            assert_func_segment(
+                &path.segments[1],
+                "&slice(   ,   )",
+                |f| assert!(matches!(f, VariablePredefineFunctions::Slice)),
+                |params| {
+                    assert_eq!(params.len(), 2);
+                    assert_param_none(&params[0], "   ");
+                    assert_param_none(&params[1], "   ");
+                },
+            );
+
+            println!("[a.&slice(   ,   )] parse to {}", path)
+        }
+
+        #[test]
+        fn test__sliceLPaCWsCWsRP() {
+            println!("test__sliceLPaCWsCWsRP");
+
+            let path = DataPath::from_str("&slice(a,   ,   )").unwrap();
+            assert_eq!(path.path.to_string(), "&slice(a,   ,   )");
+            assert_eq!(path.path.start_index(), 0);
+            assert_eq!(path.path.end_index(), 17);
+            assert_eq!(path.segments.len(), 1);
+            assert_func_segment(
+                &path.segments[0],
+                "&slice(a,   ,   )",
+                |f| assert!(matches!(f, VariablePredefineFunctions::Slice)),
+                |params| {
+                    assert_eq!(params.len(), 3);
+                    assert_param_plain(&params[0], "a");
+                    assert_param_none(&params[1], "   ");
+                    assert_param_none(&params[2], "   ");
+                },
+            );
+
+            println!("[&slice(a,   ,   )] parse to {}", path)
+        }
     }
 }
