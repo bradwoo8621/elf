@@ -2,6 +2,29 @@ use crate::FuncParser;
 use watchmen_model::StdR;
 
 impl FuncParser {
+    /// get real param index in function definition
+    ///
+    /// never call this function when
+    /// - the given param index is 0,
+    /// - and the function requires context,
+    /// - and the current parsing is without context.
+    /// in above case, real param index will be -1, and for return type usize, which is invalid.
+    /// but this function will return 0 in this case to avoid panic,
+    /// and the caller should make sure not to call this function in above case.
+    pub fn real_param_index(&self, param_index: usize) -> usize {
+        if self.with_context {
+            // with context, param index is real param index
+            param_index
+        } else if self.func.require_context() {
+            // no context, but require context, which means the first parameter is context
+            // so real param index is param index - 1
+            if param_index == 0 { 0 } else { param_index - 1 }
+        } else {
+            // no context and not require it, so real param index is param index
+            param_index
+        }
+    }
+
     /// - [param_index]: starts from 0,
     /// - [one_more_param_booked]:
     ///   - if [,] detected,
@@ -33,12 +56,12 @@ impl FuncParser {
         // which means one more parameter to be counted.
         // but still there is a special case, which is
         // - param index is 0,
-        // - function does not allow context,
+        // - function does not allow context or already has context,
         // - function's max param count is 0,
         // in this case, the whitespaces in memory will be ignored.
         // that is saying, in this case, parameter on air count is 0.
         let mut param_on_air_count = 0;
-        if param_index == parsed_param_count {
+        if param_index >= parsed_param_count {
             // typically, there is one parameter on air
             param_on_air_count = 1;
             if param_index == 0 && max_param_count == 0 && !one_more_param_booked {

@@ -100,4 +100,12 @@ impl PathParser {
             end_char_index
         ))
     }
+
+    /// report error at [index of param start]
+    pub fn incorrect_function_param_not_close<R>(&self, param_start_char_index: usize) -> StdR<R> {
+        self.inner.error(format!(
+            "Incorrect data path[{}], caused by the closing \",\" or \")\" is not matched, parameter starts at index [{}].",
+            self.inner.full_path(), param_start_char_index
+        ))
+    }
 }

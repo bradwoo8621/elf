@@ -36,7 +36,7 @@ impl ParserInnerState {
     pub fn new_at_current_char_and_copy_in_memory_chars(other: &mut Self) -> Self {
         ParserInnerState {
             all_chars: other.all_chars.clone(),
-            char_index: other.char_index + 1,
+            char_index: other.char_index,
             in_memory_chars: if other.in_memory_chars_is_empty() {
                 String::new()
             } else {

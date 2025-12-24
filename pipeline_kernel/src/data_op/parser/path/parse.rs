@@ -172,10 +172,94 @@ impl PathParser {
         Ok(())
     }
 
+    /// called by [parse_till_param_end] only.
+    fn consume_in_memory_chars_before_comma(&mut self) -> StdR<()> {
+        if self.inner.in_memory_chars_is_empty() {
+            // check the previous char
+            if let Some(previous_char) = self.inner.previous_char() {
+                match previous_char {
+                    // previous char is start of something, and not ends yet
+                    '.' | '(' | '{' | '&' | ',' => self.inner.incorrect_comma(),
+                    _ => {
+                        // is an empty parameter or previous chars already consumed
+                        Ok(())
+                    }
+                }
+            } else {
+                // no char before right parenthesis, it cannot be the first char
+                // never happen there always a "(" to trigger the caller function
+                self.inner.incorrect_comma()
+            }
+        } else {
+            self.consume_in_memory_chars_as_plain_path(false)
+        }
+    }
+
+    /// called by [parse_till_param_end] only.
+    fn consume_in_memory_chars_before_right_parenthesis(&mut self) -> StdR<()> {
+        if self.inner.in_memory_chars_is_empty() {
+            // check the previous char
+            if let Some(previous_char) = self.inner.previous_char() {
+                match previous_char {
+                    // previous char is start of something, and not ends yet
+                    '.' | '{' | '&' | ',' => self.inner.incorrect_right_parenthesis(),
+                    '(' | _ => {
+                        // is an empty parameter or previous chars already consumed
+                        Ok(())
+                    }
+                }
+            } else {
+                // no char before right parenthesis, it cannot be the first char
+                // never happen there always a "(" to trigger the caller function
+                self.inner.incorrect_right_parenthesis()
+            }
+        } else {
+            self.consume_in_memory_chars_as_plain_path(false)
+        }
+    }
+
     /// basically very similar to the standard parse. The differences are as follows:
     /// - parsing ends when one of [,)] is encountered.
     /// - if the string is completely consumed without encountering one of [,)], an error is reported.
-    pub fn parse_till_param_end(&mut self) -> StdR<()> {
+    /// and there might be a blank string in memory.
+    ///
+    /// note this function is trigger when a [&] or a char is needed to be appended into in-memory chars,
+    /// which means there must be a param needs to be parsed.
+    pub fn parse_till_param_end(&mut self, param_start_char_index: usize) -> StdR<()> {
+        loop {
+            if let Some(char) = self.inner.current_char() {
+                match char {
+                    // start of function, no content before function
+                    '&' => self.consume_func_path()?,
+                    '(' => self.inner.incorrect_left_parenthesis()?,
+                    ')' => {
+                        self.consume_in_memory_chars_before_right_parenthesis()?;
+                        break;
+                    }
+                    // start of sub path
+                    '{' => self.consume_literal_concat_function()?,
+                    // end
+                    '}' => self.inner.incorrect_right_brace()?,
+                    // segment end
+                    '.' => self.consume_in_memory_chars_before_dot()?,
+                    ',' => {
+                        self.consume_in_memory_chars_before_comma()?;
+                        break;
+                    }
+                    // potential escape char, check next char
+                    '\\' => self.inner.consume_potential_escape_char(),
+                    // normal char, append to current chars
+                    _ => self
+                        .inner
+                        .consume_char_into_memory_and_move_char_index_to_next(*char),
+                };
+            } else {
+                // reach the end, no char anymore
+                // "," or ")" not encountered, raise error
+                return self.incorrect_function_param_not_close(param_start_char_index);
+            }
+        }
+
         Ok(())
     }
 }

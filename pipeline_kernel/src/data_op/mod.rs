@@ -1,4 +1,5 @@
 mod data_path;
+mod data_path_display;
 mod data_path_parser;
 mod data_visitor;
 mod data_visitor_base;

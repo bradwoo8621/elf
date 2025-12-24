@@ -29,7 +29,7 @@ impl FuncParser {
             inner: ParserInnerState::new_at_current_char_and_copy_in_memory_chars(&mut self.inner),
             segments: vec![],
         };
-        path_parser.parse_till_param_end()?;
+        path_parser.parse_till_param_end(param_start_char_index)?;
         let delegate = &mut FuncParserDelegate {
             parser: self,
             param_start_char_index,
@@ -179,18 +179,11 @@ impl FuncParser {
         index_of_left_parenthesis: usize,
         param_index: usize,
     ) -> StdR<()> {
-        let real_param_index = if !self.with_context {
-            // no context, so current param index is real param index
-            param_index
-        } else {
-            // with context, so need to minus 1 to get real param index
-            param_index - 1
-        };
+        let real_param_index = self.real_param_index(param_index);
         let max_param_count = self.func.max_param_count();
         if let Some(max_count) = max_param_count {
-            if max_count > real_param_index {
+            if max_count <= real_param_index {
                 // current parameter is not allowed, over the max param count
-                // basically, never happens, checked already
                 return self
                     .incorrect_function_param_over_max_count(index_of_left_parenthesis, max_count);
             }
@@ -215,10 +208,10 @@ impl FuncParser {
     /// move char index to next at last
     fn end_param(&mut self, index_of_left_parenthesis: usize, param_index: usize) -> StdR<()> {
         let parsed_count = self.params.len();
-        if param_index == 0 {
+        if param_index == 0 && parsed_count != 1 {
             // no parameter parsed, current is the first parameter.
             self.end_param_at_0()?
-        } else if parsed_count < param_index {
+        } else if parsed_count <= param_index {
             // current parameter not parsed yet
             self.end_param_at_not_0(index_of_left_parenthesis, param_index)?
         } else {
@@ -280,20 +273,14 @@ impl FuncParser {
 
         // total parsed parameter count, include context if not with context currently
         let mut param_index: usize = 0;
-        let mut whitespace_met = true;
         let mut param_start_char_index = self.inner.current_char_index();
         loop {
             if let Some(char) = self.inner.current_char() {
                 match char {
                     '&' => {
-                        if whitespace_met {
-                            self.inner.incorrect_ampersand()?;
-                        } else {
-                            // ignore the whitespaces before function
-                            self.inner.clear_in_memory_chars();
-                            self.parse_param(param_start_char_index)?;
-                            whitespace_met = false;
-                        }
+                        // ignore the whitespaces before function
+                        self.inner.clear_in_memory_chars();
+                        self.parse_param(param_start_char_index)?;
                     }
                     '(' => self.inner.incorrect_left_parenthesis()?,
                     // end of parameters
@@ -310,20 +297,16 @@ impl FuncParser {
                     ',' => {
                         self.end_param_before_comma(index_of_left_parenthesis, param_index)?;
                         param_index += 1;
-                        param_start_char_index = self.inner.next_char_index();
+                        // char index already moved to next in end_param
+                        param_start_char_index = self.inner.current_char_index();
                     }
                     // \s, ignore.
                     // in python version, whitespaces after function name is allowed, compatible logic here
-                    ' ' | '\t' | '\r' | '\n' | '\x0C' | '\x0B' => {
-                        whitespace_met = true;
-                        self.inner
-                            .consume_char_into_memory_and_move_char_index_to_next(*char)
-                    }
+                    ' ' | '\t' | '\r' | '\n' | '\x0C' | '\x0B' => self
+                        .inner
+                        .consume_char_into_memory_and_move_char_index_to_next(*char),
                     // other char
-                    _ => {
-                        self.parse_param(param_start_char_index)?;
-                        whitespace_met = false;
-                    }
+                    _ => self.parse_param(param_start_char_index)?,
                 };
             } else {
                 // reach the end, no char anymore

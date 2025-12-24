@@ -1,6 +1,5 @@
 use bigdecimal::BigDecimal;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-use std::fmt::{Display, Formatter};
 use std::sync::Arc;
 use watchmen_model::VariablePredefineFunctions;
 
@@ -57,12 +56,6 @@ impl PathStr {
 
     pub fn end_index(&self) -> usize {
         self.end_index
-    }
-}
-
-impl Display for PathStr {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.to_string())
     }
 }
 
