@@ -1,30 +1,39 @@
-use crate::{EnvFile, ErrorCode, StdErrCode, StdR, VoidR};
-use config::{Case, Config, Environment, File, FileFormat};
+use crate::{EnvConfig, EnvFile, ErrorCode, OsEnv, StdErrCode, StdR, Values, VoidR};
+use config::{Config, File, FileFormat};
 use std::path::Path;
-use std::sync::RwLock;
+use std::sync::{OnceLock, RwLock};
 
-static GLOBAL_CONFIG: RwLock<Option<Config>> = RwLock::new(None);
+static ENV_CONFIG: OnceLock<RwLock<EnvConfig>> = OnceLock::new();
 
 pub struct Envs;
 
 impl Envs {
-    fn set(config: Config) -> VoidR {
-        let mut guard = GLOBAL_CONFIG
-            .write()
-            .or_else(|e| StdErrCode::ConfigGlobalInstanceLock.msg(e.to_string()))?;
-        *guard = Some(config);
+    fn os_env() -> OsEnv {
+        OsEnv::default()
+    }
 
-        Ok(())
+    /// only once, otherwise raise error
+    fn set(config: Config) -> VoidR {
+        if ENV_CONFIG
+            .set(RwLock::new(EnvConfig::with(config)))
+            .is_err()
+        {
+            StdErrCode::EnvInit.msg("Failed to initialize environment variables again.")
+        } else {
+            Ok(())
+        }
+    }
+
+    fn default_config() -> StdR<Config> {
+        Config::builder()
+            .add_source(File::new("./.env", EnvFile).required(false))
+            .add_source(Self::os_env())
+            .build()
+            .or_else(|e| StdErrCode::EnvInit.msg(e.to_string()))
     }
 
     pub fn init() -> VoidR {
-        let config = Config::builder()
-            .add_source(File::new("./.env", EnvFile).required(false))
-            .add_source(Environment::with_convert_case(Case::UpperSnake))
-            .build()
-            .or_else(|e| StdErrCode::ConfigInit.msg(e.to_string()))?;
-
-        Self::set(config)
+        Self::set(Self::default_config()?)
     }
 
     pub fn with_files(files: Vec<String>) -> VoidR {
@@ -62,7 +71,7 @@ impl Envs {
                     Some("ini") => builder.add_source(File::new(file.as_str(), FileFormat::Ini)),
                     Some("ron") => builder.add_source(File::new(file.as_str(), FileFormat::Ron)),
                     _ => {
-                        return StdErrCode::ConfigFileFormatNotSupported
+                        return StdErrCode::EnvFileFormatNotSupported
                             .msg(format!("Env file[{}] not supported yet.", file));
                     }
                 };
@@ -70,28 +79,27 @@ impl Envs {
         }
 
         let config = builder
-            .add_source(Environment::with_convert_case(Case::UpperSnake))
+            .add_source(Self::os_env())
             .build()
-            .or_else(|e| StdErrCode::ConfigInit.msg(e.to_string()))?;
+            .or_else(|e| StdErrCode::EnvInit.msg(e.to_string()))?;
 
         Envs::set(config)
     }
 }
 
 impl Envs {
-    pub fn get_str(key: &str) -> StdR<Option<String>> {
-        let guard = GLOBAL_CONFIG
-            .read()
-            .or_else(|e| StdErrCode::ConfigGlobalInstanceLock.msg(e.to_string()))?;
-        if let Some(config) = guard.as_ref() {
-            if let Ok(s) = config.get_string(key) {
-                Ok(Some(s.clone()))
-            } else {
-                Ok(None)
-            }
-        } else {
-            StdErrCode::ConfigInit.msg("Environment not initialized yet.")
-        }
+    fn env_config() -> &'static RwLock<EnvConfig> {
+        ENV_CONFIG.get_or_init(|| match Envs::default_config() {
+            Ok(config) => RwLock::new(EnvConfig::with(config)),
+            Err(e) => panic!(
+                "Failed to initialize environment variables, caused by {}",
+                e
+            ),
+        })
+    }
+
+    pub fn get_str(key: &str) -> Option<String> {
+        Self::env_config().get_str(key)
     }
 }
 
@@ -101,16 +109,29 @@ mod tests {
     use std::env::{remove_var, set_var};
 
     #[test]
-    fn test_0() {
+    fn test_priority_env_vs_file() {
         unsafe {
             set_var("TEST_KEY", "test value");
         }
 
         Envs::with_files(vec!["test/.env".to_string()]).expect("Failed to init environment");
-        assert_eq!(Envs::get_str("TEST_KEY").unwrap().unwrap(), "test value");
+        assert_eq!(Envs::get_str("TEST_KEY").unwrap(), "test value");
 
         unsafe {
             remove_var("TEST_KEY");
         }
+    }
+
+    #[test]
+    fn test_priority_files() {
+        Envs::with_files(vec!["test/.env".to_string(), "test/2.env".to_string()])
+            .expect("Failed to init environment");
+        assert_eq!(Envs::get_str("TEST_KEY").unwrap(), "test value");
+    }
+
+    #[test]
+    fn test_json() {
+        Envs::with_files(vec!["test/test.json".to_string()]).expect("Failed to init environment");
+        assert_eq!(Envs::get_str("test.key").unwrap(), "test value json");
     }
 }

@@ -34,10 +34,11 @@ pub trait ErrorCode {
 
 pub enum StdErrCode {
     DecimalParse,
-    /// config
-    ConfigInit,
-    ConfigGlobalInstanceLock,
-    ConfigFileFormatNotSupported,
+    /// environment variables
+    EnvInit,
+    EnvFileFormatNotSupported,
+    EnvValueGet,
+    EnvValueTypeMismatch,
     /// with multiple sub errors
     Multiple,
     Unknown,
@@ -48,9 +49,10 @@ impl ErrorCode for StdErrCode {
         match self {
             StdErrCode::DecimalParse => "STDE-00001",
 
-            StdErrCode::ConfigInit => "STDE-00100",
-            StdErrCode::ConfigGlobalInstanceLock => "STDE-00101",
-            StdErrCode::ConfigFileFormatNotSupported => "STDE-00102",
+            StdErrCode::EnvInit => "STDE-00100",
+            StdErrCode::EnvFileFormatNotSupported => "STDE-00101",
+            StdErrCode::EnvValueGet => "STDE-00102",
+            StdErrCode::EnvValueTypeMismatch => "STDE-00103",
 
             StdErrCode::Multiple => "STDE-99998",
             StdErrCode::Unknown => "STDE-99999",
