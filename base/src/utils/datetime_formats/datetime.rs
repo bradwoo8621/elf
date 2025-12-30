@@ -1,5 +1,6 @@
 use crate::{
-    DateTimeFormatterBase, DateTimeFormatterSupport, EnvConfig, ErrorCode, StdErrCode, StdR, VoidR,
+    DateTimeFormatterBase, DateTimeFormatterSupport, EnvConfig, ErrorCode, LooseDateTimeParser,
+    StdErrCode, StdR, VoidR,
 };
 use chrono::NaiveDateTime;
 use std::collections::HashMap;
@@ -45,7 +46,7 @@ impl DateTimeFormatterBase<NaiveDateTime> for DateTimeFormatter {
 
     // noinspection DuplicatedCode
     fn try_parse(valid_part: &String, support: &DateTimeFormatterSupport) -> Option<NaiveDateTime> {
-        if let Ok(datetime) = NaiveDateTime::parse_from_str(valid_part.as_str(), &support.format) {
+        if let Ok(datetime) = LooseDateTimeParser::parse(valid_part, &support.format) {
             Some(datetime)
         } else {
             None
@@ -53,14 +54,14 @@ impl DateTimeFormatterBase<NaiveDateTime> for DateTimeFormatter {
     }
 
     fn format_not_found<R>(str: &String) -> StdR<R> {
-        StdErrCode::TimeParse.msg(format!(
+        StdErrCode::DateTimeParse.msg(format!(
             "No suitable format for parsing the given string[{}] into a datetime.",
             str
         ))
     }
 
     fn parse_failed<R>(str: &String) -> StdR<R> {
-        StdErrCode::TimeParse.msg(format!(
+        StdErrCode::DateTimeParse.msg(format!(
             "The given string[{}] cannot be parsed into a datetime.",
             str
         ))

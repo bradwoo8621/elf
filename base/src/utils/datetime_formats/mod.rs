@@ -5,6 +5,7 @@ mod formatter_support;
 mod full_datetime;
 mod initializer;
 mod loose_date;
+mod loose_datetime_parse;
 mod time;
 
 pub use date::*;
@@ -14,4 +15,5 @@ pub use formatter_support::*;
 pub use full_datetime::*;
 pub use initializer::*;
 pub use loose_date::*;
+pub use loose_datetime_parse::*;
 pub use time::*;

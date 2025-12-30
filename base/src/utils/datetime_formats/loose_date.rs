@@ -14,7 +14,7 @@ pub struct LooseDateFormatter;
 
 impl LooseDateFormatter {
     pub fn default_formats() -> Vec<String> {
-        let mut formats = DateTimeFormatter::default_formats();
+        let mut formats = DateFormatter::default_formats();
         formats.append(&mut DateTimeFormatter::default_formats());
         formats.append(&mut FullDateTimeFormatter::default_formats());
         formats
@@ -54,7 +54,7 @@ impl LooseDateFormatter {
         let mut formats = Self::formats_of(
             envs,
             DateFormatter::formats_from_env,
-            DateTimeFormatter::default_formats,
+            DateFormatter::default_formats,
         )?;
         formats.append(&mut Self::formats_of(
             envs,
@@ -106,8 +106,8 @@ impl LooseDateFormatter {
                 Self::format_not_found(str, target_type)
             } else {
                 for support in supports {
-                    if let Some(time) = try_parse(&valid_part, support) {
-                        return Ok(time);
+                    if let Some(date_or_datetime) = try_parse(&valid_part, support) {
+                        return Ok(date_or_datetime);
                     }
                 }
                 Self::parse_failed(str, target_type)

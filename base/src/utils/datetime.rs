@@ -45,21 +45,85 @@ impl DateTimeUtils for String {
 
 #[cfg(test)]
 mod tests {
-    use chrono::Timelike;
     use crate::DateTimeUtils;
+    use chrono::{Datelike, Timelike};
 
     #[test]
     fn test_time() {
-        let time = "01:02:03".to_string().to_time().expect("Failed to convert to time.");
+        let time = "01:02:03"
+            .to_string()
+            .to_time()
+            .expect("Failed to convert to time.");
         assert_eq!(time.hour(), 1);
         assert_eq!(time.minute(), 2);
         assert_eq!(time.second(), 3);
         assert_eq!(time.nanosecond(), 0);
 
-        let time = "233445".to_string().to_time().expect("Failed to convert to time.");
+        let time = "233445"
+            .to_string()
+            .to_time()
+            .expect("Failed to convert to time.");
         assert_eq!(time.hour(), 23);
         assert_eq!(time.minute(), 34);
         assert_eq!(time.second(), 45);
         assert_eq!(time.nanosecond(), 0);
+    }
+
+    #[test]
+    fn test_date() {
+        let date = "2025-12-30"
+            .to_string()
+            .to_date()
+            .expect("Failed to convert to date.");
+        assert_eq!(date.year(), 2025);
+        assert_eq!(date.month(), 12);
+        assert_eq!(date.day(), 30);
+
+        let date = "2025-12-30 01:02:03"
+            .to_string()
+            .to_date_loose()
+            .expect("Failed to convert to date.");
+        assert_eq!(date.year(), 2025);
+        assert_eq!(date.month(), 12);
+        assert_eq!(date.day(), 30);
+    }
+
+    #[test]
+    fn test_datetime() {
+        let datetime = "2025-12-30 01:02:03"
+            .to_string()
+            .to_datetime()
+            .expect("Failed to convert to datetime.");
+        assert_eq!(datetime.year(), 2025);
+        assert_eq!(datetime.month(), 12);
+        assert_eq!(datetime.day(), 30);
+        assert_eq!(datetime.hour(), 1);
+        assert_eq!(datetime.minute(), 2);
+        assert_eq!(datetime.second(), 3);
+        assert_eq!(datetime.nanosecond(), 0);
+
+        let datetime = "2025-12-30 01:02"
+            .to_string()
+            .to_datetime()
+            .expect("Failed to convert to datetime.");
+        assert_eq!(datetime.year(), 2025);
+        assert_eq!(datetime.month(), 12);
+        assert_eq!(datetime.day(), 30);
+        assert_eq!(datetime.hour(), 1);
+        assert_eq!(datetime.minute(), 2);
+        assert_eq!(datetime.second(), 0);
+        assert_eq!(datetime.nanosecond(), 0);
+
+        let datetime = "2025-12-30"
+            .to_string()
+            .to_datetime_loose()
+            .expect("Failed to convert to datetime.");
+        assert_eq!(datetime.year(), 2025);
+        assert_eq!(datetime.month(), 12);
+        assert_eq!(datetime.day(), 30);
+        assert_eq!(datetime.hour(), 0);
+        assert_eq!(datetime.minute(), 0);
+        assert_eq!(datetime.second(), 0);
+        assert_eq!(datetime.nanosecond(), 0);
     }
 }

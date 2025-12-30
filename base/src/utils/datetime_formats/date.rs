@@ -46,14 +46,14 @@ impl DateTimeFormatterBase<NaiveDate> for DateFormatter {
     }
 
     fn format_not_found<R>(str: &String) -> StdR<R> {
-        StdErrCode::TimeParse.msg(format!(
+        StdErrCode::DateParse.msg(format!(
             "No suitable format for parsing the given string[{}] into a date.",
             str
         ))
     }
 
     fn parse_failed<R>(str: &String) -> StdR<R> {
-        StdErrCode::TimeParse.msg(format!(
+        StdErrCode::DateParse.msg(format!(
             "The given string[{}] cannot be parsed into a date.",
             str
         ))
