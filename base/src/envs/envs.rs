@@ -1,43 +1,33 @@
-use crate::{EnvConfig, EnvFile, ErrorCode, OsEnv, StdErrCode, StdR, Values, VoidR};
-use bigdecimal::BigDecimal;
+use crate::{EnvConfig, EnvFile, ErrorCode, OsEnv, StdErrCode, StdR};
 use config::{Config, File, FileFormat};
 use std::path::Path;
-use std::sync::{Arc, OnceLock, RwLock};
-
-static ENV_CONFIG: OnceLock<RwLock<EnvConfig>> = OnceLock::new();
 
 pub struct Envs;
 
+/// Load environment variables, including the specified environment variable file
+/// (if specified; otherwise, load the [.env] file in the execution directory).
+/// Environment variables are not retained.
+///
+/// Therefore, the environment variables loaded at different times may vary.
+/// Typically, environment variables are loaded when the system starts and are not reloaded afterward.
+/// If the loaded environment variables need to be used continuously,
+/// consume the returned [Config] to store them elsewhere and maintain reasonable references.
 impl Envs {
     fn os_env() -> OsEnv {
         OsEnv::default()
     }
 
-    /// only once, otherwise raise error
-    fn set(config: Config) -> VoidR {
-        if ENV_CONFIG
-            .set(RwLock::new(EnvConfig::with(config)))
-            .is_err()
-        {
-            StdErrCode::EnvInit.msg("Failed to initialize environment variables again.")
-        } else {
-            Ok(())
-        }
-    }
-
-    fn default_config() -> StdR<Config> {
-        Config::builder()
+    pub fn init() -> StdR<EnvConfig> {
+        let config = Config::builder()
             .add_source(File::new("./.env", EnvFile).required(false))
             .add_source(Self::os_env())
             .build()
-            .or_else(|e| StdErrCode::EnvInit.msg(e.to_string()))
+            .or_else(|e| StdErrCode::EnvInit.msg(e.to_string()))?;
+
+        Ok(EnvConfig::new(config))
     }
 
-    pub fn init() -> VoidR {
-        Self::set(Self::default_config()?)
-    }
-
-    pub fn with_files(files: Vec<String>) -> VoidR {
+    pub fn with_files(files: Vec<String>) -> StdR<EnvConfig> {
         if files.len() == 0 {
             return Self::init();
         }
@@ -84,63 +74,10 @@ impl Envs {
             .build()
             .or_else(|e| StdErrCode::EnvInit.msg(e.to_string()))?;
 
-        Envs::set(config)
+        Ok(EnvConfig::new(config))
     }
 }
 
-impl Envs {
-    fn env_config() -> &'static RwLock<EnvConfig> {
-        ENV_CONFIG.get_or_init(|| match Envs::default_config() {
-            Ok(config) => RwLock::new(EnvConfig::with(config)),
-            Err(e) => panic!(
-                "Failed to initialize environment variables, caused by {}",
-                e
-            ),
-        })
-    }
-
-    pub fn bool(key: &str) -> Option<bool> {
-        Self::env_config().get_bool(key)
-    }
-
-    pub fn bool_or(key: &str, default_value: bool) -> bool {
-        Self::env_config().get_bool_or_default(key, default_value)
-    }
-
-    pub fn str(key: &str) -> Option<Arc<String>> {
-        Self::env_config().get_str(key)
-    }
-
-    pub fn str_or(key: &str, default_value: String) -> Arc<String> {
-        Self::env_config().get_str_or_default(key, default_value)
-    }
-
-    pub fn str_vec(key: &str) -> Option<Arc<Vec<Arc<String>>>> {
-        Self::env_config().get_vec(key)
-    }
-
-    pub fn str_vec_or(key: &str, default_value: &Arc<Vec<Arc<String>>>) -> Arc<Vec<Arc<String>>> {
-        Self::env_config().get_vec_or_default(key, default_value)
-    }
-
-    pub fn int(key: &str) -> Option<i64> {
-        Self::env_config().get_int(key)
-    }
-
-    pub fn int_or(key: &str, default_value: i64) -> i64 {
-        Self::env_config().get_int_or_default(key, default_value)
-    }
-
-    pub fn decimal(key: &str) -> Option<Arc<BigDecimal>> {
-        Self::env_config().get_decimal(key)
-    }
-
-    pub fn decimal_or(key: &str, default_value: BigDecimal) -> Arc<BigDecimal> {
-        Self::env_config().get_decimal_or_default(key, default_value)
-    }
-}
-
-/// TODO cannot run test in same process!
 #[cfg(test)]
 mod tests {
     use crate::Envs;
@@ -152,8 +89,12 @@ mod tests {
             set_var("TEST_KEY", "test value");
         }
 
-        Envs::with_files(vec!["test/.env".to_string()]).expect("Failed to init environment");
-        assert_eq!(Envs::str("TEST_KEY").unwrap().as_str(), "test value");
+        let config =
+            Envs::with_files(vec!["test/.env".to_string()]).expect("Failed to init environment");
+        assert_eq!(
+            config.get_string("TEST_KEY").unwrap().unwrap().as_str(),
+            "test value"
+        );
 
         unsafe {
             remove_var("TEST_KEY");
@@ -162,14 +103,21 @@ mod tests {
 
     #[test]
     fn test_priority_files() {
-        Envs::with_files(vec!["test/.env".to_string(), "test/2.env".to_string()])
+        let config = Envs::with_files(vec!["test/.env".to_string(), "test/2.env".to_string()])
             .expect("Failed to init environment");
-        assert_eq!(Envs::str("TEST_KEY").unwrap().as_str(), "test value");
+        assert_eq!(
+            config.get_string("TEST_KEY").unwrap().unwrap().as_str(),
+            "test value"
+        );
     }
 
     #[test]
     fn test_json() {
-        Envs::with_files(vec!["test/test.json".to_string()]).expect("Failed to init environment");
-        assert_eq!(Envs::str("test.key").unwrap().as_str(), "test value json");
+        let config = Envs::with_files(vec!["test/test.json".to_string()])
+            .expect("Failed to init environment");
+        assert_eq!(
+            config.get_string("test.key").unwrap().unwrap().as_str(),
+            "test value json"
+        );
     }
 }
