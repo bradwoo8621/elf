@@ -12,10 +12,10 @@ pub enum StdErrDetail {
 impl Display for StdErrDetail {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            StdErrDetail::Str(s) => {
+            Self::Str(s) => {
                 write!(f, "{}", s)
             }
-            StdErrDetail::Sub(vec) => {
+            Self::Sub(vec) => {
                 write!(
                     f,
                     "{}",

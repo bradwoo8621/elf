@@ -27,15 +27,15 @@ impl CompiledParameterCondition {
 impl InMemoryParameterCondition for CompiledParameterCondition {
     fn is_true(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         match self {
-            CompiledParameterCondition::Expression(v) => v.is_true(variables),
-            CompiledParameterCondition::Joint(v) => v.is_true(variables),
+            Self::Expression(v) => v.is_true(variables),
+            Self::Joint(v) => v.is_true(variables),
         }
     }
 
     fn is_false(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         match self {
-            CompiledParameterCondition::Expression(v) => v.is_false(variables),
-            CompiledParameterCondition::Joint(v) => v.is_false(variables),
+            Self::Expression(v) => v.is_false(variables),
+            Self::Joint(v) => v.is_false(variables),
         }
     }
 }

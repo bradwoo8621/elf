@@ -58,31 +58,31 @@ impl CompiledParameterExpression {
 impl InMemoryParameterCondition for CompiledParameterExpression {
     fn is_true(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         match self {
-            CompiledParameterExpression::Empty(v) => v.is_true(variables),
-            CompiledParameterExpression::NotEmpty(v) => v.is_true(variables),
-            CompiledParameterExpression::Equals(v) => v.is_true(variables),
-            CompiledParameterExpression::NotEquals(v) => v.is_true(variables),
-            CompiledParameterExpression::LessThan(v) => v.is_true(variables),
-            CompiledParameterExpression::LessThanOrEquals(v) => v.is_true(variables),
-            CompiledParameterExpression::MoreThan(v) => v.is_true(variables),
-            CompiledParameterExpression::MoreThanOrEquals(v) => v.is_true(variables),
-            CompiledParameterExpression::In(v) => v.is_true(variables),
-            CompiledParameterExpression::NotIn(v) => v.is_true(variables),
+            Self::Empty(v) => v.is_true(variables),
+            Self::NotEmpty(v) => v.is_true(variables),
+            Self::Equals(v) => v.is_true(variables),
+            Self::NotEquals(v) => v.is_true(variables),
+            Self::LessThan(v) => v.is_true(variables),
+            Self::LessThanOrEquals(v) => v.is_true(variables),
+            Self::MoreThan(v) => v.is_true(variables),
+            Self::MoreThanOrEquals(v) => v.is_true(variables),
+            Self::In(v) => v.is_true(variables),
+            Self::NotIn(v) => v.is_true(variables),
         }
     }
 
     fn is_false(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
         match self {
-            CompiledParameterExpression::Empty(v) => v.is_false(variables),
-            CompiledParameterExpression::NotEmpty(v) => v.is_false(variables),
-            CompiledParameterExpression::Equals(v) => v.is_false(variables),
-            CompiledParameterExpression::NotEquals(v) => v.is_false(variables),
-            CompiledParameterExpression::LessThan(v) => v.is_false(variables),
-            CompiledParameterExpression::LessThanOrEquals(v) => v.is_false(variables),
-            CompiledParameterExpression::MoreThan(v) => v.is_false(variables),
-            CompiledParameterExpression::MoreThanOrEquals(v) => v.is_false(variables),
-            CompiledParameterExpression::In(v) => v.is_false(variables),
-            CompiledParameterExpression::NotIn(v) => v.is_false(variables),
+            Self::Empty(v) => v.is_false(variables),
+            Self::NotEmpty(v) => v.is_false(variables),
+            Self::Equals(v) => v.is_false(variables),
+            Self::NotEquals(v) => v.is_false(variables),
+            Self::LessThan(v) => v.is_false(variables),
+            Self::LessThanOrEquals(v) => v.is_false(variables),
+            Self::MoreThan(v) => v.is_false(variables),
+            Self::MoreThanOrEquals(v) => v.is_false(variables),
+            Self::In(v) => v.is_false(variables),
+            Self::NotIn(v) => v.is_false(variables),
         }
     }
 }

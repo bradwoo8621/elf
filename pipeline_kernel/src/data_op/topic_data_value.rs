@@ -12,7 +12,7 @@ impl ArcTopicDataValue {
     /// check itself is [None] or not
     pub fn is_none(&self) -> bool {
         match self {
-            ArcTopicDataValue::None => true,
+            Self::None => true,
             _ => false,
         }
     }
@@ -20,7 +20,7 @@ impl ArcTopicDataValue {
     /// check itself is string or not
     pub fn is_str(&self) -> Result<&String, &Self> {
         match self {
-            ArcTopicDataValue::Str(s) => Ok(s),
+            Self::Str(s) => Ok(s),
             _ => Err(self),
         }
     }
@@ -28,7 +28,7 @@ impl ArcTopicDataValue {
     /// check itself is bool or not
     pub fn is_bool(&self) -> Result<&bool, &Self> {
         match self {
-            ArcTopicDataValue::Bool(b) => Ok(b),
+            Self::Bool(b) => Ok(b),
             _ => Err(self),
         }
     }
@@ -42,13 +42,13 @@ impl ArcTopicDataValue {
     /// others -> cannot to bool, none
     pub fn try_to_bool(&self) -> Result<bool, &Self> {
         match self {
-            ArcTopicDataValue::Bool(b) => Ok(*b),
-            ArcTopicDataValue::Str(s) => match s.to_ascii_lowercase().as_str() {
+            Self::Bool(b) => Ok(*b),
+            Self::Str(s) => match s.to_ascii_lowercase().as_str() {
                 "1" | "true" | "t" | "yes" | "y" => Ok(true),
                 "0" | "false" | "f" | "no" | "n" => Ok(false),
                 _ => Err(self),
             },
-            ArcTopicDataValue::Num(n) => {
+            Self::Num(n) => {
                 if n.is_one() {
                     Ok(true)
                 } else if n.is_zero() {
@@ -63,11 +63,11 @@ impl ArcTopicDataValue {
 
     pub fn try_to_decimal(&self) -> StdR<Arc<BigDecimal>> {
         match self {
-            ArcTopicDataValue::Num(decimal) => Ok(decimal.clone()),
-            ArcTopicDataValue::None => {
+            Self::Num(decimal) => Ok(decimal.clone()),
+            Self::None => {
                 StdErrCode::DecimalParse.msg("Cannot convert none to decimal.")
             }
-            ArcTopicDataValue::Str(str) => {
+            Self::Str(str) => {
                 if str.is_blank() {
                     StdErrCode::DecimalParse.msg("Cannot convert blank string to decimal.")
                 } else if let Ok(decimal) = str.to_decimal() {
@@ -85,7 +85,7 @@ impl ArcTopicDataValue {
     /// check itself is decimal or not
     pub fn is_num(&self) -> Result<&BigDecimal, &Self> {
         match self {
-            ArcTopicDataValue::Num(n) => Ok(n),
+            Self::Num(n) => Ok(n),
             _ => Err(self),
         }
     }
@@ -93,7 +93,7 @@ impl ArcTopicDataValue {
     /// check itself is datetime or not
     pub fn is_datetime(&self) -> Result<&NaiveDateTime, &Self> {
         match self {
-            ArcTopicDataValue::DateTime(dt) => Ok(dt),
+            Self::DateTime(dt) => Ok(dt),
             _ => Err(self),
         }
     }
@@ -101,7 +101,7 @@ impl ArcTopicDataValue {
     /// check itself is date or not
     pub fn is_date(&self) -> Result<&NaiveDate, &Self> {
         match self {
-            ArcTopicDataValue::Date(d) => Ok(d),
+            Self::Date(d) => Ok(d),
             _ => Err(self),
         }
     }
@@ -109,7 +109,7 @@ impl ArcTopicDataValue {
     /// check itself is time or not
     pub fn is_time(&self) -> Result<&NaiveTime, &Self> {
         match self {
-            ArcTopicDataValue::Time(t) => Ok(t),
+            Self::Time(t) => Ok(t),
             _ => Err(self),
         }
     }
@@ -117,9 +117,9 @@ impl ArcTopicDataValue {
     /// check itself is date/time/datetime or not
     pub fn is_datetime_related(&self) -> bool {
         match self {
-            ArcTopicDataValue::Date(_) => true,
-            ArcTopicDataValue::DateTime(_) => true,
-            ArcTopicDataValue::Time(_) => true,
+            Self::Date(_) => true,
+            Self::DateTime(_) => true,
+            Self::Time(_) => true,
             _ => false,
         }
     }
@@ -128,10 +128,10 @@ impl ArcTopicDataValue {
     /// otherwise: false
     pub fn is_empty(&self) -> bool {
         match self {
-            ArcTopicDataValue::None => true,
-            ArcTopicDataValue::Str(v) => v.len() == 0,
-            ArcTopicDataValue::Map(v) => v.is_empty(),
-            ArcTopicDataValue::Vec(v) => v.is_empty(),
+            Self::None => true,
+            Self::Str(v) => v.len() == 0,
+            Self::Map(v) => v.is_empty(),
+            Self::Vec(v) => v.is_empty(),
             _ => false,
         }
     }
@@ -146,8 +146,8 @@ impl ArcTopicDataValue {
     /// otherwise: false
     pub fn is_none_or_empty_str(&self) -> bool {
         match self {
-            ArcTopicDataValue::None => true,
-            ArcTopicDataValue::Str(v) => v.len() == 0,
+            Self::None => true,
+            Self::Str(v) => v.len() == 0,
             _ => false,
         }
     }
@@ -188,11 +188,11 @@ impl ArcTopicDataValue {
     ///    - 7.2. another is string, equals another to time
     pub fn is_same_as(&self, another: &ArcTopicDataValue) -> bool {
         match self {
-            ArcTopicDataValue::None => {
+            Self::None => {
                 // #1.1
                 another.is_none_or_empty_str()
             }
-            ArcTopicDataValue::Str(one_str) => {
+            Self::Str(one_str) => {
                 if let Ok(another_str) = another.is_str() {
                     // 2.1
                     one_str.deref() == another_str
@@ -238,7 +238,7 @@ impl ArcTopicDataValue {
                     false
                 }
             }
-            ArcTopicDataValue::Num(one_decimal) => {
+            Self::Num(one_decimal) => {
                 if let Ok(another_decimal) = another.is_num() {
                     // 3.1
                     one_decimal.deref() == another_decimal
@@ -260,7 +260,7 @@ impl ArcTopicDataValue {
                     false
                 }
             }
-            ArcTopicDataValue::Bool(one_bool) => {
+            Self::Bool(one_bool) => {
                 if let Ok(another_bool) = another.try_to_bool() {
                     // 4.1, 4.2, 4.3, 4.4, 4.5
                     *one_bool == another_bool
@@ -268,7 +268,7 @@ impl ArcTopicDataValue {
                     false
                 }
             }
-            ArcTopicDataValue::DateTime(one_datetime) => {
+            Self::DateTime(one_datetime) => {
                 if let Ok(another_datetime) = another.is_datetime() {
                     // 5.1
                     one_datetime.date() == another_datetime.date()
@@ -286,7 +286,7 @@ impl ArcTopicDataValue {
                     false
                 }
             }
-            ArcTopicDataValue::Date(one_date) => {
+            Self::Date(one_date) => {
                 if let Ok(another_datetime) = another.is_datetime() {
                     // 6.1
                     *one_date.deref() == another_datetime.date()
@@ -304,7 +304,7 @@ impl ArcTopicDataValue {
                     false
                 }
             }
-            ArcTopicDataValue::Time(one_time) => {
+            Self::Time(one_time) => {
                 if let Ok(another_time) = another.is_time() {
                     // 7.1
                     *one_time.deref() == *another_time
@@ -320,9 +320,9 @@ impl ArcTopicDataValue {
                 }
             }
             // map is not comparable
-            ArcTopicDataValue::Map(_) => false,
+            Self::Map(_) => false,
             // vec is not comparable
-            ArcTopicDataValue::Vec(_) => false,
+            Self::Vec(_) => false,
         }
     }
 
@@ -333,15 +333,15 @@ impl ArcTopicDataValue {
 
     pub fn display_in_error(value: &ArcTopicDataValue) -> String {
         match value {
-            ArcTopicDataValue::None => String::from("none"),
-            ArcTopicDataValue::Str(v) => v.to_string(),
-            ArcTopicDataValue::Num(v) => String::from_decimal(v),
-            ArcTopicDataValue::Bool(v) => String::from_bool(v),
-            ArcTopicDataValue::Date(v) => v.to_string(),
-            ArcTopicDataValue::Time(v) => v.to_string(),
-            ArcTopicDataValue::DateTime(v) => v.to_string(),
-            ArcTopicDataValue::Map(_) => String::from("map"),
-            ArcTopicDataValue::Vec(_) => String::from("vec"),
+            Self::None => String::from("none"),
+            Self::Str(v) => v.to_string(),
+            Self::Num(v) => String::from_decimal(v),
+            Self::Bool(v) => String::from_bool(v),
+            Self::Date(v) => v.to_string(),
+            Self::Time(v) => v.to_string(),
+            Self::DateTime(v) => v.to_string(),
+            Self::Map(_) => String::from("map"),
+            Self::Vec(_) => String::from("vec"),
         }
     }
 
@@ -387,7 +387,7 @@ impl ArcTopicDataValue {
     /// for example, "2025-12-09 11:00:00" [is not less than] "2025-12-09 12:00:00".
     pub fn is_less_than(&self, another: &ArcTopicDataValue) -> StdR<bool> {
         match self {
-            ArcTopicDataValue::None => {
+            Self::None => {
                 if another.is_none_or_empty_str() {
                     // 1.1
                     Ok(false)
@@ -399,7 +399,7 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Str(one_value) => {
+            Self::Str(one_value) => {
                 if let Ok(another_decimal) = another.is_num() {
                     // 2.1
                     if let Ok(one_decimal) = one_value.to_decimal() {
@@ -433,7 +433,7 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Num(one_decimal) => {
+            Self::Num(one_decimal) => {
                 if let Ok(another_decimal) = another.is_num() {
                     // 3.1
                     Ok(one_decimal.deref() < another_decimal)
@@ -449,8 +449,8 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Bool(_) => self.must_compare_between_num_or_datetime(another),
-            ArcTopicDataValue::DateTime(one_datetime) => {
+            Self::Bool(_) => self.must_compare_between_num_or_datetime(another),
+            Self::DateTime(one_datetime) => {
                 if let Ok(another_datetime) = another.is_datetime() {
                     // 4.1
                     Ok(one_datetime.date() < another_datetime.date())
@@ -469,7 +469,7 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Date(one_date) => {
+            Self::Date(one_date) => {
                 if let Ok(another_datetime) = another.is_datetime() {
                     // 5.1
                     Ok(*one_date.deref() < another_datetime.date())
@@ -488,7 +488,7 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Time(one_time) => {
+            Self::Time(one_time) => {
                 if let Ok(another_time) = another.is_time() {
                     // 6.1
                     Ok(*one_time.deref() < *another_time)
@@ -505,9 +505,9 @@ impl ArcTopicDataValue {
                 }
             }
             // map is not comparable
-            ArcTopicDataValue::Map(_) => self.must_compare_between_num_or_datetime(another),
+            Self::Map(_) => self.must_compare_between_num_or_datetime(another),
             // vec is not comparable
-            ArcTopicDataValue::Vec(_) => self.must_compare_between_num_or_datetime(another),
+            Self::Vec(_) => self.must_compare_between_num_or_datetime(another),
         }
     }
 
@@ -519,7 +519,7 @@ impl ArcTopicDataValue {
     /// refer to [is_less_than]
     pub fn is_more_than(&self, another: &ArcTopicDataValue) -> StdR<bool> {
         match self {
-            ArcTopicDataValue::None => {
+            Self::None => {
                 if another.is_none_or_empty_str()
                     || another.is_num().is_ok()
                     || another.is_datetime_related()
@@ -531,7 +531,7 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Str(one_str) => {
+            Self::Str(one_str) => {
                 if let Ok(another_decimal) = another.is_num() {
                     // 2.1
                     if let Ok(one_decimal) = one_str.to_decimal() {
@@ -565,7 +565,7 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Num(one_decimal) => {
+            Self::Num(one_decimal) => {
                 if let Ok(another_decimal) = another.is_num() {
                     // 3.1
                     Ok(one_decimal.deref() > another_decimal)
@@ -581,8 +581,8 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Bool(_) => self.must_compare_between_num_or_datetime(another),
-            ArcTopicDataValue::DateTime(one_datetime) => {
+            Self::Bool(_) => self.must_compare_between_num_or_datetime(another),
+            Self::DateTime(one_datetime) => {
                 if let Ok(another_datetime) = another.is_datetime() {
                     // 4.1
                     Ok(one_datetime.date() > another_datetime.date())
@@ -601,7 +601,7 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Date(one_date) => {
+            Self::Date(one_date) => {
                 if let Ok(another_datetime) = another.is_datetime() {
                     // 5.1
                     Ok(*one_date.deref() > another_datetime.date())
@@ -620,7 +620,7 @@ impl ArcTopicDataValue {
                     self.must_compare_between_num_or_datetime(another)
                 }
             }
-            ArcTopicDataValue::Time(one_time) => {
+            Self::Time(one_time) => {
                 if let Ok(another_time) = another.is_time() {
                     // 6.1
                     Ok(*one_time.deref() > *another_time)
@@ -637,9 +637,9 @@ impl ArcTopicDataValue {
                 }
             }
             // map is not comparable
-            ArcTopicDataValue::Map(_) => self.must_compare_between_num_or_datetime(another),
+            Self::Map(_) => self.must_compare_between_num_or_datetime(another),
             // vec is not comparable
-            ArcTopicDataValue::Vec(_) => self.must_compare_between_num_or_datetime(another),
+            Self::Vec(_) => self.must_compare_between_num_or_datetime(another),
         }
     }
 
@@ -655,20 +655,20 @@ impl ArcTopicDataValue {
     /// 4. error.
     pub fn is_in(&self, another: &ArcTopicDataValue) -> StdR<bool> {
         match another {
-            ArcTopicDataValue::None => Ok(false),
-            ArcTopicDataValue::Vec(another_vec) => match self {
-                ArcTopicDataValue::Vec(_) => Ok(false),
-                ArcTopicDataValue::Map(_) => Ok(false),
+            Self::None => Ok(false),
+            Self::Vec(another_vec) => match self {
+                Self::Vec(_) => Ok(false),
+                Self::Map(_) => Ok(false),
                 // same as any element in vec
                 _ => Ok(another_vec.iter().any(|another_value| self.is_same_as(another_value)))
             },
-            ArcTopicDataValue::Str(another_str) => match self {
-                ArcTopicDataValue::Vec(_) => Ok(false),
-                ArcTopicDataValue::Map(_) => Ok(false),
+            Self::Str(another_str) => match self {
+                Self::Vec(_) => Ok(false),
+                Self::Map(_) => Ok(false),
                 _ => Ok(another_str
                     .split(',')
                     .into_iter()
-                    .map(|s| ArcTopicDataValue::Str(Arc::new(s.to_string())))
+                    .map(|s| Self::Str(Arc::new(s.to_string())))
                     .any(|another_value| self.is_same_as(&another_value)))
             }
             _ => PipelineKernelErrorCode::ValuesNotComparable.msg(

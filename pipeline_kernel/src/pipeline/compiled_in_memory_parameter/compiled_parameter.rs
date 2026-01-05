@@ -33,9 +33,9 @@ impl CompiledParameter {
 impl InMemoryParameter for CompiledParameter {
     fn value_from(&self, variables: &PipelineExecutionVariables) -> StdR<Arc<ArcTopicDataValue>> {
         match self {
-            CompiledParameter::Topic(v) => v.value_from(variables),
-            CompiledParameter::Constant(v) => v.value_from(variables),
-            CompiledParameter::Computed(v) => v.value_from(variables),
+            Self::Topic(v) => v.value_from(variables),
+            Self::Constant(v) => v.value_from(variables),
+            Self::Computed(v) => v.value_from(variables),
         }
     }
 }

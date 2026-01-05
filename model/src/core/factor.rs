@@ -109,69 +109,69 @@ pub enum FactorTypeCategory {
 impl FactorType {
     pub fn category(&self) -> FactorTypeCategory {
         match self {
-            FactorType::Text => FactorTypeCategory::Text,
-            FactorType::Address
-            | FactorType::Road
-            | FactorType::Community
-            | FactorType::Email
-            | FactorType::Phone
-            | FactorType::Mobile
-            | FactorType::Fax
-            | FactorType::Occupation
-            | FactorType::IdNo => FactorTypeCategory::TextLike,
-            FactorType::Continent
-            | FactorType::Region
-            | FactorType::Country
-            | FactorType::Province
-            | FactorType::City
-            | FactorType::District
-            | FactorType::ResidenceType
-            | FactorType::Gender
-            | FactorType::Religion
-            | FactorType::Nationality
-            | FactorType::BizTrade
-            | FactorType::Enum => FactorTypeCategory::EnumText,
-            FactorType::Sequence
-            | FactorType::Number
-            | FactorType::Unsigned
-            | FactorType::Floor
-            | FactorType::ResidentialArea
-            | FactorType::Age
-            | FactorType::BizScale => FactorTypeCategory::Numeric,
-            FactorType::Year
-            | FactorType::HalfYear
-            | FactorType::Quarter
-            | FactorType::Month
-            | FactorType::HalfMonth
-            | FactorType::TenDays
-            | FactorType::WeekOfYear
-            | FactorType::WeekOfMonth
-            | FactorType::HalfWeek
-            | FactorType::DayOfMonth
-            | FactorType::DayOfWeek
-            | FactorType::DayKind
-            | FactorType::Hour
-            | FactorType::HourKind
-            | FactorType::Minute
-            | FactorType::Second
-            | FactorType::Millisecond
-            | FactorType::AmPm => FactorTypeCategory::DatetimeNumeric,
-            FactorType::FullDatetime => FactorTypeCategory::FullDatetime,
-            FactorType::Datetime => FactorTypeCategory::Datetime,
-            FactorType::Date | FactorType::DateOfBirth => FactorTypeCategory::Date,
-            FactorType::Time => FactorTypeCategory::Time,
-            FactorType::Boolean => FactorTypeCategory::Boolean,
-            FactorType::Object | FactorType::Array => FactorTypeCategory::Complex,
+            Self::Text => FactorTypeCategory::Text,
+            Self::Address
+            | Self::Road
+            | Self::Community
+            | Self::Email
+            | Self::Phone
+            | Self::Mobile
+            | Self::Fax
+            | Self::Occupation
+            | Self::IdNo => FactorTypeCategory::TextLike,
+            Self::Continent
+            | Self::Region
+            | Self::Country
+            | Self::Province
+            | Self::City
+            | Self::District
+            | Self::ResidenceType
+            | Self::Gender
+            | Self::Religion
+            | Self::Nationality
+            | Self::BizTrade
+            | Self::Enum => FactorTypeCategory::EnumText,
+            Self::Sequence
+            | Self::Number
+            | Self::Unsigned
+            | Self::Floor
+            | Self::ResidentialArea
+            | Self::Age
+            | Self::BizScale => FactorTypeCategory::Numeric,
+            Self::Year
+            | Self::HalfYear
+            | Self::Quarter
+            | Self::Month
+            | Self::HalfMonth
+            | Self::TenDays
+            | Self::WeekOfYear
+            | Self::WeekOfMonth
+            | Self::HalfWeek
+            | Self::DayOfMonth
+            | Self::DayOfWeek
+            | Self::DayKind
+            | Self::Hour
+            | Self::HourKind
+            | Self::Minute
+            | Self::Second
+            | Self::Millisecond
+            | Self::AmPm => FactorTypeCategory::DatetimeNumeric,
+            Self::FullDatetime => FactorTypeCategory::FullDatetime,
+            Self::Datetime => FactorTypeCategory::Datetime,
+            Self::Date | Self::DateOfBirth => FactorTypeCategory::Date,
+            Self::Time => FactorTypeCategory::Time,
+            Self::Boolean => FactorTypeCategory::Boolean,
+            Self::Object | Self::Array => FactorTypeCategory::Complex,
         }
     }
 
     pub fn is_date_or_time(&self) -> bool {
         match self {
-            FactorType::Date
-            | FactorType::Time
-            | FactorType::Datetime
-            | FactorType::FullDatetime
-            | FactorType::DateOfBirth => true,
+            Self::Date
+            | Self::Time
+            | Self::Datetime
+            | Self::FullDatetime
+            | Self::DateOfBirth => true,
             _ => false,
         }
     }

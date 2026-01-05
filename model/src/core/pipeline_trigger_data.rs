@@ -57,13 +57,13 @@ pub enum TopicDataColumnNames {
 impl TopicDataColumnNames {
     pub fn column_name(self) -> &'static str {
         match self {
-            TopicDataColumnNames::Id => "id_",
-            TopicDataColumnNames::RawTopicData => "data_",
-            TopicDataColumnNames::AggregateAssist => "aggregate_assist_",
-            TopicDataColumnNames::Version => "version_",
-            TopicDataColumnNames::TenantId => "tenant_id_",
-            TopicDataColumnNames::InsertTime => "insert_time_",
-            TopicDataColumnNames::UpdateTime => "update_time_",
+            Self::Id => "id_",
+            Self::RawTopicData => "data_",
+            Self::AggregateAssist => "aggregate_assist_",
+            Self::Version => "version_",
+            Self::TenantId => "tenant_id_",
+            Self::InsertTime => "insert_time_",
+            Self::UpdateTime => "update_time_",
         }
     }
 }

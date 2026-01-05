@@ -73,8 +73,8 @@ impl Display for FuncDataPath {
 impl Display for DataPathSegment {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self {
-            DataPathSegment::Plain(plain) => write!(f, "{}", plain),
-            DataPathSegment::Func(func) => write!(f, "{}", func),
+            Self::Plain(plain) => write!(f, "{}", plain),
+            Self::Func(func) => write!(f, "{}", func),
         }
     }
 }

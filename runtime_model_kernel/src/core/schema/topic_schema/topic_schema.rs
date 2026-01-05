@@ -1,4 +1,4 @@
-use crate::{ArcFactor, ArcTopic, HierarchyAid};
+use crate::{ArcFactor, ArcTopic, HierarchyAid, TopicSchemaFactors};
 use std::ops::Deref;
 use std::sync::Arc;
 use watchmen_base::{StdR, VoidR};
@@ -7,27 +7,23 @@ use watchmen_model::{FactorId, TenantId, Topic, TopicCode, TopicData, TopicId};
 /// The schema of a topic, including various factor groups.
 /// all factor fields are optional, depending on whether the topic has the corresponding factors.
 pub struct TopicSchema {
-    inner: Arc<ArcTopic>,
-    // flatten_factors: Option<Arc<Vec<Arc<TopicSchemaFlattenFactor>>>>,
-    // date_or_time_factors: Option<Arc<Vec<Arc<TopicSchemaDateOrTimeFactorGroup>>>>,
-    // encrypt_factor_groups: Option<Arc<Vec<Arc<TopicSchemaEncryptFactorGroup>>>>,
-    // default_value_factor_groups: Option<Arc<Vec<Arc<TopicSchemaDefaultValueFactorGroup>>>>,
+    topic: Arc<ArcTopic>,
+    factors: Option<Arc<TopicSchemaFactors>>,
 }
 
 impl TopicSchema {
     pub fn new(topic: Topic) -> StdR<Self> {
         let arc_topic = ArcTopic::new(topic)?;
+        let factors = TopicSchemaFactors::of_topic(&arc_topic)?;
+
         Ok(Self {
-            // flatten_factors: TopicSchemaFlattenFactor::of_topic(&arc_topic),
-            // date_or_time_factors: TopicSchemaDateOrTimeFactorGroups::create(&arc_topic),
-            // encrypt_factor_groups: TopicSchemaEncryptFactorGroups::create(&arc_topic),
-            // default_value_factor_groups: TopicSchemaDefaultValueFactorGroups::create(&arc_topic),
-            inner: arc_topic,
+            factors: factors.if_functional(),
+            topic: arc_topic,
         })
     }
 
     pub fn topic(&self) -> &Arc<ArcTopic> {
-        &self.inner
+        &self.topic
     }
 
     pub fn topic_id(&self) -> &Arc<TopicId> {
@@ -110,7 +106,7 @@ impl TopicSchema {
 
     /// given data might be changed
     fn flatten(&self, data: &mut TopicData) {
-        if self.inner.is_raw_topic() {
+        if self.topic.is_raw_topic() {
             return;
         }
 

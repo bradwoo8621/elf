@@ -51,19 +51,19 @@ pub enum StdErrCode {
 impl ErrorCode for StdErrCode {
     fn code(&self) -> &'static str {
         match self {
-            StdErrCode::DecimalParse => "STDE-00001",
-            StdErrCode::FullDateTimeParse => "STDE-00002",
-            StdErrCode::DateTimeParse => "STDE-00003",
-            StdErrCode::DateParse => "STDE-00004",
-            StdErrCode::TimeParse => "STDE-00005",
+            Self::DecimalParse => "STDE-00001",
+            Self::FullDateTimeParse => "STDE-00002",
+            Self::DateTimeParse => "STDE-00003",
+            Self::DateParse => "STDE-00004",
+            Self::TimeParse => "STDE-00005",
 
-            StdErrCode::EnvInit => "STDE-00100",
-            StdErrCode::EnvFileFormatNotSupported => "STDE-00101",
-            StdErrCode::EnvValueGet => "STDE-00102",
-            StdErrCode::EnvValueTypeMismatch => "STDE-00103",
+            Self::EnvInit => "STDE-00100",
+            Self::EnvFileFormatNotSupported => "STDE-00101",
+            Self::EnvValueGet => "STDE-00102",
+            Self::EnvValueTypeMismatch => "STDE-00103",
 
-            StdErrCode::Multiple => "STDE-99998",
-            StdErrCode::Unknown => "STDE-99999",
+            Self::Multiple => "STDE-99998",
+            Self::Unknown => "STDE-99999",
         }
     }
 }

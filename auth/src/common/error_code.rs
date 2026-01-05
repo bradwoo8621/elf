@@ -14,13 +14,13 @@ pub enum AuthErrorCode {
 impl ErrorCode for AuthErrorCode {
     fn code(&self) -> &'static str {
         match self {
-            AuthErrorCode::AuthenticationFailed => "AUTH-00001",
-            AuthErrorCode::Unauthorized => "AUTH-00002",
-            AuthErrorCode::Forbidden => "AUTH-00003",
-            AuthErrorCode::TenantIdMissedInUser => "AUTH-00101",
-            AuthErrorCode::UserIdMissedInUser => "AUTH-00102",
-            AuthErrorCode::NameMissedInUser => "AUTH-00103",
-            AuthErrorCode::RoleMissedInUser => "AUTH-00104",
+            Self::AuthenticationFailed => "AUTH-00001",
+            Self::Unauthorized => "AUTH-00002",
+            Self::Forbidden => "AUTH-00003",
+            Self::TenantIdMissedInUser => "AUTH-00101",
+            Self::UserIdMissedInUser => "AUTH-00102",
+            Self::NameMissedInUser => "AUTH-00103",
+            Self::RoleMissedInUser => "AUTH-00104",
         }
     }
 }

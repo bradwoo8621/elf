@@ -3,8 +3,10 @@ use std::collections::{BTreeSet, HashMap};
 use std::fmt::{Display, Formatter};
 use std::ops::Deref;
 use std::sync::Arc;
-use watchmen_base::{DisplayLines, ErrorCode, StdR, VoidR};
-use watchmen_model::FactorType;
+use watchmen_base::{
+    BooleanUtils, DateTimeUtils, DisplayLines, ErrorCode, NumericUtils, StdR, VoidR,
+};
+use watchmen_model::{FactorType, FactorTypeCategory, TopicDataValue};
 
 fn factors_to_str(factors: &Vec<TopicSchemaFactor>) -> String {
     factors
@@ -15,18 +17,139 @@ fn factors_to_str(factors: &Vec<TopicSchemaFactor>) -> String {
         .join(",\n")
 }
 
+fn filter_functional_factors(factors: Vec<TopicSchemaFactor>) -> Vec<TopicSchemaFactor> {
+    factors
+        .into_iter()
+        .map(|f| f.if_functional())
+        .filter(|f| f.is_some())
+        .map(|f| f.unwrap())
+        .collect()
+}
+
 pub struct SimpleTopicSchemaFactor {
     factor: Arc<ArcFactor>,
     name: String,
+    is_date_or_time: bool,
+    is_encryptable: bool,
+    default_value: Option<Arc<TopicDataValue>>,
+    is_flatten: bool,
 }
 
 impl Display for SimpleTopicSchemaFactor {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "SimpleTopicSchemaFactor[name={}, factor_name={}, factor_id={}]",
-            self.name, self.factor.name, self.factor.factor_id
+            "SimpleTopicSchemaFactor[name={}, factor_name={}, factor_id={}, is_date_or_time={}, is_encryptable={}, default_value={}, is_flatten={}]",
+            self.name,
+            self.factor.name,
+            self.factor.factor_id,
+            self.is_date_or_time,
+            self.is_encryptable,
+            if let Some(value) = &self.default_value {
+                format!("{}", value)
+            } else {
+                "".to_string()
+            },
+            self.is_flatten,
         )
+    }
+}
+
+impl SimpleTopicSchemaFactor {
+    fn new(factor: Arc<ArcFactor>, name: String) -> Self {
+        Self {
+            name,
+            is_date_or_time: factor.is_date_or_time(),
+            is_encryptable: factor.encrypt.is_some(),
+            default_value: Self::compute_default_value(&factor),
+            is_flatten: factor.flatten,
+            factor,
+        }
+    }
+
+    /// compute default value
+    /// - none when not defined,
+    /// - none when empty string,
+    /// - ignore default value when cast failed,
+    /// - do not perform a validity check on the default value.
+    fn compute_default_value(factor: &Arc<ArcFactor>) -> Option<Arc<TopicDataValue>> {
+        let defined_default_value = &factor.default_value;
+        if defined_default_value.is_none() {
+            // no default value defined
+            return None;
+        }
+
+        let defined_default_value = defined_default_value.as_ref().unwrap();
+        if defined_default_value.is_empty() {
+            // defined default value is empty string
+            return None;
+        }
+
+        let computed_default_value = match factor.r#type.category() {
+            FactorTypeCategory::Text
+            | FactorTypeCategory::TextLike
+            | FactorTypeCategory::EnumText => {
+                TopicDataValue::Str(defined_default_value.deref().clone())
+            }
+            // date time related types
+            FactorTypeCategory::FullDatetime => {
+                if let Ok(v) = defined_default_value.deref().to_full_datetime() {
+                    TopicDataValue::DateTime(v)
+                } else {
+                    TopicDataValue::None
+                }
+            }
+            FactorTypeCategory::Datetime => {
+                if let Ok(v) = defined_default_value.deref().to_datetime_loose() {
+                    TopicDataValue::DateTime(v)
+                } else {
+                    TopicDataValue::None
+                }
+            }
+            FactorTypeCategory::Date => {
+                if let Ok(v) = defined_default_value.deref().to_date_loose() {
+                    TopicDataValue::Date(v)
+                } else {
+                    TopicDataValue::None
+                }
+            }
+            FactorTypeCategory::Time => {
+                if let Ok(v) = defined_default_value.deref().to_time() {
+                    TopicDataValue::Time(v)
+                } else {
+                    TopicDataValue::None
+                }
+            }
+            // date time related types, no check, take as number
+            FactorTypeCategory::DatetimeNumeric | FactorTypeCategory::Numeric => {
+                if let Ok(v) = defined_default_value.deref().to_decimal() {
+                    TopicDataValue::Num(v)
+                } else {
+                    TopicDataValue::None
+                }
+            }
+            FactorTypeCategory::Boolean => {
+                TopicDataValue::Bool(defined_default_value.deref().to_bool())
+            }
+            FactorTypeCategory::Complex => TopicDataValue::None,
+        };
+
+        match computed_default_value {
+            TopicDataValue::None => None,
+            _ => Some(Arc::new(computed_default_value)),
+        }
+    }
+
+    fn if_functional(self) -> Option<TopicSchemaFactor> {
+        if self.is_date_or_time
+            || self.is_encryptable
+            || self.is_flatten
+            || self.default_value.is_some()
+        {
+            Some(TopicSchemaFactor::Simple(self))
+        } else {
+            None
+        }
     }
 }
 
@@ -38,14 +161,37 @@ pub struct VecOrMapTopicSchemaFactor {
 
 impl Display for VecOrMapTopicSchemaFactor {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "VecOrMapTopicSchemaFactor[name={}, factor_name={}, factor_id={}, factors=[\n{}\n]]",
-            self.name,
-            self.factor.name,
-            self.factor.factor_id,
-            factors_to_str(&self.children)
-        )
+        if self.children.is_empty() {
+            write!(
+                f,
+                "VecOrMapTopicSchemaFactor[name={}, factor_name={}, factor_id={}, factors=[]]",
+                self.name, self.factor.name, self.factor.factor_id,
+            )
+        } else {
+            write!(
+                f,
+                "VecOrMapTopicSchemaFactor[name={}, factor_name={}, factor_id={}, factors=[\n{}\n]]",
+                self.name,
+                self.factor.name,
+                self.factor.factor_id,
+                factors_to_str(&self.children)
+            )
+        }
+    }
+}
+
+impl VecOrMapTopicSchemaFactor {
+    fn if_functional(self) -> Option<TopicSchemaFactor> {
+        let functional_children: Vec<TopicSchemaFactor> = filter_functional_factors(self.children);
+        if functional_children.is_empty() {
+            None
+        } else {
+            Some(TopicSchemaFactor::VecOrMap(Self {
+                factor: self.factor,
+                name: self.name,
+                children: functional_children,
+            }))
+        }
     }
 }
 
@@ -56,12 +202,30 @@ pub struct FakeTopicSchemaFactor {
 
 impl Display for FakeTopicSchemaFactor {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "FakeTopicSchemaFactor[name={}, factors=[\n{}\n]]",
-            self.name,
-            factors_to_str(&self.children)
-        )
+        if self.children.is_empty() {
+            write!(f, "FakeTopicSchemaFactor[name={}, factors=[]]", self.name,)
+        } else {
+            write!(
+                f,
+                "FakeTopicSchemaFactor[name={}, factors=[\n{}\n]]",
+                self.name,
+                factors_to_str(&self.children)
+            )
+        }
+    }
+}
+
+impl FakeTopicSchemaFactor {
+    fn if_functional(self) -> Option<TopicSchemaFactor> {
+        let functional_children: Vec<TopicSchemaFactor> = filter_functional_factors(self.children);
+        if functional_children.is_empty() {
+            None
+        } else {
+            Some(TopicSchemaFactor::Fake(Self {
+                name: self.name,
+                children: functional_children,
+            }))
+        }
     }
 }
 
@@ -74,9 +238,19 @@ pub enum TopicSchemaFactor {
 impl Display for TopicSchemaFactor {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            TopicSchemaFactor::Simple(v) => write!(f, "{}", v),
-            TopicSchemaFactor::VecOrMap(v) => write!(f, "{}", v),
-            TopicSchemaFactor::Fake(v) => write!(f, "{}", v),
+            Self::Simple(v) => write!(f, "{}", v),
+            Self::VecOrMap(v) => write!(f, "{}", v),
+            Self::Fake(v) => write!(f, "{}", v),
+        }
+    }
+}
+
+impl TopicSchemaFactor {
+    fn if_functional(self) -> Option<TopicSchemaFactor> {
+        match self {
+            Self::Simple(v) => v.if_functional(),
+            Self::VecOrMap(v) => v.if_functional(),
+            Self::Fake(v) => v.if_functional(),
         }
     }
 }
@@ -133,10 +307,10 @@ impl TopicSchemaFactorsBuilder {
                         children: vec![],
                     })
                 }
-                _ => TopicSchemaFactor::Simple(SimpleTopicSchemaFactor {
-                    factor: factor.clone(),
-                    name: name.clone(),
-                }),
+                _ => TopicSchemaFactor::Simple(SimpleTopicSchemaFactor::new(
+                    factor.clone(),
+                    name.clone(),
+                )),
             },
             _ => TopicSchemaFactor::Fake(FakeTopicSchemaFactor {
                 name: name.clone(),
@@ -313,11 +487,15 @@ pub struct TopicSchemaFactors {
 
 impl Display for TopicSchemaFactors {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "TopicSchemaFactors[\n{}\n]",
-            factors_to_str(&self.factors)
-        )
+        if self.factors.is_empty() {
+            write!(f, "TopicSchemaFactors[factors=[]]")
+        } else {
+            write!(
+                f,
+                "TopicSchemaFactors[factors=[\n{}\n]]",
+                factors_to_str(&self.factors)
+            )
+        }
     }
 }
 
@@ -326,6 +504,18 @@ impl TopicSchemaFactors {
         let mut context = TopicSchemaFactorsContext::new(topic);
         TopicSchemaFactorsBuilder::collect_factors(&mut context)?;
         TopicSchemaFactorsBuilder::create_factors(&mut context)
+    }
+
+    pub fn if_functional(self) -> Option<Arc<Self>> {
+        let functional_factors: Vec<TopicSchemaFactor> = filter_functional_factors(self.factors);
+
+        if functional_factors.is_empty() {
+            None
+        } else {
+            Some(Arc::new(Self {
+                factors: functional_factors,
+            }))
+        }
     }
 }
 
@@ -376,6 +566,10 @@ mod tests {
                 Factor::new()
                     .factor_id("107".to_string())
                     .name("work.addresses.city".to_string())
+                    .r#type(FactorType::Text),
+                Factor::new()
+                    .factor_id("108".to_string())
+                    .name("work.unknown.name".to_string())
                     .r#type(FactorType::Text),
             ])
             .tenant_id("1".to_string())

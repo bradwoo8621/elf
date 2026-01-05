@@ -32,29 +32,29 @@ pub enum PipelineActionType {
 impl PipelineActionType {
     pub fn for_read(self) -> bool {
         match self {
-            PipelineActionType::ReadRow => true,
-            PipelineActionType::ReadFactor => true,
-            PipelineActionType::Exists => true,
-            PipelineActionType::ReadRows => true,
-            PipelineActionType::ReadFactors => true,
+            Self::ReadRow => true,
+            Self::ReadFactor => true,
+            Self::Exists => true,
+            Self::ReadRows => true,
+            Self::ReadFactors => true,
             _ => false,
         }
     }
 
     pub fn for_write(self) -> bool {
         match self {
-            PipelineActionType::InsertRow => true,
-            PipelineActionType::MergeRow => true,
-            PipelineActionType::InsertOrMergeRow => true,
-            PipelineActionType::WriteFactor => true,
+            Self::InsertRow => true,
+            Self::MergeRow => true,
+            Self::InsertOrMergeRow => true,
+            Self::WriteFactor => true,
             _ => false,
         }
     }
 
     pub fn for_delete(self) -> bool {
         match self {
-            PipelineActionType::DeleteRow => true,
-            PipelineActionType::DeleteRows => true,
+            Self::DeleteRow => true,
+            Self::DeleteRows => true,
             _ => false,
         }
     }

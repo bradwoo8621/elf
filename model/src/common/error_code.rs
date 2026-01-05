@@ -8,8 +8,8 @@ pub enum ModelErrorCode {
 impl ErrorCode for ModelErrorCode {
     fn code(&self) -> &'static str {
         match self {
-            ModelErrorCode::StrEnumParse => "MDLE-00001",
-            ModelErrorCode::VariableFunctionParse => "MDLE-00002",
+            Self::StrEnumParse => "MDLE-00001",
+            Self::VariableFunctionParse => "MDLE-00002",
         }
     }
 }

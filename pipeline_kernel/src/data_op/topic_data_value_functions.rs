@@ -19,11 +19,11 @@ impl ArcTopicDataValue {
         NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
     {
         match self {
-            ArcTopicDataValue::Vec(vec) => BigDecimal::from_usize(vec.len())
-                .map(|value| Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(value)))))
+            Self::Vec(vec) => BigDecimal::from_usize(vec.len())
+                .map(|value| Ok(Arc::new(Self::Num(Arc::new(value)))))
                 .unwrap_or(decimal_parse_err()),
-            ArcTopicDataValue::Map(map) => BigDecimal::from_usize(map.len())
-                .map(|value| Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(value)))))
+            Self::Map(map) => BigDecimal::from_usize(map.len())
+                .map(|value| Ok(Arc::new(Self::Num(Arc::new(value)))))
                 .unwrap_or(decimal_parse_err()),
             _ => not_support(),
         }
@@ -41,12 +41,12 @@ impl ArcTopicDataValue {
         NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
     {
         match self {
-            ArcTopicDataValue::Str(str) => BigDecimal::from_usize(str.chars().count())
-                .map(|value| Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(value)))))
+            Self::Str(str) => BigDecimal::from_usize(str.chars().count())
+                .map(|value| Ok(Arc::new(Self::Num(Arc::new(value)))))
                 .unwrap_or(decimal_parse_err()),
-            ArcTopicDataValue::Num(decimal) => {
+            Self::Num(decimal) => {
                 BigDecimal::from_usize(String::from_decimal(decimal).chars().count())
-                    .map(|value| Ok(Arc::new(ArcTopicDataValue::Num(Arc::new(value)))))
+                    .map(|value| Ok(Arc::new(Self::Num(Arc::new(value)))))
                     .unwrap_or(decimal_parse_err())
             }
             _ => not_support(),
@@ -64,8 +64,8 @@ impl ArcTopicDataValue {
         NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
     {
         match self {
-            ArcTopicDataValue::Vec(vec) => {
-                let mut distinct_values: Vec<Arc<ArcTopicDataValue>> = vec![];
+            Self::Vec(vec) => {
+                let mut distinct_values: Vec<Arc<Self>> = vec![];
 
                 let mut none_added = false;
                 let mut true_added = false;
@@ -78,7 +78,7 @@ impl ArcTopicDataValue {
 
                 vec.iter().for_each(|value| {
                     let should_add = match value.deref() {
-                        ArcTopicDataValue::Str(str) => {
+                        Self::Str(str) => {
                             if !string_values.contains_key(str) {
                                 string_values.insert(str.clone(), 1);
                                 true
@@ -86,7 +86,7 @@ impl ArcTopicDataValue {
                                 false
                             }
                         }
-                        ArcTopicDataValue::Num(decimal) => {
+                        Self::Num(decimal) => {
                             if !decimal_values.contains_key(decimal) {
                                 decimal_values.insert(decimal.clone(), 1);
                                 true
@@ -94,7 +94,7 @@ impl ArcTopicDataValue {
                                 false
                             }
                         }
-                        ArcTopicDataValue::Bool(bool) => {
+                        Self::Bool(bool) => {
                             if *bool && !true_added {
                                 true_added = true;
                                 true
@@ -105,7 +105,7 @@ impl ArcTopicDataValue {
                                 false
                             }
                         }
-                        ArcTopicDataValue::DateTime(datetime) => {
+                        Self::DateTime(datetime) => {
                             if !datetime_values.contains_key(datetime) {
                                 datetime_values.insert(datetime.clone(), 1);
                                 true
@@ -113,7 +113,7 @@ impl ArcTopicDataValue {
                                 false
                             }
                         }
-                        ArcTopicDataValue::Date(date) => {
+                        Self::Date(date) => {
                             if !date_values.contains_key(date) {
                                 date_values.insert(date.clone(), 1);
                                 true
@@ -121,7 +121,7 @@ impl ArcTopicDataValue {
                                 false
                             }
                         }
-                        ArcTopicDataValue::Time(time) => {
+                        Self::Time(time) => {
                             if !time_values.contains_key(time) {
                                 time_values.insert(time.clone(), 1);
                                 true
@@ -129,9 +129,9 @@ impl ArcTopicDataValue {
                                 false
                             }
                         }
-                        ArcTopicDataValue::Vec(_) => true,
-                        ArcTopicDataValue::Map(_) => true,
-                        ArcTopicDataValue::None => {
+                        Self::Vec(_) => true,
+                        Self::Map(_) => true,
+                        Self::None => {
                             if !none_added {
                                 none_added = true;
                                 true
@@ -145,7 +145,7 @@ impl ArcTopicDataValue {
                     }
                 });
 
-                Ok(Arc::new(ArcTopicDataValue::Vec(Arc::new(distinct_values))))
+                Ok(Arc::new(Self::Vec(Arc::new(distinct_values))))
             }
             _ => not_support(),
         }
@@ -162,39 +162,37 @@ impl ArcTopicDataValue {
         NotSupport: FnOnce() -> StdR<Arc<ArcTopicDataValue>>,
     {
         match self {
-            ArcTopicDataValue::Str(str) => Ok(Arc::new(ArcTopicDataValue::Str(str.clone()))),
-            ArcTopicDataValue::Vec(vec) => {
+            Self::Str(str) => Ok(Arc::new(Self::Str(str.clone()))),
+            Self::Vec(vec) => {
                 if vec.len() == 0 {
-                    Ok(Arc::new(ArcTopicDataValue::Str(Arc::new("".to_string()))))
+                    Ok(Arc::new(Self::Str(Arc::new("".to_string()))))
                 } else {
                     let mut segments: Vec<String> = vec![];
                     for value in vec.iter() {
                         match value.deref() {
-                            ArcTopicDataValue::Str(str) => {
+                            Self::Str(str) => {
                                 segments.push(str.to_string());
                             }
-                            ArcTopicDataValue::Num(decimal) => {
+                            Self::Num(decimal) => {
                                 segments.push(String::from_decimal(decimal.deref()));
                             }
-                            ArcTopicDataValue::Bool(bool) => {
+                            Self::Bool(bool) => {
                                 segments.push(String::from_bool(bool));
                             }
-                            ArcTopicDataValue::DateTime(datetime) => {
+                            Self::DateTime(datetime) => {
                                 segments.push(String::from_datetime(datetime));
                             }
-                            ArcTopicDataValue::Date(date) => {
+                            Self::Date(date) => {
                                 segments.push(String::from_date(date));
                             }
-                            ArcTopicDataValue::Time(time) => {
+                            Self::Time(time) => {
                                 segments.push(String::from_time(time));
                             }
-                            ArcTopicDataValue::None => {}
+                            Self::None => {}
                             _ => return not_support(),
                         }
                     }
-                    Ok(Arc::new(ArcTopicDataValue::Str(Arc::new(
-                        segments.join(sep),
-                    ))))
+                    Ok(Arc::new(Self::Str(Arc::new(segments.join(sep)))))
                 }
             }
             _ => not_support(),
