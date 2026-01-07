@@ -1,3 +1,4 @@
+use crate::EncryptorUtils;
 use watchmen_base::StdR;
 use watchmen_model::{FactorEncryptMethod, TopicDataValue};
 
@@ -20,4 +21,16 @@ pub trait Encryptor {
 
     /// returns none when no decryption applied
     fn decrypt(&self, value: &TopicDataValue) -> StdR<Option<TopicDataValue>>;
+}
+
+pub trait StrEncryptor {
+    fn do_encrypt(&self, value: String) -> String;
+
+    fn encrypt(&self, value: &TopicDataValue) -> StdR<Option<TopicDataValue>> {
+        if let Some(str_value) = EncryptorUtils::value_to_str(value)? {
+            Ok(Some(TopicDataValue::Str(self.do_encrypt(str_value))))
+        } else {
+            Ok(None)
+        }
+    }
 }

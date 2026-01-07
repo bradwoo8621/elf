@@ -1,8 +1,8 @@
-use crate::{Encryptor, RuntimeModelKernelErrorCode};
+use crate::{Encryptor, EncryptorUtils, RuntimeModelKernelErrorCode, StrEncryptor};
 use watchmen_base::{ErrorCode, StdR};
 use watchmen_model::{FactorEncryptMethod, TopicDataValue};
 
-/// use [*] to mask char
+/// use [*] to mask trailing chars
 pub struct LastCharsMask {
     digits: usize,
     method: FactorEncryptMethod,
@@ -11,53 +11,69 @@ pub struct LastCharsMask {
 impl LastCharsMask {
     pub fn new(digits: usize) -> StdR<Self> {
         match digits {
-            3 => Ok(Self { digits, method: FactorEncryptMethod::MaskLast3 }),
-            6 => Ok(Self { digits, method: FactorEncryptMethod::MaskLast6 }),
+            3 => Ok(Self::last_3()),
+            6 => Ok(Self::last_6()),
             _ => RuntimeModelKernelErrorCode::EncryptNotSupport.msg(format!("Given digits[{}] is not supported by last chars mask, only 3 or 6 digits is supported.", digits))
         }
     }
 
+    pub fn last_3() -> Self {
+        Self {
+            digits: 3,
+            method: FactorEncryptMethod::MaskLast3,
+        }
+    }
+
+    pub fn last_6() -> Self {
+        Self {
+            digits: 6,
+            method: FactorEncryptMethod::MaskLast6,
+        }
+    }
+}
+
+impl StrEncryptor for LastCharsMask {
     /// when given str
     /// - length is less than digits, all chars replaced with [*],
-    /// - if there is no enough ascii digit char([0-9]) in given str, replace the tailing digits to [*],
-    /// - replace the tailing ascii digit chars([0-9]) to [*].
+    /// - if there is no enough ascii digit char([0-9]) in given str, replace the trailing digits to [*],
+    /// - replace the trailing ascii digit chars([0-9]) to [*].
     ///
     /// for example, digits is 3
     /// - [ab] -> [**],
     /// - [abc] -> [***],
     /// - [ab1c] -> [a***],
     /// - [12a3] -> [**a*],
-    fn do_encrypt(&self, value: &str) -> String {
+    fn do_encrypt(&self, mut value: String) -> String {
         let length = value.chars().count();
         if length <= self.digits {
-            return "*".repeat(length);
+            return EncryptorUtils::n_asterisks(length);
         }
 
-        let mut decimal_count = 0;
-        for ch in value.chars() {
-            if ch.is_ascii_digit() {
-                decimal_count += 1;
-            }
-        }
+        let decimal_count = EncryptorUtils::get_ascii_digit_count(&value);
 
         if decimal_count < self.digits {
-            let mut result = String::with_capacity(length);
-            result.push_str(&value[0..length - self.digits]);
-            result.extend(std::iter::repeat('*').take(self.digits));
-            return result;
-        }
-
-        let mut result = String::with_capacity(length);
-        let mut remaining_digits = self.digits;
-        for ch in value.chars().rev() {
-            if remaining_digits > 0 && ch.is_ascii_digit() {
-                result.push('*');
-                remaining_digits -= 1;
-            } else {
-                result.push(ch);
+            let replace_start = value.char_indices().nth(length - self.digits).unwrap().0;
+            for offset in 0..self.digits {
+                let index = replace_start + offset;
+                value.replace_range(index..index + 1, "*");
+            }
+        } else {
+            let mut indices = vec![];
+            let mut remaining_digits = self.digits;
+            let mut index = length;
+            for ch in value.chars().rev() {
+                index -= ch.len_utf8();
+                if remaining_digits > 0 && ch.is_ascii_digit() {
+                    indices.push(index);
+                    remaining_digits -= 1;
+                }
+            }
+            for index in indices {
+                value.replace_range(index..index + 1, "*");
             }
         }
-        result.chars().rev().collect()
+
+        value
     }
 }
 
@@ -81,31 +97,7 @@ impl Encryptor for LastCharsMask {
     }
 
     fn encrypt(&self, value: &TopicDataValue) -> StdR<Option<TopicDataValue>> {
-        let str_value = match value {
-            TopicDataValue::Str(s) => s.clone(),
-            TopicDataValue::Num(n) => n.to_string(),
-            TopicDataValue::Bool(b) => b.to_string(),
-            TopicDataValue::DateTime(dt) => dt.to_string(),
-            TopicDataValue::Date(d) => d.to_string(),
-            TopicDataValue::Time(t) => t.to_string(),
-            TopicDataValue::Map(map) => {
-                return RuntimeModelKernelErrorCode::EncryptNotSupport.msg(format!(
-                    "Last chars mask doesn't support map value[{}].",
-                    TopicDataValue::map_to_display(map)
-                ));
-            }
-            TopicDataValue::Vec(vec) => {
-                return RuntimeModelKernelErrorCode::EncryptNotSupport.msg(format!(
-                    "Last chars mask doesn't support vec value[{}].",
-                    TopicDataValue::vec_to_display(vec)
-                ));
-            }
-            TopicDataValue::None => String::default(),
-        };
-
-        Ok(Some(TopicDataValue::Str(
-            self.do_encrypt(str_value.as_str()),
-        )))
+        StrEncryptor::encrypt(self, value)
     }
 
     /// always returns none, last chars mask cannot be decrypted.
@@ -116,19 +108,8 @@ impl Encryptor for LastCharsMask {
 
 #[cfg(test)]
 mod tests {
-    use crate::{Encryptor, LastCharsMask};
-    use watchmen_base::StdR;
+    use crate::{Encryptor, EncryptorUtils, LastCharsMask};
     use watchmen_model::TopicDataValue;
-
-    fn stringify(value: StdR<Option<TopicDataValue>>) -> String {
-        let value = value
-            .expect("Failed to get value from StdR<>.")
-            .expect("Failed to get value from Option<>.");
-        match value {
-            TopicDataValue::Str(str) => str,
-            _ => panic!("Value from TopicDataValue is not string."),
-        }
-    }
 
     /// - [ab] -> [**],
     /// - [abc] -> [***],
@@ -136,22 +117,22 @@ mod tests {
     /// - [12a3] -> [**a*],
     #[test]
     fn test() {
-        let masker = LastCharsMask::new(3).expect("Failed to create masker");
+        let masker = LastCharsMask::last_3();
         assert_eq!(
             "**",
-            stringify(masker.encrypt(&TopicDataValue::Str("ab".to_string())))
+            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("ab".to_string())))
         );
         assert_eq!(
             "***",
-            stringify(masker.encrypt(&TopicDataValue::Str("abc".to_string())))
+            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("abc".to_string())))
         );
         assert_eq!(
             "a***",
-            stringify(masker.encrypt(&TopicDataValue::Str("ab1c".to_string())))
+            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("ab1c".to_string())))
         );
         assert_eq!(
             "**a*",
-            stringify(masker.encrypt(&TopicDataValue::Str("12a3".to_string())))
+            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("12a3".to_string())))
         );
     }
 }
