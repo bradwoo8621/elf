@@ -5,7 +5,7 @@ use watchmen_model::{Pipeline, PipelineId, TenantId, TopicId};
 /// TODO pipeline meta service using tenant and it's meta datasource (or the global meta datasource)
 ///  to find out pipeline meta.
 ///  the tenant meta datasource is a new feature, which is defined on tenant
-pub struct PipelineMetaService {}
+pub struct PipelineMetaService;
 
 impl PipelineMetaService {
     fn new() -> StdR<Arc<Self>> {

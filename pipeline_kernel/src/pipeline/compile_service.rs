@@ -3,7 +3,7 @@ use std::sync::Arc;
 use watchmen_base::StdR;
 use watchmen_runtime_model_kernel::{PipelineSchema, PipelineService, TopicSchema};
 
-pub struct PipelineCompileService {}
+pub struct PipelineCompileService;
 
 impl PipelineCompileService {
     fn new() -> StdR<Arc<Self>> {

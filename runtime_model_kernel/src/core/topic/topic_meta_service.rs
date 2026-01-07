@@ -5,7 +5,7 @@ use watchmen_model::{TenantId, Topic, TopicCode, TopicId};
 /// TODO topic meta service using tenant and it's meta datasource (or the global meta datasource)
 ///  to find out topic meta.
 ///  the tenant meta datasource is a new feature, which is defined on tenant
-pub struct TopicMetaService {}
+pub struct TopicMetaService;
 
 impl TopicMetaService {
     fn new() -> StdR<Arc<Self>> {

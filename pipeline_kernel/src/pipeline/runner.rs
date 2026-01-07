@@ -2,7 +2,7 @@ use crate::{PipelineExecutionRunner, PipelineRunContext};
 use tokio;
 use watchmen_base::VoidR;
 
-pub struct PipelineRunner {}
+pub struct PipelineRunner;
 
 impl PipelineRunner {
     pub fn execute(context: PipelineRunContext) -> VoidR {

@@ -4,7 +4,7 @@ use watchmen_base::StdR;
 use watchmen_model::TenantId;
 use watchmen_runtime_model_kernel::ArcConstantParameter;
 
-pub struct CompiledConstantParameter {}
+pub struct CompiledConstantParameter;
 
 impl CompiledConstantParameter {
     pub fn new(_parameter: &Arc<ArcConstantParameter>, _tenant_id: &Arc<TenantId>) -> StdR<Self> {

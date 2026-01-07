@@ -50,6 +50,8 @@ pub enum RuntimeModelKernelErrorCode {
     TopicSchemaGenerate,
 
     TopicDataComplete,
+
+    EncryptNotSupport,
 }
 
 impl ErrorCode for RuntimeModelKernelErrorCode {
@@ -102,6 +104,8 @@ impl ErrorCode for RuntimeModelKernelErrorCode {
             Self::TopicSchemaGenerate => "RTMK-00600",
 
             Self::TopicDataComplete => "RTMK-00700",
+
+            Self::EncryptNotSupport => "RTMK-00800",
         }
     }
 }

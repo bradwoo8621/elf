@@ -2,7 +2,7 @@ use crate::{PipelineCompilationProvider, PipelineExecutable, PipelineExecution};
 use watchmen_base::StdR;
 use watchmen_runtime_model_kernel::PipelineService;
 
-pub struct PipelineExecutionRunner {}
+pub struct PipelineExecutionRunner;
 
 impl PipelineExecutionRunner {
     pub async fn run(execution: PipelineExecution) -> StdR<Option<Vec<PipelineExecution>>> {

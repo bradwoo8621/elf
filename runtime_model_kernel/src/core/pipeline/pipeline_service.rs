@@ -1,6 +1,6 @@
 use crate::{PipelineMetaProvider, PipelineSchemaProvider};
 
-pub struct PipelineService {}
+pub struct PipelineService;
 
 impl PipelineMetaProvider for PipelineService {}
 impl PipelineSchemaProvider for PipelineService {}

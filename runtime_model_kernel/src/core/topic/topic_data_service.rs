@@ -3,7 +3,7 @@ use std::sync::Arc;
 use watchmen_base::StdR;
 use watchmen_model::TopicData;
 
-pub struct TopicDataService {}
+pub struct TopicDataService;
 
 impl TopicMetaProvider for TopicDataService {}
 

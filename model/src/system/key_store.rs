@@ -17,11 +17,13 @@ pub enum KeyStoreValue {
     Vec(Vec<KeyStoreValue>),
 }
 
+pub type KeyStoreParams = HashMap<String, KeyStoreValue>;
+
 #[adapt_model(storable)]
 pub struct KeyStore {
     pub tenant_id: Option<TenantId>,
     pub key_type: Option<String>,
-    pub params: Option<HashMap<String, KeyStoreValue>>,
+    pub params: Option<KeyStoreParams>,
     #[serde(with = "option_naive_datetime")]
     pub created_at: Option<NaiveDateTime>,
     pub created_by: Option<UserId>,
