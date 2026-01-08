@@ -3,10 +3,10 @@ use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
 
 pub fn serialize<S: Serializer>(
-    time: &Option<NaiveDateTime>,
+    datetime: &Option<NaiveDateTime>,
     serializer: S,
 ) -> Result<S::Ok, S::Error> {
-    match time {
+    match datetime {
         Some(time) => serializer.serialize_str(&time.format("%Y-%m-%d %H:%M:%S").to_string()),
         _ => serializer.serialize_none(),
     }

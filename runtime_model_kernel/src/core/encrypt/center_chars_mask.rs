@@ -4,7 +4,6 @@ use watchmen_model::{FactorEncryptMethod, TopicDataValue};
 
 /// use [*] to mask trailing chars
 pub struct CenterCharsMask {
-    digits: usize,
     method: FactorEncryptMethod,
 }
 
@@ -19,15 +18,22 @@ impl CenterCharsMask {
 
     pub fn center_3() -> Self {
         Self {
-            digits: 3,
             method: FactorEncryptMethod::MaskCenter3,
         }
     }
 
     pub fn center_5() -> Self {
         Self {
-            digits: 5,
             method: FactorEncryptMethod::MaskCenter5,
+        }
+    }
+
+    fn replace_decimal_count(&self) -> usize {
+        match self.method {
+            FactorEncryptMethod::MaskCenter3 => 3,
+            FactorEncryptMethod::MaskCenter5 => 5,
+            // default 3
+            _ => 3,
         }
     }
 }
@@ -204,15 +210,16 @@ impl CenterDecimalReplacer {
 impl CenterCharsMask {
     /// chars count must be greater than or equal [digits].
     fn replace_with_asterisks(&self, mut value: String, chars_count: usize) -> String {
-        let remain_char_count = chars_count.saturating_sub(self.digits);
+        let replace_decimal_count = self.replace_decimal_count();
+        let remain_char_count = chars_count.saturating_sub(replace_decimal_count);
         let chars_count_from_start = remain_char_count / 2;
         let mut start_index: usize = 0;
         for ch in value.chars().take(chars_count_from_start) {
             start_index += ch.len_utf8();
         }
         value.replace_range(
-            start_index..start_index + self.digits,
-            &"*".repeat(self.digits),
+            start_index..start_index + replace_decimal_count,
+            &"*".repeat(replace_decimal_count),
         );
         value
     }
@@ -233,16 +240,17 @@ impl StrEncryptor for CenterCharsMask {
     /// - [12a34] -> [**a*4],
     /// - [123a456] -> [1**a*56]
     fn do_encrypt(&self, value: String) -> String {
-        let length = value.chars().count();
-        if length <= self.digits {
-            return EncryptorUtils::n_asterisks(length);
+        let replace_decimal_count = self.replace_decimal_count();
+        let chars_count = value.chars().count();
+        if chars_count <= replace_decimal_count {
+            return EncryptorUtils::n_asterisks(chars_count);
         }
 
         let decimal_count = EncryptorUtils::get_ascii_digit_count(&value);
-        if decimal_count < self.digits {
-            self.replace_with_asterisks(value, length)
+        if decimal_count < replace_decimal_count {
+            self.replace_with_asterisks(value, chars_count)
         } else {
-            CenterDecimalReplacer::replace(value, self.digits)
+            CenterDecimalReplacer::replace(value, replace_decimal_count)
         }
     }
 }
@@ -293,27 +301,27 @@ mod tests {
         let masker = CenterCharsMask::center_3();
         assert_eq!(
             "**",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("ab".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("ab".to_string())))
         );
         assert_eq!(
             "***",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("abc".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("abc".to_string())))
         );
         assert_eq!(
             "***c",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("ab1c".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("ab1c".to_string())))
         );
         assert_eq!(
             "**a*",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("12a3".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("12a3".to_string())))
         );
         assert_eq!(
             "1*a**",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("12a34".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("12a34".to_string())))
         );
         assert_eq!(
             "12*a**6",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("123a456".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("123a456".to_string())))
         );
     }
 }

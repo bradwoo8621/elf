@@ -107,7 +107,8 @@ impl LooseDateFormatter {
         error_code: EC,
         target_type: &str,
         try_parse: TryParse,
-    ) -> StdR<T>
+        get_format: bool,
+    ) -> StdR<(T, Option<String>)>
     where
         EC: ErrorCode,
         TryParse: Fn(&String, &DateTimeFormatterSupport) -> Option<T>,
@@ -119,7 +120,14 @@ impl LooseDateFormatter {
             } else {
                 for support in supports {
                     if let Some(date_or_datetime) = try_parse(&valid_part, support) {
-                        return Ok(date_or_datetime);
+                        return Ok((
+                            date_or_datetime,
+                            if get_format {
+                                Some(support.format.clone())
+                            } else {
+                                None
+                            },
+                        ));
                     }
                 }
                 Self::parse_failed(str, error_code, target_type)
@@ -130,7 +138,14 @@ impl LooseDateFormatter {
     }
 
     pub fn parse_date(str: &String) -> StdR<NaiveDate> {
-        Self::parse(str, StdErrCode::DateParse, "date", DateFormatter::try_parse)
+        Self::parse(
+            str,
+            StdErrCode::DateParse,
+            "date",
+            DateFormatter::try_parse,
+            false,
+        )
+        .map(|r| r.0)
     }
 
     pub fn parse_datetime(str: &String) -> StdR<NaiveDateTime> {
@@ -139,7 +154,20 @@ impl LooseDateFormatter {
             StdErrCode::DateTimeParse,
             "datetime",
             DateTimeFormatter::try_parse,
+            false,
         )
+        .map(|r| r.0)
+    }
+
+    pub fn parse_datetime_and_format(str: &String) -> StdR<(NaiveDateTime, String)> {
+        Self::parse(
+            str,
+            StdErrCode::DateTimeParse,
+            "datetime",
+            DateTimeFormatter::try_parse,
+            true,
+        )
+        .map(|(dt, f)| (dt, f.unwrap()))
     }
 
     pub fn parse_full_datetime(str: &String) -> StdR<NaiveDateTime> {
@@ -148,6 +176,8 @@ impl LooseDateFormatter {
             StdErrCode::FullDateTimeParse,
             "datetime",
             FullDateTimeFormatter::try_parse,
+            false,
         )
+        .map(|r| r.0)
     }
 }

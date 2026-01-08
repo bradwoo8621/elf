@@ -4,7 +4,6 @@ use watchmen_model::{FactorEncryptMethod, TopicDataValue};
 
 /// use [*] to mask trailing chars
 pub struct LastCharsMask {
-    digits: usize,
     method: FactorEncryptMethod,
 }
 
@@ -19,15 +18,22 @@ impl LastCharsMask {
 
     pub fn last_3() -> Self {
         Self {
-            digits: 3,
             method: FactorEncryptMethod::MaskLast3,
         }
     }
 
     pub fn last_6() -> Self {
         Self {
-            digits: 6,
             method: FactorEncryptMethod::MaskLast6,
+        }
+    }
+
+    fn replace_decimal_count(&self) -> usize {
+        match self.method {
+            FactorEncryptMethod::MaskLast3 => 3,
+            FactorEncryptMethod::MaskLast6 => 6,
+            // default 3
+            _ => 3,
         }
     }
 }
@@ -44,28 +50,33 @@ impl StrEncryptor for LastCharsMask {
     /// - [ab1c] -> [a***],
     /// - [12a3] -> [**a*],
     fn do_encrypt(&self, mut value: String) -> String {
-        let length = value.chars().count();
-        if length <= self.digits {
-            return EncryptorUtils::n_asterisks(length);
+        let replace_decimal_count = self.replace_decimal_count();
+        let chars_count = value.chars().count();
+        if chars_count <= replace_decimal_count {
+            return EncryptorUtils::n_asterisks(chars_count);
         }
 
         let decimal_count = EncryptorUtils::get_ascii_digit_count(&value);
 
-        if decimal_count < self.digits {
-            let replace_start = value.char_indices().nth(length - self.digits).unwrap().0;
-            for offset in 0..self.digits {
+        if decimal_count < replace_decimal_count {
+            let replace_start = value
+                .char_indices()
+                .nth(chars_count - replace_decimal_count)
+                .unwrap()
+                .0;
+            for offset in 0..replace_decimal_count {
                 let index = replace_start + offset;
                 value.replace_range(index..index + 1, "*");
             }
         } else {
             let mut indices = vec![];
-            let mut remaining_digits = self.digits;
-            let mut index = length;
+            let mut remain_decimal_count = replace_decimal_count;
+            let mut index = chars_count;
             for ch in value.chars().rev() {
                 index -= ch.len_utf8();
-                if remaining_digits > 0 && ch.is_ascii_digit() {
+                if remain_decimal_count > 0 && ch.is_ascii_digit() {
                     indices.push(index);
-                    remaining_digits -= 1;
+                    remain_decimal_count -= 1;
                 }
             }
             for index in indices {
@@ -120,19 +131,19 @@ mod tests {
         let masker = LastCharsMask::last_3();
         assert_eq!(
             "**",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("ab".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("ab".to_string())))
         );
         assert_eq!(
             "***",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("abc".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("abc".to_string())))
         );
         assert_eq!(
             "a***",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("ab1c".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("ab1c".to_string())))
         );
         assert_eq!(
             "**a*",
-            EncryptorUtils::stringify(masker.encrypt(&TopicDataValue::Str("12a3".to_string())))
+            EncryptorUtils::get_str(masker.encrypt(&TopicDataValue::Str("12a3".to_string())))
         );
     }
 }

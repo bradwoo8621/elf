@@ -2,8 +2,8 @@ use chrono::NaiveDate;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
 
-pub fn serialize<S: Serializer>(time: &NaiveDate, serializer: S) -> Result<S::Ok, S::Error> {
-    serializer.serialize_str(&time.format("%Y-%m-%d").to_string())
+pub fn serialize<S: Serializer>(date: &NaiveDate, serializer: S) -> Result<S::Ok, S::Error> {
+    serializer.serialize_str(&date.format("%Y-%m-%d").to_string())
 }
 
 pub fn deserialize<'de, D>(deserializer: D) -> Result<NaiveDate, D::Error>
