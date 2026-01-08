@@ -9,6 +9,10 @@ chrono = "0.4.42"
 serde = { version = "1.0.228", features = ["derive"] }
 md5 = "0.8.0"
 sha2 = "0.11.0-rc.3"
+cfb-mode = "0.9.0-rc.1"
+aes = "0.9.0-rc.2"
 hex = "0.4.3"
+base64 = "0.22.1"
+subtle = "2.6.1"
 watchmen_base = { path = "../base" }
 watchmen_model = { path = "../model" }

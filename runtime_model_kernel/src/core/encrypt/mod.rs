@@ -1,3 +1,4 @@
+mod aes_encrypt;
 mod center_chars_mask;
 mod date_mask;
 mod encryptor;
@@ -7,6 +8,7 @@ mod mail_mask;
 mod md5_encrypt;
 mod sha256_encrypt;
 
+pub use aes_encrypt::*;
 pub use center_chars_mask::*;
 pub use date_mask::*;
 pub use encryptor::*;
