@@ -12,7 +12,7 @@ use subtle::ConstantTimeEq;
 use watchmen_base::{ErrorCode, StdR};
 use watchmen_model::{FactorEncryptMethod, KeyStoreValue, TenantId, TopicDataValue};
 
-struct InnerAesCrypto {
+pub struct AesCryptographer {
     key: String,
     iv: String,
 }
@@ -20,7 +20,7 @@ struct InnerAesCrypto {
 type Aes256CfbEncoder = CfbEncryptor<Aes256>;
 type Aes256CfbDecoder = CfbDecryptor<Aes256>;
 
-impl InnerAesCrypto {
+impl AesCryptographer {
     pub fn new(key: String, iv: String) -> Self {
         Self { key, iv }
     }
@@ -140,11 +140,11 @@ impl AesCrypto {
         }
     }
 
-    fn get_current_crypto() -> StdR<InnerAesCrypto> {
+    fn get_current_crypto() -> StdR<AesCryptographer> {
         todo!("implement get_current_crypto for AesCrypto")
     }
 
-    fn get_crypto(&self, head: &String) -> StdR<InnerAesCrypto> {
+    fn get_crypto(&self, head: &String) -> StdR<AesCryptographer> {
         let head_len = head.len();
         let key = if head_len <= 5 {
             None
@@ -203,7 +203,7 @@ impl AesCrypto {
             }
         };
 
-        Ok(InnerAesCrypto::new(aes_key.clone(), aes_iv.clone()))
+        Ok(AesCryptographer::new(aes_key.clone(), aes_iv.clone()))
     }
 }
 
@@ -255,12 +255,12 @@ impl AesCryptoFinder {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::encrypt::aes_crypto::InnerAesCrypto;
+    use crate::AesCryptographer;
 
     // noinspection SpellCheckingInspection
     #[test]
     fn test() {
-        let encryptor = InnerAesCrypto::new(
+        let encryptor = AesCryptographer::new(
             "0123456789abcdefghijklmnopqrstuv".to_string(),
             "wxyz0123456789ab".to_string(),
         );
