@@ -1,7 +1,7 @@
 use bigdecimal::BigDecimal;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use elf_model::VariablePredefineFunctions;
 use std::sync::Arc;
-use watchmen_model::VariablePredefineFunctions;
 
 /// path string with start and end index in the full string
 pub struct PathStr {

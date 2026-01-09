@@ -1,5 +1,5 @@
 use crate::{DataPathSegment, PathParser, PlainDataPath};
-use watchmen_base::VoidR;
+use elf_base::VoidR;
 
 /// consume plain path
 impl PathParser {

@@ -1,5 +1,5 @@
 use crate::AuthenticationDetails;
-use watchmen_model::User;
+use elf_model::User;
 
 pub trait AuthenticationProvider {
     fn accept(&self, details: &AuthenticationDetails) -> bool;

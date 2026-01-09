@@ -1,7 +1,7 @@
 use crate::{BaseDataModel, FactorId, MonitorRuleCode, MonitorRuleSeverity, Storable, TopicId};
 use chrono::NaiveDate;
-use watchmen_base::serde::option_naive_date;
-use watchmen_model_marco::adapt_model;
+use elf_base::serde::option_naive_date;
+use elf_model_marco::adapt_model;
 
 #[adapt_model(storable)]
 pub struct MonitorRuleDetected {

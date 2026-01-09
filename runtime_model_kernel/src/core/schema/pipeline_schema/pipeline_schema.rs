@@ -1,7 +1,7 @@
 use crate::ArcPipeline;
+use elf_base::StdR;
+use elf_model::{Pipeline, PipelineTriggerType, TenantId};
 use std::sync::Arc;
-use watchmen_base::StdR;
-use watchmen_model::{Pipeline, PipelineTriggerType, TenantId};
 
 pub struct PipelineSchema {
     inner: Arc<ArcPipeline>,

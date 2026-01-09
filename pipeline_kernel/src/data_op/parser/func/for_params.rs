@@ -1,5 +1,5 @@
 use crate::FuncParser;
-use watchmen_base::VoidR;
+use elf_base::VoidR;
 
 impl FuncParser {
     /// get real param index in function definition

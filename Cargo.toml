@@ -4,5 +4,5 @@ members = [
     "base", "model", "model_marco",
     "auth",
     "runtime_model_kernel", "pipeline_kernel",
-    "elf"
+    "boot"
 ]

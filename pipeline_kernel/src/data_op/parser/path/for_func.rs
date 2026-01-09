@@ -1,6 +1,6 @@
 use crate::{DataPathSegment, FuncDataPath, FuncParser, ParserInnerState, PathParser, PathStr};
-use watchmen_base::{StdR, VoidR};
-use watchmen_model::VariablePredefineFunctions;
+use elf_base::{StdR, VoidR};
+use elf_model::VariablePredefineFunctions;
 
 /// consume function
 impl PathParser {

@@ -1,5 +1,5 @@
 use crate::{
-    DataPath, DataPathSegment, FuncDataPathParam, FuncParamValue, FuncParamValuePath, PathParser,
+	DataPath, DataPathSegment, FuncDataPathParam, FuncParamValue, FuncParamValuePath, PathParser,
 };
 
 pub trait AnyFuncParser {

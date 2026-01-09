@@ -1,6 +1,6 @@
+use elf_auth::Principal;
+use elf_model::PipelineTriggerTraceId;
 use std::sync::Arc;
-use watchmen_auth::Principal;
-use watchmen_model::PipelineTriggerTraceId;
 
 pub struct PipelineExecutionLogMonitor {
     pub principal: Arc<Principal>,

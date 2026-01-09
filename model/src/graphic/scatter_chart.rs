@@ -2,7 +2,7 @@ use crate::{
 	BaseDataModel, ChartBorder, ChartColor, ChartTruncation, ChartType, EChartsGrid, EChartsLegend,
 	EChartsTitle, EChartsXAxis, EChartsYAxis, PredefinedChartColorSeries, Storable,
 };
-use watchmen_model_marco::adapt_model;
+use elf_model_marco::adapt_model;
 
 #[adapt_model(storable)]
 pub struct ScatterChartSettings {

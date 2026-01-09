@@ -1,6 +1,6 @@
 use crate::{DataPathSegment, FuncDataPath, ParserInnerState};
+use elf_model::VariablePredefineFunctions;
 use std::sync::Arc;
-use watchmen_model::VariablePredefineFunctions;
 
 pub struct PathParser {
     pub inner: ParserInnerState,

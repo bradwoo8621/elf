@@ -1,6 +1,6 @@
 use crate::{Crypto, CryptoUtils, RuntimeModelKernelErrorCode};
-use watchmen_base::{ErrorCode, StdR};
-use watchmen_model::TopicDataValue;
+use elf_base::{ErrorCode, StdR};
+use elf_model::TopicDataValue;
 
 /// use [*] to mask center chars
 /// replace chars count (n) should follow given encrypt method.
@@ -280,7 +280,7 @@ impl Crypto for CenterCharsMask {
 #[cfg(test)]
 mod tests {
     use crate::{CenterCharsMask, Crypto, CryptoUtils};
-    use watchmen_model::TopicDataValue;
+    use elf_model::TopicDataValue;
 
     /// - [ab] -> [**],
     /// - [abc] -> [***],

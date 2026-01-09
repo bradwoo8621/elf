@@ -1,6 +1,6 @@
 use crate::{ComputedParameter, ConstantParameter, TopicFactorParameter};
+use elf_model_marco::VariousStructTypes;
 use serde::{Deserialize, Serialize};
-use watchmen_model_marco::VariousStructTypes;
 
 #[derive(Serialize, Deserialize, VariousStructTypes)]
 #[serde(tag = "kind")]

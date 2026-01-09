@@ -1,7 +1,7 @@
 mod code;
-mod result;
 mod error;
+mod result;
 
 pub use code::*;
-pub use result::*;
 pub use error::*;
+pub use result::*;

@@ -1,5 +1,5 @@
 use crate::{FuncDataPathParam, FuncParamValue, FuncParamValuePath, LiteralConcatFuncParser};
-use watchmen_base::VoidR;
+use elf_base::VoidR;
 
 /// consume str value
 impl LiteralConcatFuncParser {

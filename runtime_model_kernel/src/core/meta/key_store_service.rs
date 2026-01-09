@@ -1,5 +1,5 @@
-use watchmen_base::StdR;
-use watchmen_model::{KeyStoreParams, TenantId};
+use elf_base::StdR;
+use elf_model::{KeyStoreParams, TenantId};
 
 /// TODO keystore meta service using tenant and it's meta datasource (or the global meta datasource)
 ///  to find out keystore meta.
@@ -14,7 +14,7 @@ impl KeyStoreService {
         _key_type: &String,
         _key_key: &Option<String>,
         _tenant_id: &TenantId,
-    ) -> StdR<KeyStoreParams> {
+    ) -> StdR<Option<KeyStoreParams>> {
         todo!("implement find for KeyStoreMetaService")
     }
 }

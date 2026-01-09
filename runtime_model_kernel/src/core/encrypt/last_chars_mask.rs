@@ -1,6 +1,6 @@
 use crate::{Crypto, CryptoUtils, RuntimeModelKernelErrorCode};
-use watchmen_base::{ErrorCode, StdR};
-use watchmen_model::TopicDataValue;
+use elf_base::{ErrorCode, StdR};
+use elf_model::TopicDataValue;
 
 /// use [*] to mask trailing chars.
 /// replace chars count (n) should follow given encrypt method.
@@ -109,7 +109,7 @@ impl Crypto for LastCharsMask {
 #[cfg(test)]
 mod tests {
     use crate::{Crypto, CryptoUtils, LastCharsMask};
-    use watchmen_model::TopicDataValue;
+    use elf_model::TopicDataValue;
 
     /// - [ab] -> [**],
     /// - [abc] -> [***],

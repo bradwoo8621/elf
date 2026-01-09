@@ -1,6 +1,6 @@
-use watchmen_base::{ErrorCode, StdR};
-use watchmen_model::ModelErrorCode;
-use watchmen_model_marco::{Display, Serde, StrEnum};
+use elf_base::{ErrorCode, StdR};
+use elf_model::ModelErrorCode;
+use elf_model_marco::{Display, Serde, StrEnum};
 
 #[derive(Display, Serde, StrEnum)]
 pub enum AuthenticationScheme {

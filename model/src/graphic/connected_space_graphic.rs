@@ -2,7 +2,7 @@ use crate::{
 	BaseDataModel, ConnectedSpaceId, GraphicRect, Storable, TenantId, TopicId, UserBasedTuple,
 	UserId,
 };
-use watchmen_model_marco::adapt_model;
+use elf_model_marco::adapt_model;
 
 #[adapt_model(storable)]
 pub struct TopicOfConnectedSpaceGraphic {

@@ -1,7 +1,8 @@
 [package]
-name = "elf_elf"
+name = "elf_boot"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 elf_base = { path = "../base" }
+elf_runtime_model_kernel = { path = "../runtime_model_kernel" }

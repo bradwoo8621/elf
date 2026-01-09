@@ -1,5 +1,5 @@
 use crate::TopicSchemaFactor;
-use watchmen_base::DisplayLines;
+use elf_base::DisplayLines;
 
 pub struct TopicSchemaFactorUtils;
 

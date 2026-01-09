@@ -1,7 +1,7 @@
 use crate::{Crypto, CryptoUtils};
+use elf_base::StdR;
+use elf_model::TopicDataValue;
 use md5::compute;
-use watchmen_base::StdR;
-use watchmen_model::TopicDataValue;
 
 pub struct Md5Crypto;
 
@@ -46,7 +46,7 @@ impl Crypto for Md5Crypto {
 #[cfg(test)]
 mod tests {
     use crate::{Crypto, CryptoUtils, Md5Crypto};
-    use watchmen_model::TopicDataValue;
+    use elf_model::TopicDataValue;
 
     #[test]
     fn test() {

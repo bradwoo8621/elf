@@ -1,5 +1,5 @@
 use crate::PathParser;
-use watchmen_base::VoidR;
+use elf_base::VoidR;
 
 /// consume path
 impl PathParser {

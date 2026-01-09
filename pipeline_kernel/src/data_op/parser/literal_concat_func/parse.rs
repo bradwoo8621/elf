@@ -1,5 +1,5 @@
 use crate::{LiteralConcatFuncParser, ParserInnerState, PathParser};
-use watchmen_base::VoidR;
+use elf_base::VoidR;
 
 impl LiteralConcatFuncParser {
     /// now a [{] encountered, so sub path will end with a [}].

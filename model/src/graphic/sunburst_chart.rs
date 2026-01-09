@@ -3,7 +3,7 @@ use crate::{
 	EChartsLegend, EChartsTitle, PieChartSettingsLabel, PredefinedChartColorSeries, Storable,
 };
 use bigdecimal::BigDecimal;
-use watchmen_model_marco::adapt_model;
+use elf_model_marco::adapt_model;
 
 #[adapt_model(storable)]
 pub struct SunburstChartSettingsSeries {

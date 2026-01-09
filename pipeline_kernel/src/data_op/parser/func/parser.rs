@@ -1,5 +1,5 @@
 use crate::{FuncDataPathParam, ParserInnerState};
-use watchmen_model::VariablePredefineFunctions;
+use elf_model::VariablePredefineFunctions;
 
 pub struct FuncParser {
     pub inner: ParserInnerState,

@@ -1,9 +1,9 @@
 use crate::{
-    DataPath, DataPathSegment, FuncDataPath, FuncDataPathParam, FuncParamValue, FuncParamValuePath,
-    PathStr, PlainDataPath,
+	DataPath, DataPathSegment, FuncDataPath, FuncDataPathParam, FuncParamValue, FuncParamValuePath,
+	PathStr, PlainDataPath,
 };
+use elf_base::DisplayLines;
 use std::fmt::{Display, Formatter, Result};
-use watchmen_base::DisplayLines;
 
 impl Display for PathStr {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {

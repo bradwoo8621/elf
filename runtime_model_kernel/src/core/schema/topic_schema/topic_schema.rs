@@ -1,8 +1,8 @@
 use crate::{ArcFactor, ArcTopic, TopicSchemaFactorValuePrepper, TopicSchemaFactors};
+use elf_base::{StdR, VoidR};
+use elf_model::{FactorId, TenantId, Topic, TopicCode, TopicData, TopicId};
 use std::ops::Deref;
 use std::sync::Arc;
-use watchmen_base::{StdR, VoidR};
-use watchmen_model::{FactorId, TenantId, Topic, TopicCode, TopicData, TopicId};
 
 /// The schema of a topic, including various factor groups.
 /// all factor fields are optional, depending on whether the topic has the corresponding factors.
@@ -132,7 +132,7 @@ impl TopicSchema {
 #[cfg(test)]
 mod tests {
     use crate::TopicSchema;
-    use watchmen_model::{Factor, FactorType, Topic, TopicKind, TopicType};
+    use elf_model::{Factor, FactorType, Topic, TopicKind, TopicType};
 
     fn create_sample_topic() -> Topic {
         Topic::new()

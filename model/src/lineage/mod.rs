@@ -1,6 +1,6 @@
 use crate::{BaseDataModel, Storable, TenantId};
+use elf_model_marco::adapt_model;
 use std::collections::HashMap;
-use watchmen_model_marco::adapt_model;
 
 #[adapt_model(storable)]
 pub struct LineageGraphs {

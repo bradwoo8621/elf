@@ -1,6 +1,6 @@
 use crate::{Auditable, BaseDataModel, Storable, TenantBasedTuple, TenantId, Tuple, UserId};
-use watchmen_base::serde::option_naive_datetime;
-use watchmen_model_marco::adapt_model;
+use elf_base::serde::option_naive_datetime;
+use elf_model_marco::adapt_model;
 
 pub type PackageVersionId = String;
 

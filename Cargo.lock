@@ -299,10 +299,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "elf_elf"
+name = "elf_boot"
 version = "0.1.0"
 dependencies = [
  "elf_base",
+ "elf_runtime_model_kernel",
 ]
 
 [[package]]

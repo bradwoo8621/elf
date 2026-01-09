@@ -1,5 +1,5 @@
+use elf_base::StringUtils;
 use std::sync::Arc;
-use watchmen_base::StringUtils;
 
 pub struct ParserInnerState {
     /// all chars of full path

@@ -1,7 +1,7 @@
 use crate::{ArcTopicData, ArcTopicDataMap, ArcTopicDataValue};
+use elf_model::{TopicData, TopicDataValue};
 use std::collections::HashMap;
 use std::sync::Arc;
-use watchmen_model::{TopicData, TopicDataValue};
 
 pub trait ArcTopicDataBuilder {
     fn build_value(value: TopicDataValue) -> Arc<ArcTopicDataValue> {

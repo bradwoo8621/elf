@@ -49,10 +49,10 @@ use proc_macro::TokenStream;
 /// ```
 /// if `#[serde]` already defined on field, `skip_serializing_if = "Option::is_none"` will be added.
 ///
-/// All traits and return types are from [watchmen_model] module:
+/// All traits and return types are from [elf_model] module:
 /// So import them by yourself, such as:
 /// ```text
-/// use watchmen_model::{
+/// use elf_model::{
 ///     BaseDataModel, Storable,
 ///     Auditable, OptimisticLock, LastVisit,
 ///     Tuple, TenantBasedTuple, UserBasedTuple,

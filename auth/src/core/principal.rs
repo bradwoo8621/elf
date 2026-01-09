@@ -1,6 +1,6 @@
 use crate::{AuthErrorCode, AuthenticationScheme, Authorization};
-use watchmen_base::{ErrorCode, StdR};
-use watchmen_model::{TenantId, User, UserId, UserRole};
+use elf_base::{ErrorCode, StdR};
+use elf_model::{TenantId, User, UserId, UserRole};
 
 #[derive(Clone)]
 pub struct Principal {

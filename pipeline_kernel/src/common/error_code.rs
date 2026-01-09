@@ -1,4 +1,4 @@
-use watchmen_base::ErrorCode;
+use elf_base::ErrorCode;
 
 pub enum PipelineKernelErrorCode {
     // trigger

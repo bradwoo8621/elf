@@ -1,5 +1,5 @@
 use crate::{ParserInnerState, PipelineKernelErrorCode};
-use watchmen_base::{ErrorCode, StdErrCode, StdR};
+use elf_base::{ErrorCode, StdErrCode, StdR};
 
 /// report error
 impl ParserInnerState {

@@ -1,12 +1,12 @@
 use crate::{ArcTopicDataValue, PipelineKernelErrorCode};
 use bigdecimal::{BigDecimal, One, Zero};
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use elf_base::{
+	DateTimeUtils, ErrorCode, NumericUtils, StdErrCode, StdR, StringConverter, StringUtils,
+};
 use std::ops::Deref;
 use std::str::FromStr;
 use std::sync::Arc;
-use watchmen_base::{
-    DateTimeUtils, ErrorCode, NumericUtils, StdErrCode, StdR, StringConverter, StringUtils,
-};
 
 impl ArcTopicDataValue {
     /// check itself is [None] or not
@@ -64,9 +64,7 @@ impl ArcTopicDataValue {
     pub fn try_to_decimal(&self) -> StdR<Arc<BigDecimal>> {
         match self {
             Self::Num(decimal) => Ok(decimal.clone()),
-            Self::None => {
-                StdErrCode::DecimalParse.msg("Cannot convert none to decimal.")
-            }
+            Self::None => StdErrCode::DecimalParse.msg("Cannot convert none to decimal."),
             Self::Str(str) => {
                 if str.is_blank() {
                     StdErrCode::DecimalParse.msg("Cannot convert blank string to decimal.")

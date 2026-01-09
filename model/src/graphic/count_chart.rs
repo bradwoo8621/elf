@@ -2,7 +2,7 @@ use crate::{
 	BaseDataModel, ChartBorder, ChartColor, ChartFont, ChartTruncation, ChartType, EChartsTitle,
 	PredefinedChartColorSeries, Storable,
 };
-use watchmen_model_marco::adapt_model;
+use elf_model_marco::adapt_model;
 
 #[adapt_model(storable)]
 pub struct CountChartSettingsText {

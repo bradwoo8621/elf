@@ -2,7 +2,10 @@ use chrono::NaiveDateTime;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
 
-pub fn serialize<S: Serializer>(datetime: &NaiveDateTime, serializer: S) -> Result<S::Ok, S::Error> {
+pub fn serialize<S: Serializer>(
+    datetime: &NaiveDateTime,
+    serializer: S,
+) -> Result<S::Ok, S::Error> {
     serializer.serialize_str(&datetime.format("%Y-%m-%d %H:%M:%S").to_string())
 }
 

@@ -2,8 +2,8 @@ use crate::{
 	Auditable, BaseDataModel, ConnectedSpaceId, LastVisit, Report, Storable, SubjectDataset,
 	SubjectId, TenantId, UserBasedTuple, UserId,
 };
-use watchmen_base::serde::option_naive_datetime;
-use watchmen_model_marco::adapt_model;
+use elf_base::serde::option_naive_datetime;
+use elf_model_marco::adapt_model;
 
 /// extend a [reports] field from [Subject]
 #[adapt_model(user_based, audit, last_visit)]
