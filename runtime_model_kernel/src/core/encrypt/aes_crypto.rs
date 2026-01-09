@@ -5,23 +5,31 @@ use cfb_mode::{
     cipher::{AsyncStreamCipher, KeyIvInit}, Decryptor as CfbDecryptor,
     Encryptor as CfbEncryptor,
 };
+use std::collections::HashMap;
 use std::iter::repeat;
 use std::ops::Deref;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock, RwLock};
 use subtle::ConstantTimeEq;
-use watchmen_base::{ErrorCode, StdR};
+use watchmen_base::{ErrorCode, StdErrCode, StdR, VoidR};
 use watchmen_model::{FactorEncryptMethod, KeyStoreValue, TenantId, TopicDataValue};
 
+type KeystoreType = String;
+type KeystoreKey = String;
+static KEYSTORE_TYPE: OnceLock<KeystoreType> = OnceLock::new();
+
+type AesKey = Arc<String>;
+type AesIv = Arc<String>;
+
 pub struct AesCryptographer {
-    key: String,
-    iv: String,
+    key: AesKey,
+    iv: AesIv,
 }
 
 type Aes256CfbEncoder = CfbEncryptor<Aes256>;
 type Aes256CfbDecoder = CfbDecryptor<Aes256>;
 
 impl AesCryptographer {
-    pub fn new(key: String, iv: String) -> Self {
+    pub fn new(key: AesKey, iv: AesIv) -> Self {
         Self { key, iv }
     }
 
@@ -102,6 +110,9 @@ impl AesCryptographer {
     }
 }
 
+static CRYPTOGRAPHERS: OnceLock<RwLock<HashMap<TenantId, HashMap<String, (AesKey, AesIv)>>>> =
+    OnceLock::new();
+
 pub struct AesCrypto {
     tenant_id: Arc<TenantId>,
 }
@@ -140,25 +151,23 @@ impl AesCrypto {
         }
     }
 
-    fn get_current_crypto() -> StdR<AesCryptographer> {
-        todo!("implement get_current_crypto for AesCrypto")
+    fn keystore_type() -> &'static KeystoreType {
+        KEYSTORE_TYPE.get_or_init(|| FactorEncryptMethod::Aes256Pkcs5Padding.to_string())
     }
 
-    fn get_crypto(&self, head: &String) -> StdR<AesCryptographer> {
+    fn keystore_key(head: &String) -> Option<KeystoreKey> {
         let head_len = head.len();
-        let key = if head_len <= 5 {
+        if head_len <= 5 {
             None
         } else {
             Some(head.as_str()[4..head_len - 1].to_string())
-        };
-        // TODO cache!
-        let params = KeyStoreService::find(
-            &FactorEncryptMethod::Aes256Pkcs5Padding.to_string(),
-            key,
-            self.tenant_id.deref(),
-        )?;
+        }
+    }
 
-        let aes_key = match params.get("key") {
+    fn load_from_service(&self, key: &Option<KeystoreKey>) -> StdR<(AesKey, AesIv)> {
+        let mut params = KeyStoreService::find(Self::keystore_type(), key, self.tenant_id.deref())?;
+
+        let aes_key = match params.remove("key") {
             Some(KeyStoreValue::Str(value)) => {
                 if value.len() != 32 {
                     return RuntimeModelKernelErrorCode::AesCrypto.msg(format!(
@@ -180,7 +189,7 @@ impl AesCrypto {
                     .msg("Param[key] for aes crypto not found.");
             }
         };
-        let aes_iv = match params.get("iv") {
+        let aes_iv = match params.remove("iv") {
             Some(KeyStoreValue::Str(value)) => {
                 if value.len() != 16 {
                     return RuntimeModelKernelErrorCode::AesCrypto.msg(format!(
@@ -202,8 +211,75 @@ impl AesCrypto {
                     .msg("Param[iv] for aes crypto not found.");
             }
         };
+        Ok((Arc::new(aes_key), Arc::new(aes_iv)))
+    }
 
-        Ok(AesCryptographer::new(aes_key.clone(), aes_iv.clone()))
+    fn find_from_cache(&self, key: &Option<KeystoreKey>) -> StdR<Option<(AesKey, AesIv)>> {
+        let guard = CRYPTOGRAPHERS
+            .get_or_init(|| RwLock::new(HashMap::new()))
+            .read()
+            .map_err(|e| {
+                StdErrCode::RwLock
+                    .err_with_msg(format!("Failed to get read lock, caused by {}.", e))
+            })?;
+        if let Some(tenant_map) = guard.get(self.tenant_id.deref()) {
+            match key {
+                Some(key) => {
+                    if let Some((key, iv)) = tenant_map.get(key) {
+                        return Ok(Some((key.clone(), iv.clone())));
+                    }
+                }
+                _ => {
+                    if let Some((key, iv)) = tenant_map.get("") {
+                        return Ok(Some((key.clone(), iv.clone())));
+                    }
+                }
+            }
+        }
+        Ok(None)
+    }
+
+    fn put_into_cache(&self, key: Option<KeystoreKey>, aes_key: AesKey, aes_iv: AesIv) -> VoidR {
+        let mut guard = CRYPTOGRAPHERS
+            .get_or_init(|| RwLock::new(HashMap::new()))
+            .write()
+            .map_err(|e| {
+                StdErrCode::RwLock
+                    .err_with_msg(format!("Failed to get write lock, caused by {}.", e))
+            })?;
+
+        if let Some(tenant_map) = guard.get_mut(self.tenant_id.deref()) {
+            tenant_map
+                .entry(key.unwrap_or(String::new()))
+                .or_insert_with(|| (aes_key, aes_iv));
+        } else {
+            let mut map = HashMap::new();
+            let _ = &map
+                .entry(key.unwrap_or(String::new()))
+                .or_insert_with(|| (aes_key, aes_iv));
+            guard.insert(self.tenant_id.deref().clone(), map);
+        };
+
+        Ok(())
+    }
+
+    fn get_key_and_iv(&self, key: Option<KeystoreKey>) -> StdR<(AesKey, AesIv)> {
+        if let Some((aes_key, aes_iv)) = self.find_from_cache(&key)? {
+            return Ok((aes_key, aes_iv));
+        }
+
+        let (aes_key, aes_iv) = self.load_from_service(&key)?;
+        self.put_into_cache(key, aes_key.clone(), aes_iv.clone())?;
+        Ok((aes_key, aes_iv))
+    }
+
+    fn get_current_crypto() -> StdR<AesCryptographer> {
+        todo!("implement get_current_crypto for AesCrypto")
+    }
+
+    fn get_crypto(&self, head: &String) -> StdR<AesCryptographer> {
+        let (aes_key, aes_iv) = self.get_key_and_iv(Self::keystore_key(head))?;
+        Ok(AesCryptographer::new(aes_key, aes_iv))
     }
 }
 
@@ -256,13 +332,14 @@ impl AesCryptoFinder {
 #[cfg(test)]
 mod tests {
     use crate::AesCryptographer;
+    use std::sync::Arc;
 
     // noinspection SpellCheckingInspection
     #[test]
     fn test() {
         let encryptor = AesCryptographer::new(
-            "0123456789abcdefghijklmnopqrstuv".to_string(),
-            "wxyz0123456789ab".to_string(),
+            Arc::new("0123456789abcdefghijklmnopqrstuv".to_string()),
+            Arc::new("wxyz0123456789ab".to_string()),
         );
         assert_eq!(
             encryptor

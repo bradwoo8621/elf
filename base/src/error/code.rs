@@ -56,6 +56,8 @@ pub enum StdErrCode {
     EnvFileFormatNotSupported,
     EnvValueGet,
     EnvValueTypeMismatch,
+
+    RwLock,
     /// with multiple sub errors
     Multiple,
     Unknown,
@@ -75,6 +77,7 @@ impl ErrorCode for StdErrCode {
             Self::EnvValueGet => "STDE-00102",
             Self::EnvValueTypeMismatch => "STDE-00103",
 
+            Self::RwLock => "STDE-99997",
             Self::Multiple => "STDE-99998",
             Self::Unknown => "STDE-99999",
         }

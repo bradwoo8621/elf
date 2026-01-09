@@ -12,7 +12,7 @@ impl KeyStoreService {
     // TODO get from envs when not found from datasource
     pub fn find(
         _key_type: &String,
-        _key_key: Option<String>,
+        _key_key: &Option<String>,
         _tenant_id: &TenantId,
     ) -> StdR<KeyStoreParams> {
         todo!("implement find for KeyStoreMetaService")
