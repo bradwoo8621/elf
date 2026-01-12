@@ -166,6 +166,7 @@ impl AesCrypto {
         }
     }
 
+    #[cfg(test)]
     fn new_rolling(tenant_id: Arc<TenantId>) -> Self {
         Self {
             tenant_id,
