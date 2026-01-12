@@ -1,4 +1,4 @@
-use elf_base::StdR;
+use elf_base::{StdR, VoidR};
 use elf_model::{KeyStoreParams, TenantId};
 
 /// TODO keystore meta service using tenant and it's meta datasource (or the global meta datasource)
@@ -9,12 +9,22 @@ use elf_model::{KeyStoreParams, TenantId};
 pub struct KeyStoreService;
 
 impl KeyStoreService {
-    // TODO get from envs when not found from datasource
+    /// TODO implement create for KeyStoreMetaService
+    pub fn create(
+        _key_type: &String,
+        _key_key: &Option<String>,
+        _tenant_id: &TenantId,
+        _params: KeyStoreParams,
+    ) -> VoidR {
+        Ok(())
+    }
+
+    /// TODO implement find for KeyStoreMetaService
     pub fn find(
         _key_type: &String,
         _key_key: &Option<String>,
         _tenant_id: &TenantId,
     ) -> StdR<Option<KeyStoreParams>> {
-        todo!("implement find for KeyStoreMetaService")
+        Ok(None)
     }
 }

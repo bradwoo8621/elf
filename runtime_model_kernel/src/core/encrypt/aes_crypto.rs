@@ -5,7 +5,8 @@ use cfb_mode::{
     cipher::{AsyncStreamCipher, KeyIvInit}, Decryptor as CfbDecryptor,
     Encryptor as CfbEncryptor,
 };
-use elf_base::{EnvConfig, ErrorCode, StdErrCode, StdR, VoidR};
+use chrono::{Datelike, Utc};
+use elf_base::{EnvConfig, ErrorCode, RandomStr, StdErrCode, StdR, VoidR};
 use elf_model::{FactorEncryptMethod, KeyStoreValue, TenantId, TopicDataValue};
 use std::collections::HashMap;
 use std::iter::repeat;
@@ -111,21 +112,27 @@ impl AesCryptographer {
 }
 
 static DEFAULT_PARAMS: OnceLock<(AesKey, AesIv)> = OnceLock::new();
+static ROLLING_PARAMS: OnceLock<bool> = OnceLock::new();
 static CRYPTOGRAPHERS: OnceLock<RwLock<HashMap<TenantId, HashMap<String, (AesKey, AesIv)>>>> =
     OnceLock::new();
 
 pub struct AesCrypto {
     tenant_id: Arc<TenantId>,
+    params_rolling: bool,
 }
 
 type AesEncryptHead = String;
 
 impl AesCrypto {
-    fn init_default() -> (AesKey, AesIv) {
+    fn init_default_params() -> (AesKey, AesIv) {
         (
             Arc::new("hWmZq4t7w9z$C&F)J@NcRfUjXn2r5u8x".to_string()),
             Arc::new("J@NcRfUjXn2r5u8x".to_string()),
         )
+    }
+
+    fn is_default_params_rolling() -> bool {
+        false
     }
 
     /// initialize aes params by given environment
@@ -135,18 +142,35 @@ impl AesCrypto {
         let aes_iv = envs.get_string("ENCRYPT_AES_IV")?;
         let params = match (aes_key, aes_iv) {
             (Some(aes_key), Some(aes_iv)) => (Arc::new(aes_key), Arc::new(aes_iv)),
-            (None, None) => Self::init_default(),
+            (None, None) => AesCrypto::init_default_params(),
             (None, _) => StdErrCode::EnvInit.msg("Env variable[ENCRYPT_AES_KEY] not defined.")?,
             (_, None) => StdErrCode::EnvInit.msg("Env variable[ENCRYPT_AES_IV] not defined.")?,
         };
 
         DEFAULT_PARAMS
             .set(params)
+            .or_else(|_| StdErrCode::EnvInit.msg("Failed to initialize aes key and iv."))?;
+
+        let rolling_params = envs
+            .get_bool("ENCRYPT_AES_ROLLING_PARAMS")?
+            .unwrap_or(Self::is_default_params_rolling());
+        ROLLING_PARAMS
+            .set(rolling_params)
             .or_else(|_| StdErrCode::EnvInit.msg("Failed to initialize aes key and iv."))
     }
 
     fn new(tenant_id: Arc<TenantId>) -> Self {
-        Self { tenant_id }
+        Self {
+            tenant_id,
+            params_rolling: *ROLLING_PARAMS.get_or_init(Self::is_default_params_rolling),
+        }
+    }
+
+    fn new_rolling(tenant_id: Arc<TenantId>) -> Self {
+        Self {
+            tenant_id,
+            params_rolling: true,
+        }
     }
 
     fn get_encryption_head(value: &String) -> Option<String> {
@@ -244,12 +268,24 @@ impl AesCrypto {
         }
     }
 
+    fn save_params(&self, key: &Option<KeystoreKey>, aes_key: &AesKey, aes_iv: &AesIv) -> VoidR {
+        let mut params = HashMap::new();
+        params.insert(
+            "key".to_string(),
+            KeyStoreValue::Str(aes_key.deref().clone()),
+        );
+        params.insert("iv".to_string(), KeyStoreValue::Str(aes_iv.deref().clone()));
+        KeyStoreService::create(Self::keystore_type(), key, self.tenant_id.deref(), params)
+    }
+
     fn create_params(&self, key: &Option<KeystoreKey>) -> StdR<(AesKey, AesIv)> {
         if key.is_none() {
-            let (aes_key, aes_iv) = DEFAULT_PARAMS.get_or_init(Self::init_default);
+            let (aes_key, aes_iv) = DEFAULT_PARAMS.get_or_init(Self::init_default_params);
             Ok((aes_key.clone(), aes_iv.clone()))
         } else {
-            todo!("implement create_params for AesCrypto")
+            let key = String::random_32();
+            let iv = String::random_16();
+            Ok((Arc::new(key), Arc::new(iv)))
         }
     }
 
@@ -307,7 +343,7 @@ impl AesCrypto {
         Ok(())
     }
 
-    fn get_key_and_iv(&self, key: Option<KeystoreKey>) -> StdR<(AesKey, AesIv)> {
+    fn get_or_create_params(&self, key: Option<KeystoreKey>) -> StdR<(AesKey, AesIv)> {
         if let Some((aes_key, aes_iv)) = self.find_params_from_cache(&key)? {
             return Ok((aes_key, aes_iv));
         }
@@ -315,18 +351,36 @@ impl AesCrypto {
         let (aes_key, aes_iv) = if let Some((aes_key, aes_iv)) = self.load_params(&key)? {
             (aes_key, aes_iv)
         } else {
-            self.create_params(&key)?
+            let (aes_key, aes_iv) = self.create_params(&key)?;
+            self.save_params(&key, &aes_key, &aes_iv)?;
+            (aes_key, aes_iv)
         };
         self.put_params_into_cache(key, aes_key.clone(), aes_iv.clone())?;
         Ok((aes_key, aes_iv))
     }
 
-    fn get_current_crypto() -> StdR<(AesCryptographer, AesEncryptHead)> {
-        todo!("implement get_current_crypto for AesCrypto")
+    fn current_crypto(&self) -> StdR<(AesCryptographer, AesEncryptHead)> {
+        let (aes_key, aes_iv, head) = if self.params_rolling {
+            // use (year - 2025) + (week of year) as head.
+            // e.g. 2026-01-01
+            let date = Utc::now().naive_utc();
+            let year = (date.year() - 2025).abs() as u32;
+            let iso_week = date.iso_week().week();
+            let key = format!("{}{:02}", year, iso_week);
+            let (aes_key, aes_iv) = self.get_or_create_params(Some(key.clone()))?;
+            (aes_key, aes_iv, format!("{{AES{}}}", key))
+        } else {
+            // always use "{AES}" as head
+            let (aes_key, aes_iv) = self.get_or_create_params(None)?;
+            (aes_key, aes_iv, "{AES}".to_string())
+        };
+
+        let cryptographer = AesCryptographer::new(aes_key, aes_iv);
+        Ok((cryptographer, head))
     }
 
-    fn get_crypto(&self, head: &AesEncryptHead) -> StdR<AesCryptographer> {
-        let (aes_key, aes_iv) = self.get_key_and_iv(Self::keystore_key(head))?;
+    fn get_crypto_by_head(&self, head: &AesEncryptHead) -> StdR<AesCryptographer> {
+        let (aes_key, aes_iv) = self.get_or_create_params(Self::keystore_key(head))?;
         Ok(AesCryptographer::new(aes_key, aes_iv))
     }
 }
@@ -341,7 +395,7 @@ impl Crypto for AesCrypto {
 
     fn encrypt(&self, value: &TopicDataValue) -> StdR<Option<TopicDataValue>> {
         if let Some(str_value) = CryptoUtils::value_to_str(value)? {
-            let (cryptographer, mut head) = Self::get_current_crypto()?;
+            let (cryptographer, mut head) = self.current_crypto()?;
             let encrypted = cryptographer.encrypt(&str_value)?;
             head.push_str(&encrypted);
             Ok(Some(TopicDataValue::Str(head)))
@@ -354,7 +408,7 @@ impl Crypto for AesCrypto {
         if let Some(str_value) = CryptoUtils::value_to_str(value)? {
             if let Some(head) = Self::get_encryption_head(&str_value) {
                 Ok(Some(TopicDataValue::Str(
-                    self.get_crypto(&head)?.decrypt(
+                    self.get_crypto_by_head(&head)?.decrypt(
                         &str_value
                             .strip_prefix(&head)
                             .map(|s| s.to_string())
@@ -370,9 +424,9 @@ impl Crypto for AesCrypto {
     }
 }
 
-pub struct AesCryptoFinder;
+pub struct AesCryptoBuilder;
 
-impl AesCryptoFinder {
+impl AesCryptoBuilder {
     pub fn get(tenant_id: &Arc<TenantId>) -> StdR<AesCrypto> {
         Ok(AesCrypto::new(tenant_id.clone()))
     }
@@ -380,7 +434,8 @@ impl AesCryptoFinder {
 
 #[cfg(test)]
 mod tests {
-    use crate::AesCryptographer;
+    use crate::{AesCrypto, AesCryptoBuilder, AesCryptographer, Crypto, CryptoUtils};
+    use elf_model::TopicDataValue;
     use std::sync::Arc;
 
     // noinspection SpellCheckingInspection
@@ -394,13 +449,37 @@ mod tests {
             encryptor
                 .encrypt(&"abc".to_string())
                 .expect("encryption failed"),
-            "{AES}wUcF6arwf6/5i9MWWTGeIA=="
+            "wUcF6arwf6/5i9MWWTGeIA=="
         );
         assert_eq!(
             encryptor
-                .decrypt(&"{AES}wUcF6arwf6/5i9MWWTGeIA==".to_string())
+                .decrypt(&"wUcF6arwf6/5i9MWWTGeIA==".to_string())
                 .expect("decryption failed"),
             "abc"
         );
+    }
+
+    #[test]
+    fn test_no_rolling() {
+        let crypto = AesCryptoBuilder::get(&Arc::new("1".to_string())).unwrap();
+        let encrypted =
+            CryptoUtils::get_str(crypto.encrypt(&TopicDataValue::Str("abc".to_string())));
+        assert_eq!(encrypted, "{AES}xH6wLjCVVGazKBo8aI/ooQ==");
+
+        let decrypted = CryptoUtils::get_str(crypto.decrypt(&TopicDataValue::Str(
+            "{AES}xH6wLjCVVGazKBo8aI/ooQ==".to_string(),
+        )));
+        assert_eq!(decrypted, "abc");
+    }
+
+    #[test]
+    fn test_rolling() {
+        let crypto = AesCrypto::new_rolling(Arc::new("1".to_string()));
+        let encrypted =
+            CryptoUtils::get_str(crypto.encrypt(&TopicDataValue::Str("abc".to_string())));
+        assert_ne!(encrypted, "{AES}xH6wLjCVVGazKBo8aI/ooQ==");
+        println!("Encrypted: {}", &encrypted);
+        let decrypted = CryptoUtils::get_str(crypto.decrypt(&TopicDataValue::Str(encrypted)));
+        assert_eq!(decrypted, "abc");
     }
 }

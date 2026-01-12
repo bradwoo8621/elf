@@ -1,5 +1,5 @@
 use crate::{
-    AesCrypto, AesCryptoFinder, CenterCharsMask, Crypto, DateMask, LastCharsMask, MailMask,
+    AesCrypto, AesCryptoBuilder, CenterCharsMask, Crypto, DateMask, LastCharsMask, MailMask,
     Md5Crypto, Sha256Crypto,
 };
 use elf_base::StdR;
@@ -27,7 +27,7 @@ impl FactorCrypto {
     ) -> StdR<Option<FactorCrypto>> {
         let crypto = match encrypt_method {
             FactorEncryptMethod::Aes256Pkcs5Padding => {
-                FactorCrypto::Aes256Pkcs5Padding(AesCryptoFinder::get(tenant_id)?)
+                FactorCrypto::Aes256Pkcs5Padding(AesCryptoBuilder::get(tenant_id)?)
             }
             FactorEncryptMethod::Md5 => FactorCrypto::Md5(Md5Crypto::new()),
             FactorEncryptMethod::Sha256 => FactorCrypto::Sha256(Sha256Crypto::new()),

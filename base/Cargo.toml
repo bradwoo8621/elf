@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 bigdecimal = "0.4.10"
 chrono = "0.4.42"
+rand = "0.10.0-rc.6"
 serde = { version = "1.0.228", features = ["derive"] }
 config = "0.15.19"
 dotenvy = "0.15.7"
