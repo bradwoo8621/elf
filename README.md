@@ -60,7 +60,7 @@ If your use qualifies as commercial, the following fee structure applies:
 If you offer a service similar to Software-as-a-Service (SaaS) or subscription-based offerings:
 
 - **Fee:** 20% of the **Total Commercial Contract Value** associated with the offering that includes this software.
-- **Cap:** Monthly fee not to exceed **USD 1,000**.
+- **Cap:** Monthly fee not to exceed **USD 3,000**.
 
 #### **On-Premises / Perpetual License Deployment**
 
@@ -68,6 +68,12 @@ If you provide the software via on-premises deployment or perpetual license:
 
 - **Fee:** 20% of the **Total Commercial Contract Value** of the contract that includes delivery of this software.
 - **Cap:** One-time fee not to exceed **USD 50,000**.
+- **Operations and Maintenance (O&M) Contract:** If an Operations and Maintenance (O&M) contract is established for the overall software
+  solution, an additional fee of 10% of the **Total Contract Value** of the O&M contract will be charged. This fee is capped at **USD 30,000
+  per year**. The "Total Contract Value of the O&M contract" refers to the total value of all commercial activities related to the usage,
+  support, and maintenance of the overall software solution after its initial deployment. This includes, but is not limited to, activities
+  such as adding, modifying, or removing software features (whether for this software or any other components included in the overall
+  solution), as well as any other form of operational support and maintenance performed for the client.
 
 #### **Definition of Total Commercial Contract Value**
 
@@ -77,7 +83,8 @@ agreement, regardless of whether other non-software services or components are i
 ### **2.3 How to Obtain a Commercial License**
 
 To request a commercial license or discuss licensing terms, please contact the copyright holder at:  
-**[📝 Submit commercial request](https://github.com/bradwoo8621/elf/issues/new?template=commercial-request.yml), and we will get back to you.**
+**[📝 Submit commercial request](https://github.com/bradwoo8621/elf/issues/new?template=commercial-request.yml), and we will get back to you.
+**
 
 ### **2.4 Compliance & Enforcement**
 
