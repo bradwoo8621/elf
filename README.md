@@ -62,6 +62,10 @@ If you offer a service similar to Software-as-a-Service (SaaS) or subscription-b
 - **Fee:** 20% of the **Total Commercial Contract Value** associated with the offering that includes this software.
 - **Cap:** Monthly fee not to exceed **USD 3,000**.
 
+> The fee for the subscription service is calculated based on the number of subscribers to the subscription service, not the number of
+> subscription services. For example, if your platform has 10 clients who have subscribed to services that include this software, the
+> contractual quantity is 10, and each requires separate licensing.
+
 #### **On-Premises / Perpetual License Deployment**
 
 If you provide the software via on-premises deployment or perpetual license:
@@ -95,7 +99,7 @@ agreement, regardless of whether other non-software services or components are i
    preliminary communications conducted via online links, forms, chat, etc., **do not constitute the grant of a Commercial Use license**.  
    c. Any expression of interest regarding Commercial Use is to be considered solely as a preliminary starting point for commercial
    negotiations and does not create any binding license or commitment. All final rights, obligations, fees, and scope of services shall be
-   exclusively governed by the Master Agreement formally executed by both parties.  
+   exclusively governed by the Master Agreement formally executed by both parties.
 
 ### **2.3 How to Obtain a Commercial License**
 
