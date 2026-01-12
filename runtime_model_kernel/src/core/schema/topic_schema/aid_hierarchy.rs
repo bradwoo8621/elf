@@ -1,4 +1,5 @@
 use crate::IdGen;
+use bigdecimal::{BigDecimal, FromPrimitive};
 use elf_base::VoidR;
 use elf_model::{TopicData, TopicDataValue};
 use serde::{Deserialize, Serialize};
@@ -12,7 +13,7 @@ const AID_ROOT: &'static str = "aid_root";
 #[serde(rename_all = "camelCase")]
 pub struct Ancestor {
     name: String,
-    aid_id: String,
+    aid_id: BigDecimal,
 }
 
 pub struct HierarchyAid;
@@ -58,7 +59,7 @@ impl HierarchyAid {
 
         data.insert(
             name.to_string(),
-            TopicDataValue::Str(ancestor.aid_id.clone()),
+            TopicDataValue::Num(ancestor.aid_id.clone()),
         );
         used_ancestor_keys.insert(name.to_string(), true);
     }
@@ -72,7 +73,7 @@ impl HierarchyAid {
         let mut new_ancestors = ancestors.clone();
         new_ancestors.push(Rc::new(Ancestor {
             name,
-            aid_id: aid_id.to_string(),
+            aid_id: BigDecimal::from_u128(aid_id).unwrap(),
         }));
         new_ancestors
     }
@@ -83,7 +84,7 @@ impl HierarchyAid {
         let aid_id_of_me = IdGen::next_id()?;
         data.insert(
             MY_AID_ID.to_string(),
-            TopicDataValue::Str(aid_id_of_me.to_string()),
+            TopicDataValue::Num(BigDecimal::from_u128(aid_id_of_me).unwrap()),
         );
 
         // create ancestor aid ids

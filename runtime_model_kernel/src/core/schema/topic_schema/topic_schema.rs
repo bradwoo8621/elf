@@ -224,8 +224,8 @@ mod tests {
         }
 
         let root_aid_me = data.get("aid_me").expect("failed to get aid_me from root");
-        matches!(root_aid_me, TopicDataValue::Str(_));
-        let root_aid_me = if let TopicDataValue::Str(s) = root_aid_me {
+        matches!(root_aid_me, TopicDataValue::Num(_));
+        let root_aid_me = if let TopicDataValue::Num(s) = root_aid_me {
             s
         } else {
             panic!("failed to get aid_me from root")
@@ -276,16 +276,16 @@ mod tests {
             let aid_root = test_map
                 .get("aid_root")
                 .expect("failed to get aid_root from test map");
-            matches!(aid_root, TopicDataValue::Str(_));
-            if let TopicDataValue::Str(s) = aid_root {
+            matches!(aid_root, TopicDataValue::Num(_));
+            if let TopicDataValue::Num(s) = aid_root {
                 assert_eq!(s, root_aid_me)
             }
 
             let aid_me = test_map
                 .get("aid_me")
                 .expect("failed to get aid_me from test map");
-            matches!(aid_me, TopicDataValue::Str(_));
-            if let TopicDataValue::Str(s) = aid_me {
+            matches!(aid_me, TopicDataValue::Num(_));
+            if let TopicDataValue::Num(s) = aid_me {
                 assert_ne!(s, root_aid_me)
             }
         }
