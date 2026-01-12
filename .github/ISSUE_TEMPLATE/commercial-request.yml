@@ -40,12 +40,22 @@ body:
       description: "Will your solution be offered as a subscription/service?"
       options:
         - "Yes, subscription-based SaaS"
-        - "Yes, but not subscription-based"
         - "No, one-time purchase/license"
-        - "Internal enterprise use only"
-        - "Other (please specify in description)"
+        - "Other (please specify in service description)"
     validations:
       required: true
+
+  - type: textarea
+    id: subscription_service_desc
+    attributes:
+      label: "Service description"
+      description: "Describe how your solution be offered"
+      placeholder: |
+        e.g., 
+        This is an internal data processing system for a large enterprise. 
+        We will use ELF as the engine for data cleaning and organization, ultimately generating daily-use reports based on it.
+    validations:
+      required: false
 
   - type: checkboxes
     id: time_period
@@ -61,6 +71,14 @@ body:
       required: true
 
   - type: input
+    id: time_period_spec
+    attributes:
+      label: "Expected Usage Timeline"
+      placeholder: "e.g. For at least 3 years."
+    validations:
+      required: false
+
+  - type: input
     id: expected_start
     attributes:
       label: "Expected Start Date"
@@ -71,8 +89,8 @@ body:
     id: contact_info
     attributes:
       label: "Contact Information"
-      description: "How should we contact you? (Email, phone, or other preferred method)"
-      placeholder: "email@company.com or +1-234-567-8900"
+      description: "How should we contact you? (Email only)"
+      placeholder: "email@company.com"
     validations:
       required: true
 
