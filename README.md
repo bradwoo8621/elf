@@ -80,6 +80,23 @@ If you provide the software via on-premises deployment or perpetual license:
 The **Total Commercial Contract Value** refers to the entire contractual amount for all deliverables and services provided under the
 agreement, regardless of whether other non-software services or components are included.
 
+#### **Scope of Service and Restrictions on Commercial Use**
+
+1. **Support Services:** All fees paid by the User under the aforementioned license, regardless of their designation, are strictly for the
+   purchase of or subscription to the right to use this software. Unless otherwise explicitly agreed upon in writing, these fees **do not
+   include any form of technical support, training, consultation, customization, development, operational maintenance, or other value-added
+   services**.
+
+2. **Commercial Use License:**
+   a. Any use of this software for direct or indirect commercial purposes, including but not limited to use in profit-generating activities,
+   internal operations, or integration into commercial products or services, shall be deemed "Commercial Use".  
+   b. All Commercial Use **must** be based on a separate, formally executed written license agreement (hereinafter referred to as the "
+   Master Agreement") between the User and the software provider. The standard terms, prices displayed on this platform, and any
+   preliminary communications conducted via online links, forms, chat, etc., **do not constitute the grant of a Commercial Use license**.  
+   c. Any expression of interest regarding Commercial Use is to be considered solely as a preliminary starting point for commercial
+   negotiations and does not create any binding license or commitment. All final rights, obligations, fees, and scope of services shall be
+   exclusively governed by the Master Agreement formally executed by both parties.  
+
 ### **2.3 How to Obtain a Commercial License**
 
 To request a commercial license or discuss licensing terms, please contact the copyright holder at:  
