@@ -84,6 +84,8 @@ body:
       label: "Expected Start Date"
       description: "When do you plan to start using this software?"
       placeholder: "YYYY-MM-DD or Q1 2024, etc."
+    validations:
+      required: true
 
   - type: textarea
     id: contact_info

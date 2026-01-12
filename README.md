@@ -77,7 +77,7 @@ agreement, regardless of whether other non-software services or components are i
 ### **2.3 How to Obtain a Commercial License**
 
 To request a commercial license or discuss licensing terms, please contact the copyright holder at:  
-**Please leave your request in the [Issues](https://github.com/bradwoo8621/elf/issues), and we will get back to you.**
+**[📝 Submit commercial request](https://github.com/bradwoo8621/elf/issues/new?template=commercial-request.yml), and we will get back to you.**
 
 ### **2.4 Compliance & Enforcement**
 
