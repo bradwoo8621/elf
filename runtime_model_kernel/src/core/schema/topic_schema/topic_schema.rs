@@ -132,13 +132,17 @@ impl TopicSchema {
 #[cfg(test)]
 mod tests {
     use crate::TopicSchema;
-    use elf_model::{Factor, FactorType, Topic, TopicKind, TopicType};
+    use chrono::Datelike;
+    use elf_model::{
+        Factor, FactorEncryptMethod, FactorType, Topic, TopicDataValue, TopicKind, TopicType,
+    };
+    use std::collections::HashMap;
 
     fn create_sample_topic() -> Topic {
         Topic::new()
             .topic_id(String::from("topic-1"))
             .name(String::from("Sample Topic"))
-            .r#type(TopicType::Raw)
+            .r#type(TopicType::Distinct)
             .kind(TopicKind::Business)
             .factors(vec![
                 Factor::new()
@@ -166,6 +170,26 @@ mod tests {
                     .name(String::from("dv.sub-dv.factor-5"))
                     .r#type(FactorType::Text)
                     .default_value(String::from("e")),
+                // to test prepare
+                Factor::new()
+                    .factor_id("f6".to_string())
+                    .name(String::from("test.mask-center-3"))
+                    .r#type(FactorType::Text)
+                    .default_value(String::from("abcde"))
+                    .encrypt(FactorEncryptMethod::MaskCenter3),
+                Factor::new()
+                    .factor_id("f7".to_string())
+                    .name(String::from("test.mask-last-3"))
+                    .r#type(FactorType::Text)
+                    .default_value(String::from("abcde"))
+                    .encrypt(FactorEncryptMethod::MaskLast3),
+                Factor::new()
+                    .factor_id("f8".to_string())
+                    .name(String::from("test.mask-month"))
+                    .r#type(FactorType::Date)
+                    .flatten(true)
+                    .default_value(String::from("2026-02-18"))
+                    .encrypt(FactorEncryptMethod::MaskMonth),
             ])
             .tenant_id(String::from("Tenant-1"))
             .version(1)
@@ -179,5 +203,91 @@ mod tests {
         assert_eq!(topic_schema.topic().topic_id.as_str(), "topic-1");
         // assert!(topic_schema.default_value_factor_groups.is_none());
         // println!("{:?}", topic_schema)
+    }
+
+    #[test]
+    fn test_prepare() {
+        let topic = create_sample_topic();
+        let topic_schema = TopicSchema::new(topic).expect("failed to create topic schema");
+
+        let test_map = HashMap::new();
+        let mut data = HashMap::new();
+        data.insert("test".to_string(), TopicDataValue::Map(test_map));
+        topic_schema
+            .prepare(&mut data)
+            .expect("failed to prepare topic schema");
+
+        let factor_1 = data.get("factor-1").expect("failed to get factor-1");
+        matches!(factor_1, TopicDataValue::Str(_));
+        if let TopicDataValue::Str(s) = factor_1 {
+            assert_eq!(s, "a");
+        }
+
+        let root_aid_me = data.get("aid_me").expect("failed to get aid_me from root");
+        matches!(root_aid_me, TopicDataValue::Str(_));
+        let root_aid_me = if let TopicDataValue::Str(s) = root_aid_me {
+            s
+        } else {
+            panic!("failed to get aid_me from root")
+        };
+
+        // flatten
+        let mask_month = data
+            .get("test.mask-month")
+            .expect("failed to get test.mask-month");
+        matches!(mask_month, TopicDataValue::Date(_));
+        let flatten_mask_month = if let TopicDataValue::Date(d) = mask_month {
+            assert_eq!(d.year(), 2026);
+            assert_eq!(d.month(), 1);
+            assert_eq!(d.day(), 18);
+            d
+        } else {
+            panic!("failed to get test.mask-month");
+        };
+
+        let test_map = data.get("test").expect("failed to get test topic data");
+        matches!(test_map, TopicDataValue::Map(_));
+        if let TopicDataValue::Map(test_map) = test_map {
+            println!("test map got.");
+            let mask_center_3 = test_map
+                .get("mask-center-3")
+                .expect("failed to get mask-center-3");
+            matches!(mask_center_3, TopicDataValue::Str(_));
+            if let TopicDataValue::Str(s) = mask_center_3 {
+                assert_eq!(s, "a***e");
+            }
+
+            let mask_last_3 = test_map
+                .get("mask-last-3")
+                .expect("failed to get mask-last-3");
+            matches!(mask_last_3, TopicDataValue::Str(_));
+            if let TopicDataValue::Str(s) = mask_last_3 {
+                assert_eq!(s, "ab***");
+            }
+
+            let mask_month = test_map
+                .get("mask-month")
+                .expect("failed to get mask-month");
+            matches!(mask_month, TopicDataValue::Date(_));
+            if let TopicDataValue::Date(d) = mask_month {
+                assert_eq!(d, flatten_mask_month);
+            }
+
+            let aid_root = test_map
+                .get("aid_root")
+                .expect("failed to get aid_root from test map");
+            matches!(aid_root, TopicDataValue::Str(_));
+            if let TopicDataValue::Str(s) = aid_root {
+                assert_eq!(s, root_aid_me)
+            }
+
+            let aid_me = test_map
+                .get("aid_me")
+                .expect("failed to get aid_me from test map");
+            matches!(aid_me, TopicDataValue::Str(_));
+            if let TopicDataValue::Str(s) = aid_me {
+                assert_ne!(s, root_aid_me)
+            }
+        }
     }
 }

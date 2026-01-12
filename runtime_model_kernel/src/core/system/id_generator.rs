@@ -1,4 +1,4 @@
-use crate::RuntimeModelKernelErrorCode;
+use crate::{RuntimeModelKernelErrorCode, SnowflakeIdGenerator};
 use elf_base::{ErrorCode, StdR, VoidR};
 use std::sync::{OnceLock, RwLock};
 
@@ -7,7 +7,10 @@ pub trait IdGenerator: Send + Sync {
     fn next_id(&self) -> u128;
 }
 
-struct DummyIdGenerator();
+/// always panic when call [next_id].
+/// to detect that the id generator is not initialized at startup
+#[allow(dead_code)]
+struct DummyIdGenerator;
 
 impl IdGenerator for DummyIdGenerator {
     fn next_id(&self) -> u128 {
@@ -23,8 +26,16 @@ static GLOBAL_ID_GENERATOR: OnceLock<RwLock<Box<dyn IdGenerator>>> = OnceLock::n
 pub struct IdGen();
 
 impl IdGen {
+    #[cfg(test)]
     fn init() -> RwLock<Box<dyn IdGenerator>> {
-        RwLock::new(Box::new(DummyIdGenerator()) as Box<dyn IdGenerator>)
+        let generator =
+            SnowflakeIdGenerator::new(1).expect("failed to create SnowflakeIdGenerator");
+        RwLock::new(Box::new(generator) as Box<dyn IdGenerator>)
+    }
+
+    #[cfg(not(test))]
+    fn init() -> RwLock<Box<dyn IdGenerator>> {
+        RwLock::new(Box::new(DummyIdGenerator) as Box<dyn IdGenerator>)
     }
 
     pub fn next_id() -> StdR<u128> {
@@ -49,7 +60,7 @@ impl IdGen {
 
 #[cfg(test)]
 mod tests {
-    use crate::{IdGen, IdGenerator, SnowflakeIdGenerator};
+    use crate::IdGen;
     use std::thread;
     use std::time::Instant;
     // use std::panic;
@@ -65,11 +76,6 @@ mod tests {
 
     #[test]
     fn test_snowflake() {
-        let generator =
-            SnowflakeIdGenerator::new(1).expect("failed to create SnowflakeIdGenerator");
-        IdGen::set(Box::new(generator) as Box<dyn IdGenerator>)
-            .expect("Snowflake generator set failed");
-
         let id = IdGen::next_id().expect("failed to get next id by SnowflakeIdGenerator");
         println!("{}", id);
         assert!(id > 1);

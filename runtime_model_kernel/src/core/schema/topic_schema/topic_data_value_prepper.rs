@@ -423,7 +423,7 @@ impl TopicSchemaFactorValuePrepper {
 				for child_factor in child_factors {
 					match child_factor {
 						TopicSchemaFactor::Simple(factor) => if factor.is_flatten {
-							if let Some(value) = map.get(name) {
+							if let Some(value) = map.get(&factor.name) {
 								flatten_factors_and_values.push((factor, value.clone()))
 							} else {
 								flatten_factors_and_values.push((factor, TopicDataValue::None))
