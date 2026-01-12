@@ -1,0 +1,97 @@
+name: "Request Commercial Usage"
+description: "To request this software for your commercial solution"
+title: "[Commercial] Your Company, Solution Name"
+labels: [ "commercial-request" ]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📋 Commercial Use Request Form
+        Please fill in the following information to help us understand your commercial usage requirements.
+        
+        *All fields are required unless marked optional.*
+
+  - type: input
+    id: company_name
+    attributes:
+      label: "Company Name"
+      description: "The full legal name of your company/organization"
+      placeholder: "e.g., Example Tech Inc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: commercial_use
+    attributes:
+      label: "Commercial Use Case"
+      description: "Describe how you plan to use this software in your commercial solution"
+      placeholder: |
+        e.g., 
+        - We plan to integrate this software into our SaaS platform
+        - This will be part of our enterprise solution for clients
+        - We're building a commercial application that will use this as a core component
+    validations:
+      required: true
+
+  - type: dropdown
+    id: subscription_service
+    attributes:
+      label: "Is this for a subscription-based service?"
+      description: "Will your solution be offered as a subscription/service?"
+      options:
+        - "Yes, subscription-based SaaS"
+        - "Yes, but not subscription-based"
+        - "No, one-time purchase/license"
+        - "Internal enterprise use only"
+        - "Other (please specify in description)"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: time_period
+    attributes:
+      label: "Expected Usage Timeline"
+      description: "Select all that apply"
+      options:
+        - label: "Short-term evaluation (1-3 months)"
+        - label: "Medium-term implementation (3-12 months)"
+        - label: "Long-term production use (1+ years)"
+        - label: "Not yet determined (please specify in description)"
+    validations:
+      required: true
+
+  - type: input
+    id: expected_start
+    attributes:
+      label: "Expected Start Date"
+      description: "When do you plan to start using this software?"
+      placeholder: "YYYY-MM-DD or Q1 2024, etc."
+
+  - type: textarea
+    id: contact_info
+    attributes:
+      label: "Contact Information"
+      description: "How should we contact you? (Email, phone, or other preferred method)"
+      placeholder: "email@company.com or +1-234-567-8900"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: "Additional Information (Optional)"
+      description: "Any other relevant details about your request"
+      placeholder: "e.g., expected user count, technical requirements, compliance needs, etc."
+
+  - type: checkboxes
+    id: agreements
+    attributes:
+      label: "Acknowledgments"
+      description: "Please confirm the following"
+      options:
+        - label: "I understand this is a request, not a guarantee of approval"
+          required: true
+        - label: "I agree to provide accurate information about our intended use"
+          required: true
+        - label: "I understand we may need to discuss licensing terms if approved"
+          required: true
