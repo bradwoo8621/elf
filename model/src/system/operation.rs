@@ -1,5 +1,5 @@
 use crate::{
-	Auditable, BaseDataModel, ModelErrorCode, Storable, TenantBasedTuple, TenantId, Tuple, UserId,
+    Auditable, BaseDataModel, ModelErrorCode, Storable, TenantBasedTuple, TenantId, Tuple, UserId,
 };
 use bigdecimal::BigDecimal;
 use elf_base::serde::option_naive_datetime;

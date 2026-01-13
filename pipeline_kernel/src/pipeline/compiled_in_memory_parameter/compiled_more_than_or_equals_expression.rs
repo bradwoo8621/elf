@@ -11,7 +11,10 @@ pub struct CompiledMoreThanOrEqualsExpression {
 }
 
 impl CompiledMoreThanOrEqualsExpression {
-    pub fn compile(exp: &Arc<ArcMoreThanOrEqualsExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        exp: &Arc<ArcMoreThanOrEqualsExpression>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         Ok(CompiledMoreThanOrEqualsExpression {
             left: CompiledParameter::compile(&exp.left, tenant_id)?,
             right: CompiledParameter::compile(&exp.right, tenant_id)?,

@@ -1,7 +1,7 @@
 use crate::{ArcHelper, ArcMappingFactor, ArcParameterJoint, RuntimeModelKernelErrorCode};
 use elf_base::{ErrorCode, StdR};
 use elf_model::{
-	AccumulateMode, InsertOrMergeRowAction, PipelineActionId, PipelineActionType, TopicId,
+    AccumulateMode, InsertOrMergeRowAction, PipelineActionId, PipelineActionType, TopicId,
 };
 use std::sync::Arc;
 

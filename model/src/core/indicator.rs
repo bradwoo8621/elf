@@ -1,7 +1,7 @@
 use crate::{
-	Auditable, BaseDataModel, BucketId, FactorOrSubjectDatasetColumnId, ModelErrorCode,
-	OptimisticLock, ParameterJoint, Storable, TenantBasedTuple, TenantId, TopicOrSubjectId, Tuple,
-	UserId,
+    Auditable, BaseDataModel, BucketId, FactorOrSubjectDatasetColumnId, ModelErrorCode,
+    OptimisticLock, ParameterJoint, Storable, TenantBasedTuple, TenantId, TopicOrSubjectId, Tuple,
+    UserId,
 };
 use elf_base::serde::option_naive_datetime;
 use elf_base::{ErrorCode, StdR};

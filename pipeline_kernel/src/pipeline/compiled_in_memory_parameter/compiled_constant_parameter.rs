@@ -7,7 +7,10 @@ use std::sync::Arc;
 pub struct CompiledConstantParameter;
 
 impl CompiledConstantParameter {
-    pub fn compile(_parameter: &Arc<ArcConstantParameter>, _tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        _parameter: &Arc<ArcConstantParameter>,
+        _tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         Ok(CompiledConstantParameter {})
     }
 }

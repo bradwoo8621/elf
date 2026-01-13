@@ -28,27 +28,34 @@ impl CompiledParameterExpression {
         match value.deref() {
             ArcParameterExpression::Empty(v) => CompiledEmptyExpression::compile(v, tenant_id)
                 .map(|p| CompiledParameterExpression::Empty(p)),
-            ArcParameterExpression::NotEmpty(v) => CompiledNotEmptyExpression::compile(v, tenant_id)
-                .map(|p| CompiledParameterExpression::NotEmpty(p)),
+            ArcParameterExpression::NotEmpty(v) => {
+                CompiledNotEmptyExpression::compile(v, tenant_id)
+                    .map(|p| CompiledParameterExpression::NotEmpty(p))
+            }
             ArcParameterExpression::Equals(v) => CompiledEqualsExpression::compile(v, tenant_id)
                 .map(|p| CompiledParameterExpression::Equals(p)),
-            ArcParameterExpression::NotEquals(v) => CompiledNotEqualsExpression::compile(v, tenant_id)
-                .map(|p| CompiledParameterExpression::NotEquals(p)),
-            ArcParameterExpression::LessThan(v) => CompiledLessThanExpression::compile(v, tenant_id)
-                .map(|p| CompiledParameterExpression::LessThan(p)),
+            ArcParameterExpression::NotEquals(v) => {
+                CompiledNotEqualsExpression::compile(v, tenant_id)
+                    .map(|p| CompiledParameterExpression::NotEquals(p))
+            }
+            ArcParameterExpression::LessThan(v) => {
+                CompiledLessThanExpression::compile(v, tenant_id)
+                    .map(|p| CompiledParameterExpression::LessThan(p))
+            }
             ArcParameterExpression::LessThanOrEquals(v) => {
                 CompiledLessThanOrEqualsExpression::compile(v, tenant_id)
                     .map(|p| CompiledParameterExpression::LessThanOrEquals(p))
             }
-            ArcParameterExpression::MoreThan(v) => CompiledMoreThanExpression::compile(v, tenant_id)
-                .map(|p| CompiledParameterExpression::MoreThan(p)),
+            ArcParameterExpression::MoreThan(v) => {
+                CompiledMoreThanExpression::compile(v, tenant_id)
+                    .map(|p| CompiledParameterExpression::MoreThan(p))
+            }
             ArcParameterExpression::MoreThanOrEquals(v) => {
                 CompiledMoreThanOrEqualsExpression::compile(v, tenant_id)
                     .map(|p| CompiledParameterExpression::MoreThanOrEquals(p))
             }
-            ArcParameterExpression::In(v) => {
-                CompiledInExpression::compile(v, tenant_id).map(|p| CompiledParameterExpression::In(p))
-            }
+            ArcParameterExpression::In(v) => CompiledInExpression::compile(v, tenant_id)
+                .map(|p| CompiledParameterExpression::In(p)),
             ArcParameterExpression::NotIn(v) => CompiledNotInExpression::compile(v, tenant_id)
                 .map(|p| CompiledParameterExpression::NotIn(p)),
         }

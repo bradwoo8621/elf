@@ -1,5 +1,5 @@
-use bigdecimal::{One, Zero};
 use crate::ArcTopicDataValue;
+use bigdecimal::{One, Zero};
 
 impl ArcTopicDataValue {
     /// try to cast itself to bool

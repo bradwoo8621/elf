@@ -1,6 +1,6 @@
 use crate::{
-	BaseDataModel, ModelErrorCode, Pageable, ParameterCondition, Storable, SubjectDatasetColumnId,
-	SubjectId,
+    BaseDataModel, ModelErrorCode, Pageable, ParameterCondition, Storable, SubjectDatasetColumnId,
+    SubjectId,
 };
 use elf_base::{ErrorCode, StdR};
 use elf_model_marco::{adapt_model, Display, Serde, StrEnum};

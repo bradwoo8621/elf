@@ -1,6 +1,6 @@
 use crate::{
-    DataPathSegment, FuncDataPath, FuncDataPathParam, FuncParamValue, FuncParamValuePath,
-    LiteralConcatFuncParser, ParserInnerState, DataPathParser, PathStr,
+    DataPathParser, DataPathSegment, FuncDataPath, FuncDataPathParam, FuncParamValue,
+    FuncParamValuePath, LiteralConcatFuncParser, ParserInnerState, PathStr,
 };
 use elf_base::{StdR, VoidR};
 use elf_model::VariablePredefineFunctions;
@@ -52,12 +52,12 @@ impl DataPathParser {
         should_create_concat_function: bool,
     ) -> StdR<FuncDataPath> {
         if should_create_concat_function {
-            Ok(FuncDataPath {
+            Ok(FuncDataPath::new(
                 // leave the path empty, will set it later
-                path: PathStr::of_str(""),
-                func: VariablePredefineFunctions::Concat,
-                params: Some(vec![]),
-            })
+                PathStr::of_str(""),
+                VariablePredefineFunctions::Concat,
+                None,
+            ))
         } else if let Some(data_path) = self.pop_last_concat_function() {
             // no need to create, and there is no segment in state, something wrong here!
             Ok(data_path)
@@ -101,8 +101,7 @@ impl DataPathParser {
         let mut concat = self.get_or_create_concat_function(should_create_concat_function)?;
         // move all segments from existing concat function,
         // now the concat is empty
-        let params = concat.params.take();
-        let mut params = params.unwrap_or(vec![]);
+        let mut params = concat.take_params();
 
         if self.inner.in_memory_chars_is_not_empty() {
             // create a value path
@@ -111,10 +110,10 @@ impl DataPathParser {
                 .inner
                 .char_index_before_current(self.inner.in_memory_chars_count())
                 as usize;
-            params.push(FuncDataPathParam::Value(FuncParamValuePath {
-                path: self.inner.create_path_str_exclude_current(start_char_index),
+            params.push(FuncDataPathParam::Value(FuncParamValuePath::new(
+                self.inner.create_path_str_exclude_current(start_char_index),
                 value,
-            }));
+            )));
             self.inner.clear_in_memory_chars();
         }
 
@@ -129,11 +128,12 @@ impl DataPathParser {
         self.inner
             .move_char_index_to(literal_concat_func_parser.inner.current_char_index());
         // reset the concat function path
-        concat.path = self
-            .inner
-            .create_path_str_exclude_current((index_of_char_before + 1) as usize);
-        // copy params to concat function
-        concat.params = Some(literal_concat_func_parser.params);
+        concat.update_by(
+            self.inner
+                .create_path_str_exclude_current((index_of_char_before + 1) as usize),
+            // copy params to concat function
+            Some(literal_concat_func_parser.params),
+        );
 
         // append the concat function to segments
         self.append_segment(DataPathSegment::Func(concat));

@@ -1,6 +1,6 @@
 use crate::{
-	BaseDataModel, ChartBorder, ChartColor, ChartTruncation, ChartType, EChartsGrid, EChartsLegend,
-	EChartsTitle, EChartsXAxis, EChartsYAxis, PredefinedChartColorSeries, Storable,
+    BaseDataModel, ChartBorder, ChartColor, ChartTruncation, ChartType, EChartsGrid, EChartsLegend,
+    EChartsTitle, EChartsXAxis, EChartsYAxis, PredefinedChartColorSeries, Storable,
 };
 use elf_model_marco::adapt_model;
 

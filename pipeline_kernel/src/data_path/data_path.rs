@@ -1,106 +1,6 @@
-use bigdecimal::BigDecimal;
-use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-use elf_model::VariablePredefineFunctions;
-use std::sync::Arc;
-
-/// path string with start and end index in the full string
-pub struct PathStr {
-    full_path: Arc<Vec<char>>,
-    start_index: usize,
-    end_index: usize,
-}
-
-impl PathStr {
-    /// init with given full path, start index is 0, end index is length of full path
-    pub fn of_str(full_path: &str) -> Self {
-        let path: Vec<char> = full_path.chars().collect();
-        let end_index = path.len();
-
-        PathStr {
-            full_path: Arc::new(path),
-            start_index: 0,
-            end_index,
-        }
-    }
-
-    /// init with given full path (chars), start index is 0, end index is length of full path
-    pub fn of_chars(full_path: Arc<Vec<char>>) -> Self {
-        let end_index = full_path.len();
-
-        PathStr {
-            full_path,
-            start_index: 0,
-            end_index,
-        }
-    }
-
-    /// init with given full path (chars), start index and end index
-    pub fn part_of_chars(full_path: Arc<Vec<char>>, start_index: usize, end_index: usize) -> Self {
-        PathStr {
-            full_path,
-            start_index,
-            end_index,
-        }
-    }
-
-    /// to string
-    pub fn to_string(&self) -> String {
-        self.full_path[self.start_index..self.end_index]
-            .iter()
-            .collect()
-    }
-
-    pub fn start_index(&self) -> usize {
-        self.start_index
-    }
-
-    pub fn end_index(&self) -> usize {
-        self.end_index
-    }
-}
-
-/// plain path, a string which is property name
-pub struct PlainDataPath {
-    pub path: PathStr,
-    /// if this path refers to a factor, then should know that the factor is vec (array) or not
-    /// otherwise, leave this none when don't know the type
-    pub is_vec: Option<bool>,
-}
-
-pub enum FuncParamValue {
-    Str(String),
-    Num(BigDecimal),
-    Bool(bool),
-    DateTime(NaiveDateTime),
-    Date(NaiveDate),
-    Time(NaiveTime),
-    None,
-}
-
-/// value path, a definite value
-/// only param of func can be a value path
-pub struct FuncParamValuePath {
-    pub path: PathStr,
-    pub value: FuncParamValue,
-}
-
-pub enum FuncDataPathParam {
-    Value(FuncParamValuePath),
-    Plain(PlainDataPath),
-    Func(FuncDataPath),
-    Path(DataPath),
-}
-
-pub struct FuncDataPath {
-    pub path: PathStr,
-    pub func: VariablePredefineFunctions,
-    pub params: Option<Vec<FuncDataPathParam>>,
-}
-
-pub enum DataPathSegment {
-    Plain(PlainDataPath),
-    Func(FuncDataPath),
-}
+use crate::{DataPathSegment, PathStr};
+use elf_base::DisplayLines;
+use std::fmt::{Display, Formatter};
 
 /// data path represents a path to retrieve data
 /// could be concatenated by [.], each segment of path can be a plain name or a function
@@ -128,7 +28,60 @@ pub enum DataPathSegment {
 /// - In functions related to string search and replacement,
 ///   additional character escaping is provided in the parameters. `[\r\n\t]` will be recognized as line breaks and tabs.
 pub struct DataPath {
-    pub path: PathStr,
+    path: PathStr,
     /// at least one segment, which means no [.] included
-    pub segments: Vec<DataPathSegment>,
+    segments: Vec<DataPathSegment>,
+}
+
+impl DataPath {
+    pub fn new(path: PathStr, segments: Vec<DataPathSegment>) -> Self {
+        Self { path, segments }
+    }
+
+    pub fn path(&self) -> &PathStr {
+        &self.path
+    }
+
+    pub fn this_path(&self) -> String {
+        self.path.this()
+    }
+
+    pub fn full_path(&self) -> String {
+        self.path.full()
+    }
+
+    /// return position is included
+    pub fn start_at(&self) -> usize {
+        self.path.start_index()
+    }
+
+    /// return position is excluded
+    pub fn end_at(&self) -> usize {
+        self.path.end_index()
+    }
+
+    pub fn segments(&self) -> &Vec<DataPathSegment> {
+        &self.segments
+    }
+}
+
+impl Display for DataPath {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if self.segments.len() == 0 {
+            write!(f, "DataPath[{}, segments=[]]", self.path)
+        } else {
+            let segments_str = self
+                .segments
+                .iter()
+                .map(|s| format!("{}", s))
+                .map(DisplayLines::indent)
+                .collect::<Vec<String>>()
+                .join(",\n");
+            write!(
+                f,
+                "DataPath[{}, segments=[\n{}\n]]",
+                self.path, segments_str
+            )
+        }
+    }
 }

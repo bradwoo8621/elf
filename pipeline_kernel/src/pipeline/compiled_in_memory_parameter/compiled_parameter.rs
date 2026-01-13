@@ -17,15 +17,12 @@ pub enum CompiledParameter {
 impl CompiledParameter {
     pub fn compile(value: &Arc<ArcParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         match value.deref() {
-            ArcParameter::Topic(v) => {
-                CompiledTopicFactorParameter::compile(v, tenant_id).map(|p| CompiledParameter::Topic(p))
-            }
-            ArcParameter::Constant(v) => {
-                CompiledConstantParameter::compile(v, tenant_id).map(|p| CompiledParameter::Constant(p))
-            }
-            ArcParameter::Computed(v) => {
-                CompiledComputedParameter::compile(v, tenant_id).map(|p| CompiledParameter::Computed(p))
-            }
+            ArcParameter::Topic(v) => CompiledTopicFactorParameter::compile(v, tenant_id)
+                .map(|p| CompiledParameter::Topic(p)),
+            ArcParameter::Constant(v) => CompiledConstantParameter::compile(v, tenant_id)
+                .map(|p| CompiledParameter::Constant(p)),
+            ArcParameter::Computed(v) => CompiledComputedParameter::compile(v, tenant_id)
+                .map(|p| CompiledParameter::Computed(p)),
         }
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
-    DataPathAnyFuncParser, FuncDataPathParam, FuncParamValue, FuncParamValuePath, DataPathFuncParser,
-    ParserInnerState, DataPathParser,
+    DataPathAnyFuncParser, DataPathFuncParser, DataPathParser, FuncDataPathParam, FuncParamValue,
+    FuncParamValuePath, ParserInnerState,
 };
 use elf_base::VoidR;
 
@@ -59,10 +59,10 @@ impl DataPathFuncParser {
     /// and clear in-memory chars
     fn append_blank_param(&mut self) -> VoidR {
         self.params
-            .push(FuncDataPathParam::Value(FuncParamValuePath {
-                path: self.inner.create_path_str_of_in_memory_chars(),
-                value: FuncParamValue::Str(self.inner.clone_in_memory_chars()),
-            }));
+            .push(FuncDataPathParam::Value(FuncParamValuePath::new(
+                self.inner.create_path_str_of_in_memory_chars(),
+                FuncParamValue::Str(self.inner.clone_in_memory_chars()),
+            )));
 
         self.inner.clear_in_memory_chars();
 
@@ -75,10 +75,10 @@ impl DataPathFuncParser {
     /// note the in-memory chars might not empty, it is treated as none here.
     fn append_none_param(&mut self) -> VoidR {
         self.params
-            .push(FuncDataPathParam::Value(FuncParamValuePath {
-                path: self.inner.create_path_str_of_in_memory_chars(),
-                value: FuncParamValue::None,
-            }));
+            .push(FuncDataPathParam::Value(FuncParamValuePath::new(
+                self.inner.create_path_str_of_in_memory_chars(),
+                FuncParamValue::None,
+            )));
 
         self.inner.clear_in_memory_chars();
 

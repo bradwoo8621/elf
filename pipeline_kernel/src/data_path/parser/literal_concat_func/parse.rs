@@ -1,4 +1,4 @@
-use crate::{LiteralConcatFuncParser, ParserInnerState, DataPathParser};
+use crate::{DataPathParser, LiteralConcatFuncParser, ParserInnerState};
 use elf_base::VoidR;
 
 impl LiteralConcatFuncParser {

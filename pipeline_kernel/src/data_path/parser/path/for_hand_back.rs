@@ -1,5 +1,6 @@
 use crate::{
-    DataPath, DataPathSegment, FuncDataPathParam, FuncParamValue, FuncParamValuePath, DataPathParser,
+    DataPath, DataPathParser, DataPathSegment, FuncDataPathParam, FuncParamValue,
+    FuncParamValuePath,
 };
 
 pub trait DataPathAnyFuncParser {
@@ -28,21 +29,21 @@ impl DataPathParser {
         if segments.is_empty() {
             // for literal concat function,
             // no segment, basically, it is a "{}", treated as an empty string
-            func.append_param(FuncDataPathParam::Value(FuncParamValuePath {
-                path: self.inner.create_path_str(
+            func.append_param(FuncDataPathParam::Value(FuncParamValuePath::new(
+                self.inner.create_path_str(
                     func.param_start_char_index(),
                     self.inner.current_char_index() - end_char_index_offset,
                 ),
-                value: FuncParamValue::Str(String::from("")),
-            }))
+                FuncParamValue::Str(String::from("")),
+            )))
         } else if segments.len() > 1 {
-            func.append_param(FuncDataPathParam::Path(DataPath {
-                path: self.inner.create_path_str(
+            func.append_param(FuncDataPathParam::Path(DataPath::new(
+                self.inner.create_path_str(
                     func.param_start_char_index(),
                     self.inner.current_char_index() - end_char_index_offset,
                 ),
                 segments,
-            }))
+            )))
         } else {
             match segments.pop().unwrap() {
                 DataPathSegment::Plain(plain_path) => {

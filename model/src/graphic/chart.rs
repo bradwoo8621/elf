@@ -1,7 +1,7 @@
 use crate::{
-	BarChart, BaseDataModel, CountChart, CustomizedChart, DoughnutChart, EChartsSettings,
-	LineChart, MapChart, ModelErrorCode, NightingaleChart, PieChart, ScatterChart, Storable,
-	SunburstChart, TreeChart, TreemapChart,
+    BarChart, BaseDataModel, CountChart, CustomizedChart, DoughnutChart, EChartsSettings,
+    LineChart, MapChart, ModelErrorCode, NightingaleChart, PieChart, ScatterChart, Storable,
+    SunburstChart, TreeChart, TreemapChart,
 };
 use bigdecimal::BigDecimal;
 use elf_base::{ErrorCode, StdR};

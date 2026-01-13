@@ -1,7 +1,7 @@
 use crate::{
-	BaseDataModel, ChartBorder, ChartColor, ChartFont, ChartTruncation, ChartType,
-	EChartsGridPositionOnly, EChartsHorizontalAlignment, EChartsLegend, EChartsTitle,
-	EChartsVerticalAlignment, ModelErrorCode, PredefinedChartColorSeries, Storable,
+    BaseDataModel, ChartBorder, ChartColor, ChartFont, ChartTruncation, ChartType,
+    EChartsGridPositionOnly, EChartsHorizontalAlignment, EChartsLegend, EChartsTitle,
+    EChartsVerticalAlignment, ModelErrorCode, PredefinedChartColorSeries, Storable,
 };
 use bigdecimal::BigDecimal;
 use elf_base::{ErrorCode, StdR};

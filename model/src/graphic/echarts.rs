@@ -1,6 +1,6 @@
 use crate::{
-	BaseDataModel, ChartBorder, ChartBorderStyle, ChartColor, ChartFont, ChartTruncation,
-	ModelErrorCode, PredefinedChartColorSeries, Storable,
+    BaseDataModel, ChartBorder, ChartBorderStyle, ChartColor, ChartFont, ChartTruncation,
+    ModelErrorCode, PredefinedChartColorSeries, Storable,
 };
 use bigdecimal::BigDecimal;
 use elf_base::{ErrorCode, StdR};

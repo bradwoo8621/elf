@@ -1,6 +1,6 @@
 use crate::{
-	BaseDataModel, ChartBorder, ChartColor, ChartTruncation, ChartType, EChartsGridPositionOnly,
-	EChartsTitle, ModelErrorCode, PredefinedChartColorSeries, Storable,
+    BaseDataModel, ChartBorder, ChartColor, ChartTruncation, ChartType, EChartsGridPositionOnly,
+    EChartsTitle, ModelErrorCode, PredefinedChartColorSeries, Storable,
 };
 use elf_base::{ErrorCode, StdR};
 use elf_model_marco::{adapt_model, Display, Serde, StrEnum};

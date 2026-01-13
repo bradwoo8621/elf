@@ -1,4 +1,4 @@
-use crate::{DataPathSegment, DataPathParser, PlainDataPath};
+use crate::{DataPathParser, DataPathSegment, PlainDataPath};
 use elf_base::VoidR;
 
 /// consume plain path
@@ -15,10 +15,10 @@ impl DataPathParser {
             return self.incorrect_blank_segment();
         }
 
-        self.append_segment(DataPathSegment::Plain(PlainDataPath {
-            path: self.inner.create_path_str_of_in_memory_chars(),
-            is_vec: None,
-        }));
+        self.append_segment(DataPathSegment::Plain(PlainDataPath::new(
+            self.inner.create_path_str_of_in_memory_chars(),
+            None,
+        )));
 
         self.inner.clear_in_memory_chars();
         if move_char_index_to_next {

@@ -1,5 +1,5 @@
-use elf_base::StdR;
 use crate::ArcTopicDataValue;
+use elf_base::StdR;
 
 impl ArcTopicDataValue {
     /// refer to [is_less_than]

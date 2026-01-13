@@ -1,7 +1,7 @@
 use crate::{ArcHelper, ArcParameterJoint};
 use elf_base::StdR;
 use elf_model::{
-	AggregateArithmetic, FactorId, PipelineActionId, PipelineActionType, ReadFactorAction, TopicId,
+    AggregateArithmetic, FactorId, PipelineActionId, PipelineActionType, ReadFactorAction, TopicId,
 };
 use std::sync::Arc;
 

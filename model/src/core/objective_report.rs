@@ -1,6 +1,6 @@
 use crate::{
-	Auditable, BaseDataModel, LastVisit, ObjectiveId, ObjectiveTimeframe, ObjectiveVariable,
-	Storable, TenantId, UserBasedTuple, UserId,
+    Auditable, BaseDataModel, LastVisit, ObjectiveId, ObjectiveTimeframe, ObjectiveVariable,
+    Storable, TenantId, UserBasedTuple, UserId,
 };
 use bigdecimal::BigDecimal;
 use elf_base::serde::option_naive_datetime;

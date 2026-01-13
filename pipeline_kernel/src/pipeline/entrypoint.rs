@@ -3,8 +3,8 @@ use elf_auth::Principal;
 use elf_base::VoidResultHelper;
 use elf_base::{ErrorCode, StdR, StringUtils, VoidR};
 use elf_model::{
-	PipelineId, PipelineTriggerData, PipelineTriggerTraceId, PipelineTriggerType, TopicData,
-	TopicDataId, UserRole,
+    PipelineId, PipelineTriggerData, PipelineTriggerTraceId, PipelineTriggerType, TopicData,
+    TopicDataId, UserRole,
 };
 use elf_runtime_model_kernel::{IdGen, TopicSchema, TopicSchemaProvider, TopicService};
 use std::sync::Arc;
@@ -207,11 +207,11 @@ impl PipelineEntrypoint {
 
 #[cfg(test)]
 mod tests {
-	use crate::PipelineEntrypoint;
-	use elf_auth::Principal;
-	use elf_model::{PipelineTriggerData, PipelineTriggerType, TopicData};
+    use crate::PipelineEntrypoint;
+    use elf_auth::Principal;
+    use elf_model::{PipelineTriggerData, PipelineTriggerType, TopicData};
 
-	#[test]
+    #[test]
     fn test() {
         let topic_data = TopicData::new();
         let trigger_data = PipelineTriggerData::new()

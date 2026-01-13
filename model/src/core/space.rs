@@ -1,6 +1,6 @@
 use crate::{
-	Auditable, BaseDataModel, OptimisticLock, ParameterJoint, Storable, TenantBasedTuple, TenantId,
-	TopicId, Tuple, UserGroupId, UserId,
+    Auditable, BaseDataModel, OptimisticLock, ParameterJoint, Storable, TenantBasedTuple, TenantId,
+    TopicId, Tuple, UserGroupId, UserId,
 };
 use elf_base::serde::option_naive_datetime;
 use elf_model_marco::adapt_model;

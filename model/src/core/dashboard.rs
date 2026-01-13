@@ -1,6 +1,6 @@
 use crate::{
-	Auditable, BaseDataModel, GraphicRect, LastVisit, ReportFunnel, ReportId, Storable, TenantId,
-	UserBasedTuple, UserId,
+    Auditable, BaseDataModel, GraphicRect, LastVisit, ReportFunnel, ReportId, Storable, TenantId,
+    UserBasedTuple, UserId,
 };
 use elf_base::serde::option_naive_datetime;
 use elf_model_marco::adapt_model;

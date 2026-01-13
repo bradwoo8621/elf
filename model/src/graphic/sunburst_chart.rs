@@ -1,6 +1,6 @@
 use crate::{
-	BaseDataModel, ChartBorder, ChartColor, ChartTruncation, ChartType, EChartsGridPositionOnly,
-	EChartsLegend, EChartsTitle, PieChartSettingsLabel, PredefinedChartColorSeries, Storable,
+    BaseDataModel, ChartBorder, ChartColor, ChartTruncation, ChartType, EChartsGridPositionOnly,
+    EChartsLegend, EChartsTitle, PieChartSettingsLabel, PredefinedChartColorSeries, Storable,
 };
 use bigdecimal::BigDecimal;
 use elf_model_marco::adapt_model;

@@ -1,8 +1,8 @@
 use crate::{ArcHelper, ArcParameter, ArcParameterJoint};
 use elf_base::StdR;
 use elf_model::{
-	AccumulateMode, AggregateArithmetic, FactorId, PipelineActionId, PipelineActionType, TopicId,
-	WriteFactorAction,
+    AccumulateMode, AggregateArithmetic, FactorId, PipelineActionId, PipelineActionType, TopicId,
+    WriteFactorAction,
 };
 use std::sync::Arc;
 

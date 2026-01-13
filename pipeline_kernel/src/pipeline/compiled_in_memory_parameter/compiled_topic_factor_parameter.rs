@@ -32,9 +32,6 @@ impl CompiledTopicFactorParameter {
 /// topic factor parameter always retrieve data from current trigger data
 impl CompiledTopicFactorParameter {
     pub fn value_from(&self, in_memory_data: &mut InMemoryData) -> StdR<Arc<ArcTopicDataValue>> {
-        in_memory_data
-            .current_only()
-            .get_value(&self.path)
-            .map(|v| Arc::new(v))
+        in_memory_data.current_only().get_value(&self.path)
     }
 }

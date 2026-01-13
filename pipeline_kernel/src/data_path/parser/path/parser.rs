@@ -25,7 +25,7 @@ impl DataPathParser {
     pub fn pop_last_concat_function(&mut self) -> Option<FuncDataPath> {
         if let Some(last_segment) = self.segments.last() {
             match last_segment {
-                DataPathSegment::Func(data_path) => match data_path.func {
+                DataPathSegment::Func(data_path) => match data_path.func() {
                     VariablePredefineFunctions::Concat => {
                         if let Some(segment) = self.segments.pop() {
                             match segment {

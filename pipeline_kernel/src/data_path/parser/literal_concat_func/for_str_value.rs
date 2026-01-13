@@ -12,10 +12,10 @@ impl LiteralConcatFuncParser {
         }
 
         self.params
-            .push(FuncDataPathParam::Value(FuncParamValuePath {
-                path: self.inner.create_path_str_of_in_memory_chars(),
-                value: FuncParamValue::Str(self.inner.clone_in_memory_chars()),
-            }));
+            .push(FuncDataPathParam::Value(FuncParamValuePath::new(
+                self.inner.create_path_str_of_in_memory_chars(),
+                FuncParamValue::Str(self.inner.clone_in_memory_chars()),
+            )));
 
         self.inner.clear_in_memory_chars();
 

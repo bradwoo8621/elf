@@ -1,6 +1,6 @@
 use crate::{
-	Auditable, BaseDataModel, ModelErrorCode, OptimisticLock, ParameterJoint, PipelineId, Storable,
-	TenantBasedTuple, TenantId, TopicId, Tuple, UserId,
+    Auditable, BaseDataModel, ModelErrorCode, OptimisticLock, ParameterJoint, PipelineId, Storable,
+    TenantBasedTuple, TenantId, TopicId, Tuple, UserId,
 };
 use chrono::{NaiveDate, NaiveDateTime};
 use elf_base::serde::{option_naive_date, option_naive_datetime};

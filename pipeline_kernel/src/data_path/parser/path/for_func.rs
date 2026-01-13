@@ -1,4 +1,6 @@
-use crate::{DataPathSegment, FuncDataPath, DataPathFuncParser, ParserInnerState, DataPathParser, PathStr};
+use crate::{
+    DataPathFuncParser, DataPathParser, DataPathSegment, FuncDataPath, ParserInnerState, PathStr,
+};
 use elf_base::{StdR, VoidR};
 use elf_model::VariablePredefineFunctions;
 
@@ -100,17 +102,16 @@ impl DataPathParser {
             self.inner
                 .move_char_index_to(func_parser.inner.current_char_index());
             // create and append the function to segments
-            self.append_segment(DataPathSegment::Func(FuncDataPath {
-                path: self
-                    .inner
+            self.append_segment(DataPathSegment::Func(FuncDataPath::new(
+                self.inner
                     .create_path_str_exclude_current(start_index_of_func),
-                func: func_parser.func,
-                params: if func_parser.params.is_empty() {
+                func_parser.func,
+                if func_parser.params.is_empty() {
                     None
                 } else {
                     Some(func_parser.params)
                 },
-            }));
+            )));
         } else {
             // no params followed
             let min_param_count = func.min_param_count();
@@ -121,15 +122,15 @@ impl DataPathParser {
                 return self.incorrect_function_no_param(&func);
             } else {
                 // func with has no param
-                self.append_segment(DataPathSegment::Func(FuncDataPath {
-                    path: PathStr::part_of_chars(
+                self.append_segment(DataPathSegment::Func(FuncDataPath::new(
+                    PathStr::part_of_chars(
                         self.inner.all_chars().clone(),
                         start_index_of_func,
                         start_index_of_func + func.to_string().chars().count(),
                     ),
                     func,
-                    params: None,
-                }));
+                    None,
+                )));
             }
         }
 

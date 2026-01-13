@@ -106,9 +106,9 @@ impl IdGenerator for SnowflakeIdGenerator {
 
 #[cfg(test)]
 mod tests {
-	use chrono::{DateTime, NaiveDateTime};
+    use chrono::{DateTime, NaiveDateTime};
 
-	#[test]
+    #[test]
     fn test_() {
         let millis: u128 = 0b101_01101_01111_00011_10101_11100_01011_01011_00010;
         let years: f64 = millis as f64 / 1000.0 / 60.0 / 60.0 / 24.0 / 365.0;
