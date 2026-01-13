@@ -31,7 +31,7 @@ impl TopicTrigger {
     }
 
     pub fn insert_to_synonym(current: TopicData) -> StdR<Arc<TopicTrigger>> {
-        Ok(Arc::new(TopicTrigger {
+        Ok(Arc::new(Self {
             current: Some(ArcTopicData::build(current)),
             previous: None,
             r#type: PipelineTriggerType::Insert,
@@ -40,9 +40,9 @@ impl TopicTrigger {
     }
 
     pub fn insert(current: TopicData) -> StdR<Arc<TopicTrigger>> {
-        let data_id = TopicTrigger::get_data_id(&current)?;
+        let data_id = Self::get_data_id(&current)?;
 
-        Ok(Arc::new(TopicTrigger {
+        Ok(Arc::new(Self {
             current: Some(ArcTopicData::build(current)),
             previous: None,
             r#type: PipelineTriggerType::Insert,
@@ -51,9 +51,9 @@ impl TopicTrigger {
     }
 
     pub fn merge(previous: TopicData, current: TopicData) -> StdR<Arc<TopicTrigger>> {
-        let data_id = TopicTrigger::get_data_id(&current)?;
+        let data_id = Self::get_data_id(&current)?;
 
-        Ok(Arc::new(TopicTrigger {
+        Ok(Arc::new(Self {
             current: Some(ArcTopicData::build(current)),
             previous: Some(ArcTopicData::build(previous)),
             r#type: PipelineTriggerType::Merge,
@@ -62,9 +62,9 @@ impl TopicTrigger {
     }
 
     pub fn delete(previous: TopicData) -> StdR<Arc<TopicTrigger>> {
-        let data_id = TopicTrigger::get_data_id(&previous)?;
+        let data_id = Self::get_data_id(&previous)?;
 
-        Ok(Arc::new(TopicTrigger {
+        Ok(Arc::new(Self {
             current: None,
             previous: Some(ArcTopicData::build(previous)),
             r#type: PipelineTriggerType::Delete,
