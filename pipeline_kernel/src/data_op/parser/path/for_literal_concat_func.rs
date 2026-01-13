@@ -1,6 +1,6 @@
 use crate::{
-	DataPathSegment, FuncDataPath, FuncDataPathParam, FuncParamValue, FuncParamValuePath,
-	LiteralConcatFuncParser, ParserInnerState, PathParser, PathStr,
+    DataPathSegment, FuncDataPath, FuncDataPathParam, FuncParamValue, FuncParamValuePath,
+    LiteralConcatFuncParser, ParserInnerState, PathParser, PathStr,
 };
 use elf_base::{StdR, VoidR};
 use elf_model::VariablePredefineFunctions;

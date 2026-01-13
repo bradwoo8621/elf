@@ -1,6 +1,6 @@
 use crate::{
-	DataPath, DataPathSegment, FuncDataPath, FuncDataPathParam, FuncParamValue, FuncParamValuePath,
-	PathStr, PlainDataPath,
+    DataPath, DataPathSegment, FuncDataPath, FuncDataPathParam, FuncParamValue, FuncParamValuePath,
+    PathStr, PlainDataPath,
 };
 use elf_base::DisplayLines;
 use std::fmt::{Display, Formatter, Result};
