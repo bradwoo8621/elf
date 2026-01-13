@@ -190,6 +190,12 @@ mod tests {
                     .flatten(true)
                     .default_value(String::from("2026-02-18"))
                     .encrypt(FactorEncryptMethod::MaskMonth),
+                Factor::new()
+                    .factor_id("f9".to_string())
+                    .name(String::from("test.mask-month-date"))
+                    .r#type(FactorType::Text)
+                    .default_value(String::from("2026-02-18 abc"))
+                    .encrypt(FactorEncryptMethod::MaskMonthDay),
             ])
             .tenant_id(String::from("Tenant-1"))
             .version(1)
@@ -271,6 +277,14 @@ mod tests {
             matches!(mask_month, TopicDataValue::Date(_));
             if let TopicDataValue::Date(d) = mask_month {
                 assert_eq!(d, flatten_mask_month);
+            }
+
+            let mask_month_date = test_map
+                .get("mask-month-date")
+                .expect("failed to get mask-month-date");
+            matches!(mask_month_date, TopicDataValue::Str(_));
+            if let TopicDataValue::Str(s) = mask_month_date {
+                assert_eq!(s, "2026-01-01 abc");
             }
 
             let aid_root = test_map

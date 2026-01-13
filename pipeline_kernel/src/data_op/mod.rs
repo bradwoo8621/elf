@@ -4,10 +4,10 @@ mod data_path_parser;
 mod data_visitor;
 mod data_visitor_base;
 mod func_data_visitor;
+mod functions;
 mod minmax;
 mod parser;
 mod topic_data_value;
-mod topic_data_value_functions;
 
 pub use data_path::*;
 pub use data_visitor::*;

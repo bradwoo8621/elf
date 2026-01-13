@@ -1,6 +1,8 @@
 use crate::{ArcTopicDataMap, ArcTopicDataValue, FuncDataPath, PipelineKernelErrorCode};
+use bigdecimal::{BigDecimal, FromPrimitive};
 use elf_base::{ErrorCode, StdErr, StdErrCode, StdR};
 use elf_model::VariablePredefineFunctions;
+use elf_runtime_model_kernel::IdGen;
 use std::sync::Arc;
 
 pub struct VariablePredefineFunctionCaller<'a> {
@@ -46,10 +48,16 @@ impl<'a> VariablePredefineFunctionCaller<'a> {
         let not_support_e = || self.err_function_not_supported();
 
         match self.segment.func {
-            VariablePredefineFunctions::NextSeq => todo!("variable predefine function[&nextSeq]"),
-            VariablePredefineFunctions::Count => value.count(decimal_parse_err, not_support),
+            VariablePredefineFunctions::NextSeq => IdGen::next_id().map(|v| {
+                Arc::new(ArcTopicDataValue::Num(Arc::new(
+                    BigDecimal::from_u128(v).unwrap(),
+                )))
+            }),
+            VariablePredefineFunctions::Count => {
+                value.count_of_vec_or_map(decimal_parse_err, not_support)
+            }
             VariablePredefineFunctions::Length | VariablePredefineFunctions::Len => {
-                value.length(decimal_parse_err, not_support)
+                value.length_of_str_or_num(decimal_parse_err, not_support)
             }
             VariablePredefineFunctions::Slice | VariablePredefineFunctions::Substr => {
                 todo!("variable predefine function[&slice], [&substr]")
@@ -78,24 +86,24 @@ impl<'a> VariablePredefineFunctionCaller<'a> {
             VariablePredefineFunctions::ConcatWith => {
                 todo!("variable predefine function[&concatWith]")
             }
-            VariablePredefineFunctions::Join => value.join(",", not_support),
-            VariablePredefineFunctions::Distinct => value.distinct(not_support),
+            VariablePredefineFunctions::Join => value.join_of_str_or_vec(",", not_support),
+            VariablePredefineFunctions::Distinct => value.distinct_of_vec(not_support),
             VariablePredefineFunctions::Sum => value.sum(not_support),
             VariablePredefineFunctions::Avg => value.avg(not_support),
-            VariablePredefineFunctions::Min => value.min(not_support_e),
-            VariablePredefineFunctions::MinNum => value.min_decimal(not_support_e),
-            VariablePredefineFunctions::MinDate => value.min_date(not_support_e),
+            VariablePredefineFunctions::Min => value.min_of_vec(not_support_e),
+            VariablePredefineFunctions::MinNum => value.min_decimal_of_vec(not_support_e),
+            VariablePredefineFunctions::MinDate => value.min_date_of_vec(not_support_e),
             VariablePredefineFunctions::MinDatetime | VariablePredefineFunctions::MinDt => {
-                value.min_datetime(not_support_e)
+                value.min_datetime_of_vec(not_support_e)
             }
             VariablePredefineFunctions::MinTime => value.min_time(not_support_e),
             VariablePredefineFunctions::Max => value.max(not_support_e),
-            VariablePredefineFunctions::MaxNum => value.max_decimal(not_support_e),
-            VariablePredefineFunctions::MaxDate => value.max_date(not_support_e),
+            VariablePredefineFunctions::MaxNum => value.max_decimal_of_vec(not_support_e),
+            VariablePredefineFunctions::MaxDate => value.max_date_of_vec(not_support_e),
             VariablePredefineFunctions::MaxDatetime | VariablePredefineFunctions::MaxDt => {
-                value.max_datetime(not_support_e)
+                value.max_datetime_of_vec(not_support_e)
             }
-            VariablePredefineFunctions::MaxTime => value.max_time(not_support_e),
+            VariablePredefineFunctions::MaxTime => value.max_time_of_vec(not_support_e),
             VariablePredefineFunctions::FromCurrentContext => {
                 todo!("variable predefine function[&cur]")
             }

@@ -1,4 +1,4 @@
-use crate::{RuntimeModelKernelErrorCode, SnowflakeIdGenerator};
+use crate::RuntimeModelKernelErrorCode;
 use elf_base::{ErrorCode, StdR, VoidR};
 use std::sync::{OnceLock, RwLock};
 
@@ -28,6 +28,8 @@ pub struct IdGen();
 impl IdGen {
     #[cfg(test)]
     fn init() -> RwLock<Box<dyn IdGenerator>> {
+        use crate::SnowflakeIdGenerator;
+
         let generator =
             SnowflakeIdGenerator::new(1).expect("failed to create SnowflakeIdGenerator");
         RwLock::new(Box::new(generator) as Box<dyn IdGenerator>)
