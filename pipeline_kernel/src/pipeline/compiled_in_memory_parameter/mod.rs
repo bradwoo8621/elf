@@ -15,8 +15,6 @@ mod compiled_parameter_condition;
 mod compiled_parameter_expression;
 mod compiled_parameter_joint;
 mod compiled_topic_factor_parameter;
-mod in_memory_parameter;
-mod in_memory_parameter_condition;
 
 pub use compiled_computed_parameter::*;
 pub use compiled_constant_parameter::*;
@@ -35,5 +33,3 @@ pub use compiled_parameter_condition::*;
 pub use compiled_parameter_expression::*;
 pub use compiled_parameter_joint::*;
 pub use compiled_topic_factor_parameter::*;
-pub use in_memory_parameter::*;
-pub use in_memory_parameter_condition::*;

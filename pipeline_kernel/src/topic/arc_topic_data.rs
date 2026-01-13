@@ -3,6 +3,7 @@ use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use std::collections::HashMap;
 use std::sync::Arc;
 
+/// make every [Arc].
 #[derive(Debug)]
 pub enum ArcTopicDataValue {
     DateTime(Arc<NaiveDateTime>),
@@ -11,7 +12,7 @@ pub enum ArcTopicDataValue {
     Str(Arc<String>),
     Num(Arc<BigDecimal>),
     Bool(bool),
-    Map(ArcTopicData),
+    Map(Arc<HashMap<String, Arc<ArcTopicDataValue>>>),
     Vec(Arc<Vec<Arc<ArcTopicDataValue>>>),
     None,
 }

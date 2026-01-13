@@ -1,6 +1,4 @@
-use crate::{
-    CompiledParameter, InMemoryParameter, InMemoryParameterCondition, PipelineExecutionVariables,
-};
+use crate::{CompiledParameter, InMemoryData};
 use elf_base::StdR;
 use elf_model::TenantId;
 use elf_runtime_model_kernel::ArcInExpression;
@@ -13,24 +11,24 @@ pub struct CompiledInExpression {
 }
 
 impl CompiledInExpression {
-    pub fn new(exp: &Arc<ArcInExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(exp: &Arc<ArcInExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         Ok(CompiledInExpression {
-            left: CompiledParameter::new(&exp.left, tenant_id)?,
-            right: CompiledParameter::new(&exp.right, tenant_id)?,
+            left: CompiledParameter::compile(&exp.left, tenant_id)?,
+            right: CompiledParameter::compile(&exp.right, tenant_id)?,
         })
     }
 }
 
-impl InMemoryParameterCondition for CompiledInExpression {
-    fn is_true(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
+impl CompiledInExpression {
+    pub fn is_true(&self, in_memory_data: &mut InMemoryData) -> StdR<bool> {
         self.left
-            .value_from(variables)?
-            .is_in(self.right.value_from(variables)?.deref())
+            .value_from(in_memory_data)?
+            .is_in(self.right.value_from(in_memory_data)?.deref())
     }
 
-    fn is_false(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
+    pub fn is_false(&self, in_memory_data: &mut InMemoryData) -> StdR<bool> {
         self.left
-            .value_from(variables)?
-            .is_not_in(self.right.value_from(variables)?.deref())
+            .value_from(in_memory_data)?
+            .is_not_in(self.right.value_from(in_memory_data)?.deref())
     }
 }

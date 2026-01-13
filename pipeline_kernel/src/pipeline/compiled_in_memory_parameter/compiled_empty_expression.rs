@@ -1,6 +1,4 @@
-use crate::{
-    CompiledParameter, InMemoryParameter, InMemoryParameterCondition, PipelineExecutionVariables,
-};
+use crate::{CompiledParameter, InMemoryData};
 use elf_base::StdR;
 use elf_model::TenantId;
 use elf_runtime_model_kernel::ArcEmptyExpression;
@@ -11,19 +9,19 @@ pub struct CompiledEmptyExpression {
 }
 
 impl CompiledEmptyExpression {
-    pub fn new(exp: &Arc<ArcEmptyExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(exp: &Arc<ArcEmptyExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         Ok(CompiledEmptyExpression {
-            left: CompiledParameter::new(&exp.left, tenant_id)?,
+            left: CompiledParameter::compile(&exp.left, tenant_id)?,
         })
     }
 }
 
-impl InMemoryParameterCondition for CompiledEmptyExpression {
-    fn is_true(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
-        Ok(self.left.value_from(variables)?.is_empty())
+impl CompiledEmptyExpression {
+    pub fn is_true(&self, in_memory_data: &mut InMemoryData) -> StdR<bool> {
+        Ok(self.left.value_from(in_memory_data)?.is_empty())
     }
 
-    fn is_false(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
-        Ok(self.left.value_from(variables)?.is_not_empty())
+    pub fn is_false(&self, in_memory_data: &mut InMemoryData) -> StdR<bool> {
+        Ok(self.left.value_from(in_memory_data)?.is_not_empty())
     }
 }

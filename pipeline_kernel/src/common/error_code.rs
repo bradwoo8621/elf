@@ -23,6 +23,7 @@ pub enum PipelineKernelErrorCode {
     ValuesNotComparable,
     VariableFuncNotSupported,
     IncorrectDataPath,
+    PreviousTopicDataMissed,
     // schema
     FactorNotFound,
     TopicDataPropertySegmentMissed,
@@ -52,6 +53,7 @@ impl ErrorCode for PipelineKernelErrorCode {
             Self::ValuesNotComparable => "PLKN-00103",
             Self::VariableFuncNotSupported => "PLKN-00104",
             Self::IncorrectDataPath => "PLKN-00105",
+            Self::PreviousTopicDataMissed => "PLKN-00106",
 
             Self::FactorNotFound => "PLKN-00200",
             Self::TopicDataPropertySegmentMissed => "PLKN-00201",

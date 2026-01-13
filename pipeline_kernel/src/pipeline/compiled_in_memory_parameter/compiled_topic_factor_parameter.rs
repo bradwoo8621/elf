@@ -1,7 +1,4 @@
-use crate::{
-    ArcTopicDataValue, DataPath, DataVisitor, InMemoryParameter, PipelineExecutionVariables,
-    PipelineKernelErrorCode,
-};
+use crate::{ArcTopicDataValue, DataPath, InMemoryData, PipelineKernelErrorCode};
 use elf_base::{ErrorCode, StdR};
 use elf_model::TenantId;
 use elf_runtime_model_kernel::{ArcTopicFactorParameter, TopicSchemaProvider, TopicService};
@@ -13,7 +10,10 @@ pub struct CompiledTopicFactorParameter {
 }
 
 impl CompiledTopicFactorParameter {
-    pub fn new(parameter: &Arc<ArcTopicFactorParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        parameter: &Arc<ArcTopicFactorParameter>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         let topic_schema = TopicService::schema()?.by_id(parameter.topic_id.as_ref(), tenant_id)?;
         let path = match topic_schema.factor_by_id(parameter.factor_id.as_ref()) {
             None => {
@@ -30,8 +30,11 @@ impl CompiledTopicFactorParameter {
 }
 
 /// topic factor parameter always retrieve data from current trigger data
-impl InMemoryParameter for CompiledTopicFactorParameter {
-    fn value_from(&self, variables: &PipelineExecutionVariables) -> StdR<Arc<ArcTopicDataValue>> {
-        variables.get_current_data()?.value_of(&self.path)
+impl CompiledTopicFactorParameter {
+    pub fn value_from(&self, in_memory_data: &mut InMemoryData) -> StdR<Arc<ArcTopicDataValue>> {
+        in_memory_data
+            .current_only()
+            .get_value(&self.path)
+            .map(|v| Arc::new(v))
     }
 }

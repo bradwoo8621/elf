@@ -1,6 +1,6 @@
 use crate::{
     ArcTopicDataValue, CompiledComputedParameter, CompiledConstantParameter,
-    CompiledTopicFactorParameter, InMemoryParameter, PipelineExecutionVariables,
+    CompiledTopicFactorParameter, InMemoryData,
 };
 use elf_base::StdR;
 use elf_model::TenantId;
@@ -15,27 +15,27 @@ pub enum CompiledParameter {
 }
 
 impl CompiledParameter {
-    pub fn new(value: &Arc<ArcParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(value: &Arc<ArcParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         match value.deref() {
             ArcParameter::Topic(v) => {
-                CompiledTopicFactorParameter::new(v, tenant_id).map(|p| CompiledParameter::Topic(p))
+                CompiledTopicFactorParameter::compile(v, tenant_id).map(|p| CompiledParameter::Topic(p))
             }
             ArcParameter::Constant(v) => {
-                CompiledConstantParameter::new(v, tenant_id).map(|p| CompiledParameter::Constant(p))
+                CompiledConstantParameter::compile(v, tenant_id).map(|p| CompiledParameter::Constant(p))
             }
             ArcParameter::Computed(v) => {
-                CompiledComputedParameter::new(v, tenant_id).map(|p| CompiledParameter::Computed(p))
+                CompiledComputedParameter::compile(v, tenant_id).map(|p| CompiledParameter::Computed(p))
             }
         }
     }
 }
 
-impl InMemoryParameter for CompiledParameter {
-    fn value_from(&self, variables: &PipelineExecutionVariables) -> StdR<Arc<ArcTopicDataValue>> {
+impl CompiledParameter {
+    pub fn value_from(&self, in_memory_data: &mut InMemoryData) -> StdR<Arc<ArcTopicDataValue>> {
         match self {
-            Self::Topic(v) => v.value_from(variables),
-            Self::Constant(v) => v.value_from(variables),
-            Self::Computed(v) => v.value_from(variables),
+            Self::Topic(v) => v.value_from(in_memory_data),
+            Self::Constant(v) => v.value_from(in_memory_data),
+            Self::Computed(v) => v.value_from(in_memory_data),
         }
     }
 }

@@ -1,6 +1,5 @@
 use crate::{
-    CompiledParameterExpression, CompiledParameterJoint, InMemoryParameterCondition,
-    PipelineExecutionVariables,
+    CompiledParameterExpression, CompiledParameterJoint, InMemoryData,
 };
 use elf_base::StdR;
 use elf_model::TenantId;
@@ -14,28 +13,28 @@ pub enum CompiledParameterCondition {
 }
 
 impl CompiledParameterCondition {
-    pub fn new(value: &Arc<ArcParameterCondition>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(value: &Arc<ArcParameterCondition>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
         match value.deref() {
-            ArcParameterCondition::Expression(v) => CompiledParameterExpression::new(v, tenant_id)
+            ArcParameterCondition::Expression(v) => CompiledParameterExpression::compile(v, tenant_id)
                 .map(|p| CompiledParameterCondition::Expression(p)),
-            ArcParameterCondition::Joint(v) => CompiledParameterJoint::new(v, tenant_id)
+            ArcParameterCondition::Joint(v) => CompiledParameterJoint::compile(v, tenant_id)
                 .map(|p| CompiledParameterCondition::Joint(p)),
         }
     }
 }
 
-impl InMemoryParameterCondition for CompiledParameterCondition {
-    fn is_true(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
+impl CompiledParameterCondition {
+    pub fn is_true(&self, in_memory_data: &mut InMemoryData) -> StdR<bool> {
         match self {
-            Self::Expression(v) => v.is_true(variables),
-            Self::Joint(v) => v.is_true(variables),
+            Self::Expression(v) => v.is_true(in_memory_data),
+            Self::Joint(v) => v.is_true(in_memory_data),
         }
     }
 
-    fn is_false(&self, variables: &PipelineExecutionVariables) -> StdR<bool> {
+    pub fn is_false(&self, in_memory_data: &mut InMemoryData) -> StdR<bool> {
         match self {
-            Self::Expression(v) => v.is_false(variables),
-            Self::Joint(v) => v.is_false(variables),
+            Self::Expression(v) => v.is_false(in_memory_data),
+            Self::Joint(v) => v.is_false(in_memory_data),
         }
     }
 }
