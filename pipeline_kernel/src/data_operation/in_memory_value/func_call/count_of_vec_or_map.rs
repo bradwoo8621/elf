@@ -1,0 +1,21 @@
+use crate::{ArcTopicDataValue, InMemoryFuncCall};
+use bigdecimal::{BigDecimal, FromPrimitive};
+use elf_base::StdR;
+use std::ops::Deref;
+use std::sync::Arc;
+
+impl InMemoryFuncCall<'_> {
+    /// count of vec or map
+    pub fn resolve_count_of_vec_or_map(
+        &self,
+        context: Arc<ArcTopicDataValue>,
+    ) -> StdR<Arc<ArcTopicDataValue>> {
+        let count = match context.deref() {
+            ArcTopicDataValue::Vec(vec) => BigDecimal::from_usize(vec.len()),
+            ArcTopicDataValue::Map(map) => BigDecimal::from_usize(map.len()),
+            other => return self.func_not_supported(other),
+        };
+
+        self.value_as_num(count)
+    }
+}

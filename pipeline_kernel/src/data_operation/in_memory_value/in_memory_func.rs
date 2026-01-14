@@ -10,6 +10,7 @@ use elf_runtime_model_kernel::IdGen;
 use std::sync::Arc;
 
 impl FuncDataPath {
+    /// [param_start_index] should be 0 or 1 (first one is context, passed by [source]).
     fn get_value(
         &self,
         source: &Arc<ArcTopicDataValue>,
@@ -22,35 +23,15 @@ impl FuncDataPath {
             &vec![]
         };
 
-        let param_count = params.len() - param_start_index;
-        let func = self.func();
-        let min_param_count = func.min_param_count();
-        if param_count < min_param_count {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "Function[path={}, name={}] has no enough parameters, at least {} are required, but only {} are currently provided.",
-                self.full_path(),
-                func, min_param_count, param_count
-            ));
-        }
-        if let Some(max_param_count) = func.max_param_count() {
-            if param_count > max_param_count {
-                return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                    "Function[path={}, name={}] has too many parameters, at most {} are accepted, but {} are currently provided.",
-                    self.full_path(),
-                    func, max_param_count, param_count
-                ));
-            }
-        }
-
         let mut param_values = vec![];
         for param in params[param_start_index..].iter() {
             param_values.push(param.value_from_memory(in_memory_data)?);
         }
-        Ok(Arc::new(InMemoryFuncCall::compute(
+        Ok(InMemoryFuncCall::compute(
             &self,
             source.clone(),
             param_values,
-        )?))
+        )?)
     }
 
     pub fn value_from_memory(&self, in_memory_data: &InMemoryData) -> StdR<Arc<ArcTopicDataValue>> {
