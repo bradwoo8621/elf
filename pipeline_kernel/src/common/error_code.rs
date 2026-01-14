@@ -24,6 +24,7 @@ pub enum PipelineKernelErrorCode {
     VariableFuncNotSupported,
     IncorrectDataPath,
     PreviousTopicDataMissed,
+    FailedToGetNextSeq,
     // schema
     FactorNotFound,
     TopicDataPropertySegmentMissed,
@@ -54,6 +55,7 @@ impl ErrorCode for PipelineKernelErrorCode {
             Self::VariableFuncNotSupported => "PLKN-00104",
             Self::IncorrectDataPath => "PLKN-00105",
             Self::PreviousTopicDataMissed => "PLKN-00106",
+            Self::FailedToGetNextSeq => "PLKN-00107",
 
             Self::FactorNotFound => "PLKN-00200",
             Self::TopicDataPropertySegmentMissed => "PLKN-00201",

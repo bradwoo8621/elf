@@ -3,6 +3,7 @@ use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use elf_base::DisplayLines;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
+use std::ops::Deref;
 use std::sync::Arc;
 
 /// make every [Arc].
@@ -17,6 +18,139 @@ pub enum ArcTopicDataValue {
     Map(Arc<HashMap<String, Arc<ArcTopicDataValue>>>),
     Vec(Arc<Vec<Arc<ArcTopicDataValue>>>),
     None,
+}
+
+pub trait ArcFrom<T>: Sized + From<T> {
+    fn wrap(value: Arc<T>) -> Arc<Self>;
+    fn arc_from(value: T) -> Arc<Self>;
+}
+
+impl ArcFrom<NaiveDateTime> for ArcTopicDataValue {
+    fn wrap(value: Arc<NaiveDateTime>) -> Arc<Self> {
+        Arc::new(Self::DateTime(value))
+    }
+
+    fn arc_from(value: NaiveDateTime) -> Arc<Self> {
+        Arc::new(Self::from(value))
+    }
+}
+
+impl From<NaiveDateTime> for ArcTopicDataValue {
+    fn from(value: NaiveDateTime) -> Self {
+        Self::DateTime(Arc::new(value))
+    }
+}
+
+impl ArcFrom<NaiveDate> for ArcTopicDataValue {
+    fn wrap(value: Arc<NaiveDate>) -> Arc<Self> {
+        Arc::new(Self::Date(value))
+    }
+
+    fn arc_from(value: NaiveDate) -> Arc<Self> {
+        Arc::new(Self::from(value))
+    }
+}
+
+impl From<NaiveDate> for ArcTopicDataValue {
+    fn from(value: NaiveDate) -> Self {
+        Self::Date(Arc::new(value))
+    }
+}
+
+impl ArcFrom<NaiveTime> for ArcTopicDataValue {
+    fn wrap(value: Arc<NaiveTime>) -> Arc<Self> {
+        Arc::new(Self::Time(value))
+    }
+
+    fn arc_from(value: NaiveTime) -> Arc<Self> {
+        Arc::new(Self::from(value))
+    }
+}
+
+impl From<NaiveTime> for ArcTopicDataValue {
+    fn from(value: NaiveTime) -> Self {
+        Self::Time(Arc::new(value))
+    }
+}
+
+impl ArcFrom<String> for ArcTopicDataValue {
+    fn wrap(value: Arc<String>) -> Arc<Self> {
+        Arc::new(Self::Str(value))
+    }
+
+    fn arc_from(value: String) -> Arc<Self> {
+        Arc::new(Self::from(value))
+    }
+}
+
+impl From<String> for ArcTopicDataValue {
+    fn from(value: String) -> Self {
+        Self::Str(Arc::new(value))
+    }
+}
+
+impl ArcFrom<BigDecimal> for ArcTopicDataValue {
+    fn wrap(value: Arc<BigDecimal>) -> Arc<Self> {
+        Arc::new(Self::Num(value))
+    }
+
+    fn arc_from(value: BigDecimal) -> Arc<Self> {
+        Arc::new(Self::from(value))
+    }
+}
+
+impl From<BigDecimal> for ArcTopicDataValue {
+    fn from(value: BigDecimal) -> Self {
+        Self::Num(Arc::new(value))
+    }
+}
+
+impl ArcFrom<bool> for ArcTopicDataValue {
+    fn wrap(value: Arc<bool>) -> Arc<Self> {
+        Arc::new(Self::Bool(*value.deref()))
+    }
+
+    fn arc_from(value: bool) -> Arc<Self> {
+        Arc::new(Self::from(value))
+    }
+}
+
+impl From<bool> for ArcTopicDataValue {
+    fn from(value: bool) -> Self {
+        Self::Bool(value)
+    }
+}
+
+impl ArcFrom<HashMap<String, Arc<ArcTopicDataValue>>> for ArcTopicDataValue {
+    fn wrap(value: Arc<HashMap<String, Arc<ArcTopicDataValue>>>) -> Arc<Self> {
+        Arc::new(Self::Map(value))
+    }
+
+    fn arc_from(value: HashMap<String, Arc<ArcTopicDataValue>>) -> Arc<Self> {
+        Arc::new(ArcTopicDataValue::from(value))
+    }
+}
+
+impl From<HashMap<String, Arc<ArcTopicDataValue>>> for ArcTopicDataValue {
+    fn from(value: HashMap<String, Arc<ArcTopicDataValue>>) -> Self {
+        ArcTopicDataValue::Map(Arc::new(value))
+    }
+}
+
+impl ArcFrom<Vec<Arc<ArcTopicDataValue>>> for ArcTopicDataValue {
+    fn wrap(value: Arc<Vec<Arc<ArcTopicDataValue>>>) -> Arc<Self> {
+        Arc::new(Self::Vec(value))
+    }
+
+    fn arc_from(value: Vec<Arc<ArcTopicDataValue>>) -> Arc<Self> {
+        Arc::new(ArcTopicDataValue::from(value))
+    }
+}
+
+impl From<Vec<Arc<ArcTopicDataValue>>> for ArcTopicDataValue {
+    fn from(value: Vec<Arc<ArcTopicDataValue>>) -> Self {
+        ArcTopicDataValue::Vec(Arc::new(value))
+    }
 }
 
 impl ArcTopicDataValue {
