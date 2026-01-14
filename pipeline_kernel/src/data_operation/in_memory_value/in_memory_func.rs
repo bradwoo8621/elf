@@ -1,21 +1,15 @@
-use crate::{ArcFrom, ArcTopicDataValue, FuncDataPath, InMemoryData, PipelineKernelErrorCode};
+use crate::{
+    ArcFrom, ArcTopicDataValue, FuncDataPath, InMemoryData, InMemoryFuncCall,
+    PipelineKernelErrorCode,
+};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{Timelike, Utc};
 use elf_base::{ErrorCode, StdR};
 use elf_model::VariablePredefineFunctions;
 use elf_runtime_model_kernel::IdGen;
-use std::ops::Deref;
 use std::sync::Arc;
 
 impl FuncDataPath {
-    fn call_func(
-        &self,
-        _context: &ArcTopicDataValue,
-        _params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<ArcTopicDataValue> {
-        todo!("implement call_func for FuncDataPath")
-    }
-
     fn get_value(
         &self,
         source: &Arc<ArcTopicDataValue>,
@@ -52,7 +46,11 @@ impl FuncDataPath {
         for param in params[param_start_index..].iter() {
             param_values.push(param.value_from_memory(in_memory_data)?);
         }
-        Ok(Arc::new(self.call_func(source.deref(), param_values)?))
+        Ok(Arc::new(InMemoryFuncCall::compute(
+            &self,
+            source.clone(),
+            param_values,
+        )?))
     }
 
     pub fn value_from_memory(&self, in_memory_data: &InMemoryData) -> StdR<Arc<ArcTopicDataValue>> {
