@@ -430,7 +430,7 @@ pub enum VariablePredefineFunctions {
     /// [&cur], [&cur()]
     #[display = "&cur"]
     #[restrict(context = false, max_param_count = 0)]
-    FromCurrentContext,
+    FromCurrentTriggerData,
     /// Retrieve value from previous trigger data
     /// [&old], [&old()]
     #[display = "&old"]
@@ -579,7 +579,7 @@ impl VariablePredefineFunctions {
             Self::MinDatetime => no_param_false,
             Self::MinDt => no_param_false,
             Self::MinTime => no_param_false,
-            Self::FromCurrentContext => no_param_false,
+            Self::FromCurrentTriggerData => no_param_false,
             Self::FromPreviousTriggerData => no_param_false,
             Self::DayDiff => single_param_false,
             Self::MonthDiff => single_param_false,
@@ -654,7 +654,7 @@ impl VariablePredefineFunctions {
             Self::MinDatetime => no_param_false,
             Self::MinDt => no_param_false,
             Self::MinTime => no_param_false,
-            Self::FromCurrentContext => no_param_false,
+            Self::FromCurrentTriggerData => no_param_false,
             Self::FromPreviousTriggerData => no_param_false,
             Self::DayDiff => single_param_false,
             Self::MonthDiff => single_param_false,

@@ -4,12 +4,12 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct PipelineExecutionVariables {
-    pub previous_data: Option<ArcTopicData>,
-    pub current_data: Option<ArcTopicData>,
-    pub variables: HashMap<String, Arc<ArcTopicDataValue>>,
+    previous_data: Option<ArcTopicData>,
+    current_data: Option<ArcTopicData>,
+    variables: HashMap<String, Arc<ArcTopicDataValue>>,
     // only variables from trigger data will record its factor name here
     // key is variable key, value is factor name
-    pub variables_from: HashMap<String, String>,
+    variables_from: HashMap<String, String>,
 }
 
 impl PipelineExecutionVariables {
@@ -32,6 +32,8 @@ impl PipelineExecutionVariables {
         }
     }
 
+    /// get previous topic data.
+    /// raise error when previous data not exists
     pub fn get_previous_data(&self) -> StdR<&ArcTopicData> {
         match &self.previous_data {
             Some(current_data) => Ok(current_data),
