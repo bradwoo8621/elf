@@ -1,5 +1,5 @@
 mod cast;
 mod check;
-mod retrieve;
+mod in_memory_value;
 
-pub use retrieve::*;
+pub use in_memory_value::*;
