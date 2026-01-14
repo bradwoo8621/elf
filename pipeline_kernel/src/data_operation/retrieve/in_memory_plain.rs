@@ -1,4 +1,4 @@
-use crate::{ArcTopicDataValue, InMemoryData, PipelineKernelErrorCode, PlainDataPath};
+use crate::{ArcFrom, ArcTopicDataValue, InMemoryData, PipelineKernelErrorCode, PlainDataPath};
 use elf_base::{ErrorCode, StdR};
 use std::ops::Deref;
 use std::sync::Arc;
@@ -6,22 +6,29 @@ use std::sync::Arc;
 impl PlainDataPath {
     pub fn value_from_memory(&self, in_memory_data: &InMemoryData) -> StdR<Arc<ArcTopicDataValue>> {
         let prop = self.this_path();
-        if in_memory_data.is_current_data_allowed_only() {
-            in_memory_data.get_from_current_data(&prop)
+        let value = if in_memory_data.is_current_data_allowed_only() {
+            in_memory_data.get_from_current_data(&prop)?
         } else {
-            in_memory_data.get_from_variables_or_current_data(&prop)
+            in_memory_data.get_from_variables_or_current_data(&prop)?
+        };
+        if self.is_vec().unwrap_or(false) {
+            match value.deref() {
+                // return empty vec
+                ArcTopicDataValue::None => Ok(ArcTopicDataValue::arc_from(vec![])),
+                _ => Ok(value),
+            }
+        } else {
+            Ok(value)
         }
     }
 
     /// get value from given data by given segment
     /// only map and vec are supported
-    /// - when given data is a map, return none when nothing found from this map,
-    /// - when given data is a vec, then only none and map element are supported,
-    ///   and the returned data is a vec.
-    ///   - when given segment is identified as a vec,
-    ///     - ignore the none element of given vec,
-    ///     - ignore when nothing found from the map element of given vec,
-    ///     - ignore the none value found from the map element of given vec,
+    /// and for vec source and vec value, following rules as below:
+    /// - when get value from vec source, if value from element is
+    ///   - none or [ArcTopicDataValue::None], ignore
+    ///   - or flatten,
+    /// - when value is none, is current path is vec, return empty vec
     pub fn value_from_source(
         &self,
         source: &Arc<ArcTopicDataValue>,

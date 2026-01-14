@@ -7,9 +7,6 @@ pub struct PipelineExecutionVariables {
     previous_data: Option<ArcTopicData>,
     current_data: Option<ArcTopicData>,
     variables: HashMap<String, Arc<ArcTopicDataValue>>,
-    // only variables from trigger data will record its factor name here
-    // key is variable key, value is factor name
-    variables_from: HashMap<String, String>,
 }
 
 impl PipelineExecutionVariables {
@@ -18,7 +15,6 @@ impl PipelineExecutionVariables {
             previous_data: previous,
             current_data: current,
             variables: HashMap::new(),
-            variables_from: HashMap::new(),
         }
     }
 

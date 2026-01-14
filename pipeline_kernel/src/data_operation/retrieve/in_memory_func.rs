@@ -1,15 +1,60 @@
-use crate::{
-    ArcFrom, ArcTopicDataValue, FuncDataPath, InMemoryData,
-    PipelineKernelErrorCode,
-};
+use crate::{ArcFrom, ArcTopicDataValue, FuncDataPath, InMemoryData, PipelineKernelErrorCode};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{Timelike, Utc};
 use elf_base::{ErrorCode, StdR};
 use elf_model::VariablePredefineFunctions;
 use elf_runtime_model_kernel::IdGen;
+use std::ops::Deref;
 use std::sync::Arc;
 
 impl FuncDataPath {
+    fn call_func(
+        &self,
+        _context: &ArcTopicDataValue,
+        _params: Vec<Arc<ArcTopicDataValue>>,
+    ) -> StdR<ArcTopicDataValue> {
+        todo!("implement call_func for FuncDataPath")
+    }
+
+    fn get_value(
+        &self,
+        source: &Arc<ArcTopicDataValue>,
+        param_start_index: usize,
+        in_memory_data: &InMemoryData,
+    ) -> StdR<Arc<ArcTopicDataValue>> {
+        let params = if let Some(params) = self.params() {
+            params
+        } else {
+            &vec![]
+        };
+
+        let param_count = params.len() - param_start_index;
+        let func = self.func();
+        let min_param_count = func.min_param_count();
+        if param_count < min_param_count {
+            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
+                "Function[path={}, name={}] has no enough parameters, at least {} are required, but only {} are currently provided.",
+                self.full_path(),
+                func, min_param_count, param_count
+            ));
+        }
+        if let Some(max_param_count) = func.max_param_count() {
+            if param_count > max_param_count {
+                return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
+                    "Function[path={}, name={}] has too many parameters, at most {} are accepted, but {} are currently provided.",
+                    self.full_path(),
+                    func, max_param_count, param_count
+                ));
+            }
+        }
+
+        let mut param_values = vec![];
+        for param in params[param_start_index..].iter() {
+            param_values.push(param.value_from_memory(in_memory_data)?);
+        }
+        Ok(Arc::new(self.call_func(source.deref(), param_values)?))
+    }
+
     pub fn value_from_memory(&self, in_memory_data: &InMemoryData) -> StdR<Arc<ArcTopicDataValue>> {
         let func = self.func();
         match func {
@@ -64,8 +109,8 @@ impl FuncDataPath {
 
                 // get context
                 let param_0 = &params[0];
-                let context = param_0.value_from_memory(in_memory_data)?;
-                self.get_value(&context, 1, in_memory_data)
+                let source = param_0.value_from_memory(in_memory_data)?;
+                self.get_value(&source, 1, in_memory_data)
             }
         }
     }
@@ -85,14 +130,5 @@ impl FuncDataPath {
         }
 
         self.get_value(source, 0, in_memory_data)
-    }
-
-    fn get_value(
-        &self,
-        context: &Arc<ArcTopicDataValue>,
-        param_start_index: usize,
-        in_memory_data: &InMemoryData,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        todo!("implement get_value for FuncDataPath")
     }
 }
