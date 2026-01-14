@@ -60,7 +60,7 @@ If your use qualifies as commercial, the following fee structure applies:
 If you offer a service similar to Software-as-a-Service (SaaS) or subscription-based offerings:
 
 - **Fee:** 20% of the **Total Commercial Contract Value** associated with the offering that includes this software.
-- **Cap:** Monthly fee not to exceed **USD 3,000**.
+- **Cap:** Monthly fee not to exceed **USD 5,000**.
 
 > The fee for the subscription service is calculated based on the number of subscribers to the subscription service, not the number of
 > subscription services. For example, if your platform has 10 clients who have subscribed to services that include this software, the
@@ -71,9 +71,9 @@ If you offer a service similar to Software-as-a-Service (SaaS) or subscription-b
 If you provide the software via on-premises deployment or perpetual license:
 
 - **Fee:** 20% of the **Total Commercial Contract Value** of the contract that includes delivery of this software.
-- **Cap:** One-time fee not to exceed **USD 50,000**.
+- **Cap:** One-time fee not to exceed **USD 100,000**.
 - **Operations and Maintenance (O&M) Contract:** If an Operations and Maintenance (O&M) contract is established for the overall software
-  solution, an additional fee of 10% of the **Total Contract Value** of the O&M contract will be charged. This fee is capped at **USD 30,000
+  solution, an additional fee of 10% of the **Total Contract Value** of the O&M contract will be charged. This fee is capped at **USD 50,000
   per year**. The "Total Contract Value of the O&M contract" refers to the total value of all commercial activities related to the usage,
   support, and maintenance of the overall software solution after its initial deployment. This includes, but is not limited to, activities
   such as adding, modifying, or removing software features (whether for this software or any other components included in the overall
@@ -100,6 +100,18 @@ agreement, regardless of whether other non-software services or components are i
    c. Any expression of interest regarding Commercial Use is to be considered solely as a preliminary starting point for commercial
    negotiations and does not create any binding license or commitment. All final rights, obligations, fees, and scope of services shall be
    exclusively governed by the Master Agreement formally executed by both parties.
+
+#### **Source Code Copying**
+
+Any reproduction, download, or forking of this software’s source code, regardless of whether the resulting version is subsequently modified,
+enhanced, or reduced in functionality—is explicitly regarded as a form of copying.
+
+If such a copied version, in whole or in part, is employed for direct or indirect commercial purposes, including but not limited to
+generating revenue, optimizing internal operations, or being incorporated into a commercial product or service, this use shall be classified
+as **Commercial Use**.
+
+All corresponding licensing fees, terms, and procedures outlined in the Commercial Use provisions of this agreement—including the
+requirement for a separately executed Master Agreement—shall apply fully to such activities.
 
 ### **2.3 How to Obtain a Commercial License**
 
