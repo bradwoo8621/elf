@@ -1,8 +1,8 @@
-use std::ops::Deref;
 use crate::{ArcTopicDataValue, FuncDataPath, PipelineKernelErrorCode};
 use bigdecimal::FromPrimitive;
 use elf_base::{ErrorCode, StdR};
 use elf_model::VariablePredefineFunctions;
+use std::ops::Deref;
 use std::sync::Arc;
 
 pub struct InMemoryFuncCall<'a> {
@@ -22,123 +22,13 @@ impl<'a> InMemoryFuncCall<'a> {
     pub fn full_path(&self) -> String {
         self.path.full_path()
     }
+
+    pub fn func(&self) -> &VariablePredefineFunctions {
+        self.path.func()
+    }
 }
 
 impl InMemoryFuncCall<'_> {
-    fn resolve_slice(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        let (start, end) = if params.len() == 1 {
-            (Some(0), self.extract_decimal(&params[0])?)
-        } else if params.len() == 2 {
-            (
-                self.extract_decimal(&params[0])?,
-                self.extract_decimal(&params[1])?,
-            )
-        } else {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "Slice function[path={}, name={}] requires 1 or 2 parameters.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        };
-        let str_value = self.extract_string(&context)?;
-        let start_idx = start.map(|s| s.to_usize().unwrap_or(0)).unwrap_or(0);
-        let end_idx = end
-            .map(|e| e.to_usize().unwrap_or(str_value.len()))
-            .unwrap_or(str_value.len());
-        Ok(ArcTopicDataValue::arc_from(
-            str_value
-                .chars()
-                .skip(start_idx)
-                .take(end_idx - start_idx)
-                .collect::<String>(),
-        ))
-    }
-    fn resolve_find(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        if params.len() != 1 {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "Find function[path={}, name={}] requires exactly 1 parameter.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        }
-        let substring = self.extract_string(&params[0])?;
-        let str_value = self.extract_string(&context)?;
-        let position = str_value
-            .find(&substring)
-            .map(|pos| pos as i64)
-            .unwrap_or(-1);
-        Ok(ArcTopicDataValue::arc_from(
-            bigdecimal::BigDecimal::from_i64(position).unwrap(),
-        ))
-    }
-    fn resolve_starts_with(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        if params.len() != 1 {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "StartsWith function[path={}, name={}] requires exactly 1 parameter.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        }
-        let substring = self.extract_string(&params[0])?;
-        let str_value = self.extract_string(&context)?;
-        Ok(ArcTopicDataValue::arc_from(
-            str_value.starts_with(&substring),
-        ))
-    }
-    fn resolve_ends_with(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        if params.len() != 1 {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "EndsWith function[path={}, name={}] requires exactly 1 parameter.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        }
-        let substring = self.extract_string(&params[0])?;
-        let str_value = self.extract_string(&context)?;
-        Ok(ArcTopicDataValue::arc_from(str_value.ends_with(&substring)))
-    }
-    fn resolve_trim(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        let trim_chars = if params.is_empty() {
-            None
-        } else if params.len() == 1 {
-            Some(self.extract_string(&params[0])?)
-        } else {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "Trim function[path={}, name={}] requires at most 1 parameter.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        };
-        let str_value = self.extract_string(&context)?;
-        let result = if let Some(chars) = trim_chars {
-            str_value
-                .trim_matches(&chars.chars().collect::<Vec<char>>()[..])
-                .to_string()
-        } else {
-            str_value.trim().to_string()
-        };
-        Ok(ArcTopicDataValue::arc_from(result))
-    }
     fn resolve_replace(
         &self,
         context: Arc<ArcTopicDataValue>,
@@ -750,19 +640,19 @@ impl<'a> InMemoryFuncCall<'a> {
                 self.resolve_length_of_str_or_num(context)
             }
             VariablePredefineFunctions::Slice | VariablePredefineFunctions::Substr => {
-                self.resolve_slice(context, params)
+                self.resolve_slice_of_str(context, params)
             }
             VariablePredefineFunctions::Find | VariablePredefineFunctions::Index => {
-                self.resolve_find(context, params)
+                self.resolve_find_of_str(context, params)
             }
             VariablePredefineFunctions::StartsWith | VariablePredefineFunctions::Startswith => {
-                self.resolve_starts_with(context, params)
+                self.resolve_starts_with_of_str(context, params)
             }
             VariablePredefineFunctions::EndsWith | VariablePredefineFunctions::Endswith => {
-                self.resolve_ends_with(context, params)
+                self.resolve_ends_with_of_str(context, params)
             }
             VariablePredefineFunctions::Strip | VariablePredefineFunctions::Trim => {
-                self.resolve_trim(context, params)
+                self.resolve_trim_of_str(context, params)
             }
             VariablePredefineFunctions::Replace => self.resolve_replace(context, params),
             VariablePredefineFunctions::ReplaceFirst => self.resolve_replace_first(context, params),

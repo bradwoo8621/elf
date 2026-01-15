@@ -5,6 +5,8 @@ use std::ops::Deref;
 use std::sync::Arc;
 
 impl InMemoryFuncCall<'_> {
+    /// [VariablePredefineFunctions::Count]
+    ///
     /// count of vec or map
     pub fn resolve_count_of_vec_or_map(
         &self,

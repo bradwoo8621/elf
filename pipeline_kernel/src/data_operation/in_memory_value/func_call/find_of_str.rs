@@ -1,0 +1,45 @@
+use crate::{ArcFrom, ArcTopicDataValue, InMemoryFuncCall};
+use bigdecimal::{BigDecimal, Zero};
+use elf_base::StdR;
+use std::ops::Deref;
+use std::sync::Arc;
+
+impl InMemoryFuncCall<'_> {
+    /// [VariablePredefineFunctions::Find], [VariablePredefineFunctions::Index]
+    ///
+    /// find substring start index of given string
+    /// - one and only one parameter accepted,
+    /// - parameter must be string
+    /// - parameter string is empty, return 0
+    /// - parameter string is not found, return -1
+    /// - return the start index of the parameter string in given string
+    // noinspection DuplicatedCode
+    pub fn resolve_find_of_str(
+        &self,
+        context: Arc<ArcTopicDataValue>,
+        params: Vec<Arc<ArcTopicDataValue>>,
+    ) -> StdR<Arc<ArcTopicDataValue>> {
+        match context.deref() {
+            ArcTopicDataValue::Str(str) => {
+                let sub = match params.len() {
+                    0 => return self.param_count_not_enough(self.func(), 0),
+                    1 => match params[0].deref() {
+                        ArcTopicDataValue::Str(sub) => sub.deref(),
+                        other => return self.param_must_be_str(self.func(), 0, other),
+                    },
+                    cnt => return self.param_count_too_many(self.func(), cnt),
+                };
+                if sub.len() == 0 {
+                    Ok(ArcTopicDataValue::arc_from(BigDecimal::zero()))
+                } else if str.len() == 0 {
+                    Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
+                } else if let Some(index) = str.deref().find(sub) {
+                    Ok(ArcTopicDataValue::arc_from(BigDecimal::from(index as u128)))
+                } else {
+                    Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
+                }
+            }
+            other => self.func_not_supported(other),
+        }
+    }
+}

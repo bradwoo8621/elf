@@ -12,4 +12,20 @@ impl InMemoryFuncCall<'_> {
             .map(|value| Ok(ArcTopicDataValue::arc_from(value)))
             .unwrap_or_else(|| self.decimal_parse_error("none"))
     }
+
+    pub fn try_to_usize<CannotCast>(
+        &self,
+        param: &ArcTopicDataValue,
+        none_value: usize,
+        cannot_cast: CannotCast,
+    ) -> StdR<usize>
+    where
+        CannotCast: FnOnce() -> StdR<usize>,
+    {
+        if let Ok(value) = param.try_to_usize_or_if_none(none_value) {
+            Ok(value)
+        } else {
+            cannot_cast()
+        }
+    }
 }

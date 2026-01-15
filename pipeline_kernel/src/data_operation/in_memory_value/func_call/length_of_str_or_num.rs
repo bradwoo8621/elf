@@ -5,7 +5,9 @@ use std::ops::Deref;
 use std::sync::Arc;
 
 impl InMemoryFuncCall<'_> {
-    /// length of string or decimal
+    /// [VariablePredefineFunctions::Len], [VariablePredefineFunctions::Length]
+    ///
+    /// chars count of string or decimal
     pub fn resolve_length_of_str_or_num(
         &self,
         context: Arc<ArcTopicDataValue>,
