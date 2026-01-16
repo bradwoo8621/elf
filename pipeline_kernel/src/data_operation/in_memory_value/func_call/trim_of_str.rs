@@ -9,7 +9,6 @@ impl InMemoryFuncCall<'_> {
     /// trim given string by given trimmed part
     /// - no parameter, trim whitespaces,
     /// - one parameter, must be string, trim it
-    // noinspection DuplicatedCode
     pub fn resolve_trim_of_str(
         &self,
         context: Arc<ArcTopicDataValue>,
@@ -31,7 +30,7 @@ impl InMemoryFuncCall<'_> {
                                 .to_string(),
                         ))
                     }
-                    cnt => return self.param_count_too_many(self.func(), cnt),
+                    cnt => self.param_count_too_many(self.func(), cnt),
                 },
             },
             other => self.func_not_supported(other),

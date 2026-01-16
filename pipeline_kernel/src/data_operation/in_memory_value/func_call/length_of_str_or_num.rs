@@ -11,15 +11,18 @@ impl InMemoryFuncCall<'_> {
     pub fn resolve_length_of_str_or_num(
         &self,
         context: Arc<ArcTopicDataValue>,
+        params: Vec<Arc<ArcTopicDataValue>>,
     ) -> StdR<Arc<ArcTopicDataValue>> {
-        let chars_count = match context.deref() {
-            ArcTopicDataValue::Str(str) => BigDecimal::from_usize(str.chars().count()),
-            ArcTopicDataValue::Num(decimal) => {
-                BigDecimal::from_usize(String::from_decimal(decimal).chars().count())
-            }
-            other => return self.func_not_supported(other),
-        };
+        self.no_param(&params, || {
+            let chars_count = match context.deref() {
+                ArcTopicDataValue::Str(str) => BigDecimal::from_usize(str.chars().count()),
+                ArcTopicDataValue::Num(decimal) => {
+                    BigDecimal::from_usize(String::from_decimal(decimal).chars().count())
+                }
+                other => return self.func_not_supported(other),
+            };
 
-        self.value_as_num(chars_count)
+            self.value_as_num(chars_count)
+        })
     }
 }

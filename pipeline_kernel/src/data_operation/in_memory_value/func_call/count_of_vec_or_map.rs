@@ -11,13 +11,16 @@ impl InMemoryFuncCall<'_> {
     pub fn resolve_count_of_vec_or_map(
         &self,
         context: Arc<ArcTopicDataValue>,
+        params: Vec<Arc<ArcTopicDataValue>>,
     ) -> StdR<Arc<ArcTopicDataValue>> {
-        let count = match context.deref() {
-            ArcTopicDataValue::Vec(vec) => BigDecimal::from_usize(vec.len()),
-            ArcTopicDataValue::Map(map) => BigDecimal::from_usize(map.len()),
-            other => return self.func_not_supported(other),
-        };
+        self.no_param(&params, || {
+            let count = match context.deref() {
+                ArcTopicDataValue::Vec(vec) => BigDecimal::from_usize(vec.len()),
+                ArcTopicDataValue::Map(map) => BigDecimal::from_usize(map.len()),
+                other => return self.func_not_supported(other),
+            };
 
-        self.value_as_num(count)
+            self.value_as_num(count)
+        })
     }
 }

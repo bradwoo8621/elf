@@ -29,62 +29,6 @@ impl<'a> InMemoryFuncCall<'a> {
 }
 
 impl InMemoryFuncCall<'_> {
-    fn resolve_replace(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        if params.len() != 2 {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "Replace function[path={}, name={}] requires exactly 2 parameters.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        }
-        let old_substring = self.extract_string(&params[0])?;
-        let new_substring = self.extract_string(&params[1])?;
-        let str_value = self.extract_string(&context)?;
-        Ok(ArcTopicDataValue::arc_from(
-            str_value.replace(&old_substring, &new_substring),
-        ))
-    }
-    fn resolve_replace_first(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        if params.len() != 2 {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "ReplaceFirst function[path={}, name={}] requires exactly 2 parameters.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        }
-        let old_substring = self.extract_string(&params[0])?;
-        let new_substring = self.extract_string(&params[1])?;
-        let str_value = self.extract_string(&context)?;
-        Ok(ArcTopicDataValue::arc_from(str_value.replacen(
-            &old_substring,
-            &new_substring,
-            1,
-        )))
-    }
-    fn resolve_upper(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        _params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        let str_value = self.extract_string(&context)?;
-        Ok(ArcTopicDataValue::arc_from(str_value.to_uppercase()))
-    }
-    fn resolve_lower(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        _params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        let str_value = self.extract_string(&context)?;
-        Ok(ArcTopicDataValue::arc_from(str_value.to_lowercase()))
-    }
     fn resolve_contains(
         &self,
         context: Arc<ArcTopicDataValue>,
@@ -635,9 +579,9 @@ impl<'a> InMemoryFuncCall<'a> {
     ) -> StdR<Arc<ArcTopicDataValue>> {
         match self.path.func() {
             VariablePredefineFunctions::NextSeq => self.context_disallowed(),
-            VariablePredefineFunctions::Count => self.resolve_count_of_vec_or_map(context),
+            VariablePredefineFunctions::Count => self.resolve_count_of_vec_or_map(context, params),
             VariablePredefineFunctions::Length | VariablePredefineFunctions::Len => {
-                self.resolve_length_of_str_or_num(context)
+                self.resolve_length_of_str_or_num(context, params)
             }
             VariablePredefineFunctions::Slice | VariablePredefineFunctions::Substr => {
                 self.resolve_slice_of_str(context, params)
@@ -654,10 +598,12 @@ impl<'a> InMemoryFuncCall<'a> {
             VariablePredefineFunctions::Strip | VariablePredefineFunctions::Trim => {
                 self.resolve_trim_of_str(context, params)
             }
-            VariablePredefineFunctions::Replace => self.resolve_replace(context, params),
-            VariablePredefineFunctions::ReplaceFirst => self.resolve_replace_first(context, params),
-            VariablePredefineFunctions::Upper => self.resolve_upper(context, params),
-            VariablePredefineFunctions::Lower => self.resolve_lower(context, params),
+            VariablePredefineFunctions::Replace => self.resolve_replace_of_str(context, params),
+            VariablePredefineFunctions::ReplaceFirst => {
+                self.resolve_replace_first_of_str(context, params)
+            }
+            VariablePredefineFunctions::Upper => self.resolve_upper_of_str(context, params),
+            VariablePredefineFunctions::Lower => self.resolve_lower_of_str(context, params),
             VariablePredefineFunctions::Contains => self.resolve_contains(context, params),
             VariablePredefineFunctions::Split => self.resolve_split(context, params),
             VariablePredefineFunctions::Concat => self.resolve_concat(context, params),

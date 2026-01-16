@@ -1,6 +1,7 @@
 use crate::{ArcFrom, ArcTopicDataValue, InMemoryFuncCall};
 use bigdecimal::BigDecimal;
 use elf_base::StdR;
+use std::ops::Deref;
 use std::sync::Arc;
 
 /// utilities
@@ -26,6 +27,37 @@ impl InMemoryFuncCall<'_> {
             Ok(value)
         } else {
             cannot_cast()
+        }
+    }
+
+    pub fn no_param<R, DoWhenNoParam>(
+        &self,
+        params: &Vec<Arc<ArcTopicDataValue>>,
+        do_when_no_param: DoWhenNoParam,
+    ) -> StdR<R>
+    where
+        DoWhenNoParam: FnOnce() -> StdR<R>,
+    {
+        let count = params.len();
+        if count > 0 {
+            self.param_count_too_many(self.func(), count)
+        } else {
+            do_when_no_param()
+        }
+    }
+
+    pub fn only_param<R, DoWhenOnlyParam>(
+        &self,
+        params: &Vec<Arc<ArcTopicDataValue>>,
+        do_when_only_param: DoWhenOnlyParam,
+    ) -> StdR<R>
+    where
+        DoWhenOnlyParam: FnOnce(&ArcTopicDataValue) -> StdR<R>,
+    {
+        match params.len() {
+            0 => self.param_count_not_enough(self.func(), 0),
+            1 => do_when_only_param(params[0].deref()),
+            cnt => self.param_count_too_many(self.func(), cnt),
         }
     }
 }
