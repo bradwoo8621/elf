@@ -1,8 +1,7 @@
-use crate::{ArcTopicDataValue, InMemoryFuncCall, PipelineKernelErrorCode};
+use crate::{InMemoryFuncCall, PipelineKernelErrorCode};
 use elf_base::{ErrorCode, StdErrCode, StdR};
 use elf_model::VariablePredefineFunctions;
 use std::fmt::Display;
-use std::sync::Arc;
 
 /// for errors
 impl InMemoryFuncCall<'_> {
