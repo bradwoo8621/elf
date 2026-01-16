@@ -14,25 +14,21 @@ impl InMemoryFuncCall<'_> {
         context: Arc<ArcTopicDataValue>,
         params: Vec<Arc<ArcTopicDataValue>>,
     ) -> StdR<Arc<ArcTopicDataValue>> {
+        let separator = self.zero_or_one_param(
+            &params,
+            || Ok(",".to_string()),
+            |param| Ok(self.param_to_str(param, 0)?.to_string()),
+        )?;
         match context.deref() {
             ArcTopicDataValue::Str(str) => match str.len() {
-                0 => Ok(context),
-                _ => match params.len() {
-                    0 => Ok(ArcTopicDataValue::arc_from(
-                        str.split(',')
-                            .map(|s| ArcTopicDataValue::arc_from(s.to_string()))
-                            .collect::<Vec<Arc<ArcTopicDataValue>>>(),
-                    )),
-                    1 => {
-                        let separator = self.param_to_str(&params[0], 0)?;
-                        Ok(ArcTopicDataValue::arc_from(
-                            str.split(separator)
-                                .map(|s| ArcTopicDataValue::arc_from(s.to_string()))
-                                .collect::<Vec<Arc<ArcTopicDataValue>>>(),
-                        ))
-                    }
-                    cnt => self.param_count_too_many(self.func(), cnt),
-                },
+                0 => Ok(ArcTopicDataValue::arc_from(vec![
+                    ArcTopicDataValue::arc_from(String::new()),
+                ])),
+                _ => Ok(ArcTopicDataValue::arc_from(
+                    str.split(&separator)
+                        .map(|s| ArcTopicDataValue::arc_from(s.to_string()))
+                        .collect::<Vec<Arc<ArcTopicDataValue>>>(),
+                )),
             },
             other => self.func_not_supported(other),
         }

@@ -30,7 +30,7 @@ impl InMemoryFuncCall<'_> {
         }
     }
 
-    pub fn only_param<R, DoWhenOnlyParam>(
+    pub fn one_param<R, DoWhenOnlyParam>(
         &self,
         params: &Vec<Arc<ArcTopicDataValue>>,
         do_when_only_param: DoWhenOnlyParam,
@@ -41,6 +41,57 @@ impl InMemoryFuncCall<'_> {
         match params.len() {
             0 => self.param_count_not_enough(self.func(), 0),
             1 => do_when_only_param(&params[0]),
+            cnt => self.param_count_too_many(self.func(), cnt),
+        }
+    }
+
+    pub fn two_params<R, DoWhenTwoParam>(
+        &self,
+        params: &Vec<Arc<ArcTopicDataValue>>,
+        do_when_two_params: DoWhenTwoParam,
+    ) -> StdR<R>
+    where
+        DoWhenTwoParam: FnOnce(&ArcTopicDataValue, &ArcTopicDataValue) -> StdR<R>,
+    {
+        match params.len() {
+            0 => self.param_count_not_enough(self.func(), 0),
+            1 => self.param_count_not_enough(self.func(), 1),
+            2 => do_when_two_params(&params[0], &params[1]),
+            cnt => self.param_count_too_many(self.func(), cnt),
+        }
+    }
+
+    pub fn zero_or_one_param<R, DoWhenNoParam, DoWhenOneParam>(
+        &self,
+        params: &Vec<Arc<ArcTopicDataValue>>,
+        do_when_no_param: DoWhenNoParam,
+        do_when_one_param: DoWhenOneParam,
+    ) -> StdR<R>
+    where
+        DoWhenNoParam: FnOnce() -> StdR<R>,
+        DoWhenOneParam: FnOnce(&ArcTopicDataValue) -> StdR<R>,
+    {
+        match params.len() {
+            0 => do_when_no_param(),
+            1 => do_when_one_param(&params[0]),
+            cnt => self.param_count_too_many(self.func(), cnt),
+        }
+    }
+
+    pub fn one_or_two_params<R, DoWhenOneParam, DoWhenTwoParam>(
+        &self,
+        params: &Vec<Arc<ArcTopicDataValue>>,
+        do_when_one_param: DoWhenOneParam,
+        do_when_two_params: DoWhenTwoParam,
+    ) -> StdR<R>
+    where
+        DoWhenOneParam: FnOnce(&ArcTopicDataValue) -> StdR<R>,
+        DoWhenTwoParam: FnOnce(&ArcTopicDataValue, &ArcTopicDataValue) -> StdR<R>,
+    {
+        match params.len() {
+            0 => self.param_count_not_enough(self.func(), 0),
+            1 => do_when_one_param(&params[0]),
+            2 => do_when_two_params(&params[0], &params[1]),
             cnt => self.param_count_too_many(self.func(), cnt),
         }
     }

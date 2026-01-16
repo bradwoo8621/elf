@@ -18,36 +18,45 @@ impl InMemoryFuncCall<'_> {
         context: Arc<ArcTopicDataValue>,
         params: Vec<Arc<ArcTopicDataValue>>,
     ) -> StdR<Arc<ArcTopicDataValue>> {
-        match context.deref() {
-            ArcTopicDataValue::None => Ok(Arc::new(ArcTopicDataValue::None)),
-            ArcTopicDataValue::Str(str) => {
-                if str.is_empty() {
-                    Ok(Arc::new(ArcTopicDataValue::Str(str.clone())))
-                } else {
-                    let (start_index, end_index) = match params.len() {
-                        0 => return self.param_count_not_enough(self.func(), 0),
-                        1 => {
-                            let start_index = self.param_to_usize(&params[0], 0, 0)?;
-                            let end_index = str.chars().count();
-                            (start_index, end_index)
-                        }
-                        2 => {
-                            let start_index = self.param_to_usize(&params[0], 0, 0)?;
-                            let end_index =
-                                self.param_to_usize(&params[1], str.chars().count(), 1)?;
-                            (start_index, end_index)
-                        }
-                        cnt => return self.param_count_too_many(self.func(), cnt),
-                    };
-                    let sliced = str
-                        .chars()
-                        .skip(start_index)
-                        .take(end_index - start_index)
-                        .collect::<String>();
-                    Ok(ArcTopicDataValue::arc_from(sliced))
+        self.one_or_two_params(
+            &params,
+            |param| match context.deref() {
+                ArcTopicDataValue::None => Ok(Arc::new(ArcTopicDataValue::None)),
+                ArcTopicDataValue::Str(str) => {
+                    if str.is_empty() {
+                        Ok(Arc::new(ArcTopicDataValue::Str(str.clone())))
+                    } else {
+                        let start_index = self.param_to_usize(param, 0, 0)?;
+                        let end_index = str.chars().count();
+                        let sliced = str
+                            .chars()
+                            .skip(start_index)
+                            .take(end_index - start_index)
+                            .collect::<String>();
+                        Ok(ArcTopicDataValue::arc_from(sliced))
+                    }
                 }
-            }
-            other => self.func_not_supported(other),
-        }
+                other => self.func_not_supported(other),
+            },
+            |first_param, second_param| match context.deref() {
+                ArcTopicDataValue::None => Ok(Arc::new(ArcTopicDataValue::None)),
+                ArcTopicDataValue::Str(str) => {
+                    if str.is_empty() {
+                        Ok(Arc::new(ArcTopicDataValue::Str(str.clone())))
+                    } else {
+                        let start_index = self.param_to_usize(first_param, 0, 0)?;
+                        let end_index =
+                            self.param_to_usize(second_param, str.chars().count(), 1)?;
+                        let sliced = str
+                            .chars()
+                            .skip(start_index)
+                            .take(end_index - start_index)
+                            .collect::<String>();
+                        Ok(ArcTopicDataValue::arc_from(sliced))
+                    }
+                }
+                other => self.func_not_supported(other),
+            },
+        )
     }
 }

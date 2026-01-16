@@ -559,7 +559,7 @@ impl<'a> InMemoryFuncCall<'a> {
             VariablePredefineFunctions::Upper => self.resolve_upper_of_str(context, params),
             VariablePredefineFunctions::Lower => self.resolve_lower_of_str(context, params),
             VariablePredefineFunctions::Contains => self.resolve_contains_of_str(context, params),
-            VariablePredefineFunctions::Split => self.resolve_split(context, params),
+            VariablePredefineFunctions::Split => self.resolve_split_of_str(context, params),
             VariablePredefineFunctions::Concat => self.resolve_concat(context, params),
             VariablePredefineFunctions::ConcatWith => self.resolve_concat_with(context, params),
             VariablePredefineFunctions::Join => self.resolve_join(context, params),

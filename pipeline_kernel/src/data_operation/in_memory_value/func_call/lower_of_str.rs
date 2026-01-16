@@ -6,13 +6,14 @@ use std::sync::Arc;
 impl InMemoryFuncCall<'_> {
     /// [VariablePredefineFunctions::Lower]
     ///
-    /// lower given string
+    /// lower given string (none treated as empty string)
     pub fn resolve_lower_of_str(
         &self,
         context: Arc<ArcTopicDataValue>,
         params: Vec<Arc<ArcTopicDataValue>>,
     ) -> StdR<Arc<ArcTopicDataValue>> {
         self.no_param(&params, || match context.deref() {
+            ArcTopicDataValue::None => Ok(ArcTopicDataValue::arc_from(String::new())),
             ArcTopicDataValue::Str(str) => match str.len() {
                 0 => Ok(context),
                 _ => Ok(ArcTopicDataValue::arc_from(str.to_lowercase().to_string())),

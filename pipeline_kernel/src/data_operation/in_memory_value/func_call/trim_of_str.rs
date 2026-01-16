@@ -6,7 +6,7 @@ use std::sync::Arc;
 impl InMemoryFuncCall<'_> {
     /// [VariablePredefineFunctions::Trim], [VariablePredefineFunctions::Strip]
     ///
-    /// trim given string by given trimmed part
+    /// trim given string (none treated as empty string) by given trimmed part
     /// - no parameter, trim whitespaces,
     /// - one parameter, must be string, trim it
     pub fn resolve_trim_of_str(
@@ -15,6 +15,7 @@ impl InMemoryFuncCall<'_> {
         params: Vec<Arc<ArcTopicDataValue>>,
     ) -> StdR<Arc<ArcTopicDataValue>> {
         match context.deref() {
+            ArcTopicDataValue::None => Ok(ArcTopicDataValue::arc_from(String::new())),
             ArcTopicDataValue::Str(str) => match str.len() {
                 0 => Ok(context),
                 _ => match params.len() {

@@ -6,7 +6,7 @@ use std::sync::Arc;
 impl InMemoryFuncCall<'_> {
     /// [VariablePredefineFunctions::StartsWith], [VariablePredefineFunctions::Startswith]
     ///
-    /// check given string starts with substring or not
+    /// check given string (none treated as empty string) starts with substring or not
     /// - one and only one parameter accepted,
     /// - parameter must be string
     /// - parameter string is empty, return true
@@ -17,7 +17,15 @@ impl InMemoryFuncCall<'_> {
         context: Arc<ArcTopicDataValue>,
         params: Vec<Arc<ArcTopicDataValue>>,
     ) -> StdR<Arc<ArcTopicDataValue>> {
-        self.only_param(&params, |param| match context.deref() {
+        self.one_param(&params, |param| match context.deref() {
+            ArcTopicDataValue::None => {
+                let sub = self.param_to_str(param, 0)?;
+                if sub.len() == 0 {
+                    Ok(ArcTopicDataValue::arc_from(true))
+                } else {
+                    Ok(ArcTopicDataValue::arc_from(false))
+                }
+            }
             ArcTopicDataValue::Str(str) => {
                 let sub = self.param_to_str(param, 0)?;
                 if sub.len() == 0 {

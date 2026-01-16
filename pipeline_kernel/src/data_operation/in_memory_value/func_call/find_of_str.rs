@@ -19,7 +19,15 @@ impl InMemoryFuncCall<'_> {
         context: Arc<ArcTopicDataValue>,
         params: Vec<Arc<ArcTopicDataValue>>,
     ) -> StdR<Arc<ArcTopicDataValue>> {
-        self.only_param(&params, |param| match context.deref() {
+        self.one_param(&params, |param| match context.deref() {
+            ArcTopicDataValue::None => {
+                let sub = self.param_to_str(param, 0)?;
+                if sub.len() == 0 {
+                    Ok(ArcTopicDataValue::arc_from(BigDecimal::zero()))
+                } else {
+                    Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
+                }
+            }
             ArcTopicDataValue::Str(str) => {
                 let sub = self.param_to_str(param, 0)?;
                 if sub.len() == 0 {
