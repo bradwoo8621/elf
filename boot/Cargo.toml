@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 elf_base = { path = "../base" }
 elf_runtime_model_kernel = { path = "../runtime_model_kernel" }
+elf_pipeline_kernel = { path = "../pipeline_kernel" }

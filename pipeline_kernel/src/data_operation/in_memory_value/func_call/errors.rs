@@ -23,6 +23,15 @@ impl InMemoryFuncCall<'_> {
         ))
     }
 
+    pub fn str_parse_error<R>(&self, value: impl Display) -> StdR<R> {
+        StdErrCode::DecimalParse.msg(format!(
+            "Cannot retrieve[key={}, current={}] as str, cause by current value is [{}].",
+            self.full_path(),
+            self.this_path(),
+            value
+        ))
+    }
+
     pub fn func_not_supported<R>(&self, value: impl Display) -> StdR<R> {
         PipelineKernelErrorCode::VariableFuncNotSupported.msg(format!(
             "Cannot retrieve[key={}, current={}], caused by function not supports value [{}].",

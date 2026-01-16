@@ -74,7 +74,7 @@ impl Display for TopicDataValue {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Str(s) => write!(f, "Str[{}]", s),
-            Self::Num(n) => write!(f, "Num[{}]", n),
+            Self::Num(n) => write!(f, "Num[{}]", n.to_plain_string()),
             Self::Bool(b) => write!(f, "Bool[{}]", b),
             Self::DateTime(dt) => write!(f, "DateTime[{}]", dt),
             Self::Date(d) => write!(f, "Date[{}]", d),

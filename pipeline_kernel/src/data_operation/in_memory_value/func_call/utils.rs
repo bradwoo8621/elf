@@ -1,6 +1,6 @@
 use crate::{ArcFrom, ArcTopicDataValue, InMemoryFuncCall};
 use bigdecimal::BigDecimal;
-use elf_base::StdR;
+use elf_base::{StdR, StringConverter};
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -12,6 +12,23 @@ impl InMemoryFuncCall<'_> {
         value
             .map(|value| Ok(ArcTopicDataValue::arc_from(value)))
             .unwrap_or_else(|| self.decimal_parse_error("none"))
+    }
+
+    /// convert to string if given value is not map or vec.
+    /// otherwise raise error
+    pub fn unwrap_as_str(&self, value: &ArcTopicDataValue) -> StdR<String> {
+        let str = match value {
+            ArcTopicDataValue::None => "".to_string(),
+            ArcTopicDataValue::Str(s) => s.deref().clone(),
+            ArcTopicDataValue::Num(n) => String::from_decimal(n),
+            ArcTopicDataValue::Bool(b) => String::from_bool(b),
+            ArcTopicDataValue::DateTime(dt) => String::from_datetime(dt),
+            ArcTopicDataValue::Date(d) => String::from_date(d),
+            ArcTopicDataValue::Time(t) => String::from_time(t),
+            ArcTopicDataValue::Map(_) => self.str_parse_error(value)?,
+            ArcTopicDataValue::Vec(_) => self.str_parse_error(value)?,
+        };
+        Ok(str)
     }
 
     pub fn no_param<R, DoWhenNoParam>(
@@ -96,6 +113,7 @@ impl InMemoryFuncCall<'_> {
         }
     }
 
+    /// convert [ArcTopicDataValue::Str] to string, otherwise raise error
     pub fn param_to_str<'a>(
         &self,
         param: &'a ArcTopicDataValue,
@@ -107,6 +125,7 @@ impl InMemoryFuncCall<'_> {
         }
     }
 
+    /// convert to usize, otherwise raise error
     pub fn param_to_usize(
         &self,
         param: &ArcTopicDataValue,

@@ -315,6 +315,7 @@ name = "elf_boot"
 version = "0.1.0"
 dependencies = [
  "elf_base",
+ "elf_pipeline_kernel",
  "elf_runtime_model_kernel",
 ]
 

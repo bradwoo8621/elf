@@ -29,74 +29,6 @@ impl<'a> InMemoryFuncCall<'a> {
 }
 
 impl InMemoryFuncCall<'_> {
-    fn resolve_concat(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        let mut result = self.extract_string(&context)?;
-
-        for param in params {
-            if let ArcTopicDataValue::None = *param {
-                continue;
-            }
-            result.push_str(&self.extract_string(&param)?);
-        }
-        Ok(ArcTopicDataValue::arc_from(result))
-    }
-    fn resolve_concat_with(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        if params.is_empty() {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "ConcatWith function[path={}, name={}] requires at least 2 parameters.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        }
-        let separator = self.extract_string(&params[0])?;
-        let mut result = self.extract_string(&context)?;
-
-        for param in params.iter().skip(1) {
-            if let ArcTopicDataValue::None = *param {
-                continue;
-            }
-            result.push_str(&separator);
-            result.push_str(&self.extract_string(param)?);
-        }
-        Ok(ArcTopicDataValue::arc_from(result))
-    }
-    fn resolve_join(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        let separator = if params.is_empty() {
-            ",".to_string()
-        } else if params.len() == 1 {
-            self.extract_string(&params[0])?
-        } else {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "Join function[path={}, name={}] requires at most 1 parameter.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        };
-        let vec_value = self.extract_vec(&context)?;
-        let strings: Vec<String> = vec_value
-            .iter()
-            .filter_map(|item| {
-                if let ArcTopicDataValue::None = **item {
-                    None
-                } else {
-                    self.extract_string(item).ok()
-                }
-            })
-            .collect();
-        Ok(ArcTopicDataValue::arc_from(strings.join(&separator)))
-    }
     fn resolve_distinct(
         &self,
         context: Arc<ArcTopicDataValue>,
@@ -560,9 +492,13 @@ impl<'a> InMemoryFuncCall<'a> {
             VariablePredefineFunctions::Lower => self.resolve_lower_of_str(context, params),
             VariablePredefineFunctions::Contains => self.resolve_contains_of_str(context, params),
             VariablePredefineFunctions::Split => self.resolve_split_of_str(context, params),
-            VariablePredefineFunctions::Concat => self.resolve_concat(context, params),
-            VariablePredefineFunctions::ConcatWith => self.resolve_concat_with(context, params),
-            VariablePredefineFunctions::Join => self.resolve_join(context, params),
+            VariablePredefineFunctions::Concat => {
+                self.resolve_concat_of_non_vec_or_map(context, params)
+            }
+            VariablePredefineFunctions::ConcatWith => {
+                self.resolve_concat_with_of_non_vec_or_map(context, params)
+            }
+            VariablePredefineFunctions::Join => self.resolve_join_of_str_or_vec(context, params),
             VariablePredefineFunctions::Distinct => self.resolve_distinct(context, params),
             VariablePredefineFunctions::Sum => self.resolve_sum(context, params),
             VariablePredefineFunctions::Avg => self.resolve_avg(context, params),
