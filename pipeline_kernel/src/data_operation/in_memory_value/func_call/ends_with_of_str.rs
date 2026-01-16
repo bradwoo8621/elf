@@ -19,10 +19,7 @@ impl InMemoryFuncCall<'_> {
     ) -> StdR<Arc<ArcTopicDataValue>> {
         self.only_param(&params, |param| match context.deref() {
             ArcTopicDataValue::Str(str) => {
-                let sub = match param {
-                    ArcTopicDataValue::Str(sub) => sub.deref(),
-                    other => return self.param_must_be_str(self.func(), 0, other),
-                };
+                let sub = self.param_to_str(param, 0)?;
                 if sub.len() == 0 {
                     Ok(ArcTopicDataValue::arc_from(true))
                 } else if str.len() == 0 {

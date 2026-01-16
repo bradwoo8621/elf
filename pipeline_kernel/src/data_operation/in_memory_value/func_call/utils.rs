@@ -14,22 +14,6 @@ impl InMemoryFuncCall<'_> {
             .unwrap_or_else(|| self.decimal_parse_error("none"))
     }
 
-    pub fn try_to_usize<CannotCast>(
-        &self,
-        param: &ArcTopicDataValue,
-        none_value: usize,
-        cannot_cast: CannotCast,
-    ) -> StdR<usize>
-    where
-        CannotCast: FnOnce() -> StdR<usize>,
-    {
-        if let Ok(value) = param.try_to_usize_or_if_none(none_value) {
-            Ok(value)
-        } else {
-            cannot_cast()
-        }
-    }
-
     pub fn no_param<R, DoWhenNoParam>(
         &self,
         params: &Vec<Arc<ArcTopicDataValue>>,
@@ -56,8 +40,32 @@ impl InMemoryFuncCall<'_> {
     {
         match params.len() {
             0 => self.param_count_not_enough(self.func(), 0),
-            1 => do_when_only_param(params[0].deref()),
+            1 => do_when_only_param(&params[0]),
             cnt => self.param_count_too_many(self.func(), cnt),
+        }
+    }
+
+    pub fn param_to_str<'a>(
+        &self,
+        param: &'a ArcTopicDataValue,
+        param_index: usize,
+    ) -> StdR<&'a String> {
+        match param {
+            ArcTopicDataValue::Str(sub) => Ok(sub.deref()),
+            other => return self.param_must_be_str(self.func(), param_index, other),
+        }
+    }
+
+    pub fn param_to_usize(
+        &self,
+        param: &ArcTopicDataValue,
+        none_value: usize,
+        param_index: usize,
+    ) -> StdR<usize> {
+        if let Ok(value) = param.try_to_usize_or_if_none(none_value) {
+            Ok(value)
+        } else {
+            self.param_must_be_num(self.func(), param_index, param)
         }
     }
 }

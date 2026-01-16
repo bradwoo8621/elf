@@ -15,9 +15,7 @@ impl InMemoryFuncCall<'_> {
         self.no_param(&params, || match context.deref() {
             ArcTopicDataValue::Str(str) => match str.len() {
                 0 => Ok(context),
-                _ => Ok(ArcTopicDataValue::arc_from(
-                    str.deref().to_uppercase().to_string(),
-                )),
+                _ => Ok(ArcTopicDataValue::arc_from(str.to_uppercase().to_string())),
             },
             other => self.func_not_supported(other),
         })

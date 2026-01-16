@@ -21,15 +21,12 @@ impl InMemoryFuncCall<'_> {
     ) -> StdR<Arc<ArcTopicDataValue>> {
         self.only_param(&params, |param| match context.deref() {
             ArcTopicDataValue::Str(str) => {
-                let sub = match param {
-                    ArcTopicDataValue::Str(sub) => sub.deref(),
-                    other => return self.param_must_be_str(self.func(), 0, other),
-                };
+                let sub = self.param_to_str(param, 0)?;
                 if sub.len() == 0 {
                     Ok(ArcTopicDataValue::arc_from(BigDecimal::zero()))
                 } else if str.len() == 0 {
                     Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
-                } else if let Some(index) = str.deref().find(sub) {
+                } else if let Some(index) = str.find(sub) {
                     Ok(ArcTopicDataValue::arc_from(BigDecimal::from(index as u128)))
                 } else {
                     Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))

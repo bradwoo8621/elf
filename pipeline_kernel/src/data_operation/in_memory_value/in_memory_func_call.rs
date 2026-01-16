@@ -29,52 +29,6 @@ impl<'a> InMemoryFuncCall<'a> {
 }
 
 impl InMemoryFuncCall<'_> {
-    fn resolve_contains(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        if params.len() != 1 {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "Contains function[path={}, name={}] requires exactly 1 parameter.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        }
-        let substring = self.extract_string(&params[0])?;
-        let str_value = self.extract_string(&context)?;
-        Ok(ArcTopicDataValue::arc_from(str_value.contains(&substring)))
-    }
-    fn resolve_split(
-        &self,
-        context: Arc<ArcTopicDataValue>,
-        params: Vec<Arc<ArcTopicDataValue>>,
-    ) -> StdR<Arc<ArcTopicDataValue>> {
-        let separator = if params.is_empty() {
-            ",".to_string()
-        } else if params.len() == 1 {
-            self.extract_string(&params[0])?
-        } else {
-            return PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
-                "Split function[path={}, name={}] requires at most 1 parameter.",
-                self.path.full_path(),
-                self.path.this_path()
-            ));
-        };
-        let str_value = self.extract_string(&context)?;
-        let parts: Vec<Arc<ArcTopicDataValue>> = if separator.is_empty() {
-            str_value
-                .chars()
-                .map(|c| ArcTopicDataValue::arc_from(c.to_string()))
-                .collect()
-        } else {
-            str_value
-                .split(&separator)
-                .map(|s| ArcTopicDataValue::arc_from(s.to_string()))
-                .collect()
-        };
-        Ok(ArcTopicDataValue::arc_from(parts))
-    }
     fn resolve_concat(
         &self,
         context: Arc<ArcTopicDataValue>,
@@ -604,7 +558,7 @@ impl<'a> InMemoryFuncCall<'a> {
             }
             VariablePredefineFunctions::Upper => self.resolve_upper_of_str(context, params),
             VariablePredefineFunctions::Lower => self.resolve_lower_of_str(context, params),
-            VariablePredefineFunctions::Contains => self.resolve_contains(context, params),
+            VariablePredefineFunctions::Contains => self.resolve_contains_of_str(context, params),
             VariablePredefineFunctions::Split => self.resolve_split(context, params),
             VariablePredefineFunctions::Concat => self.resolve_concat(context, params),
             VariablePredefineFunctions::ConcatWith => self.resolve_concat_with(context, params),

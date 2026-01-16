@@ -18,15 +18,11 @@ impl InMemoryFuncCall<'_> {
             ArcTopicDataValue::Str(str) => match str.len() {
                 0 => Ok(context),
                 _ => match params.len() {
-                    0 => Ok(ArcTopicDataValue::arc_from(str.deref().trim().to_string())),
+                    0 => Ok(ArcTopicDataValue::arc_from(str.trim().to_string())),
                     1 => {
-                        let matches = match params[0].deref() {
-                            ArcTopicDataValue::Str(sub) => sub.deref().clone(),
-                            other => return self.param_must_be_str(self.func(), 0, other),
-                        };
+                        let matches = self.param_to_str(&params[0], 0)?;
                         Ok(ArcTopicDataValue::arc_from(
-                            str.deref()
-                                .trim_matches(&matches.chars().collect::<Vec<char>>()[..])
+                            str.trim_matches(&matches.chars().collect::<Vec<char>>()[..])
                                 .to_string(),
                         ))
                     }

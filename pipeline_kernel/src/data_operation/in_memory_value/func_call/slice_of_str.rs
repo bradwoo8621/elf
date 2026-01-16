@@ -27,20 +27,14 @@ impl InMemoryFuncCall<'_> {
                     let (start_index, end_index) = match params.len() {
                         0 => return self.param_count_not_enough(self.func(), 0),
                         1 => {
-                            let start_index = self.try_to_usize(params[0].deref(), 0, || {
-                                self.param_must_be_num(self.func(), 0, params[0].deref())
-                            })?;
+                            let start_index = self.param_to_usize(&params[0], 0, 0)?;
                             let end_index = str.chars().count();
                             (start_index, end_index)
                         }
                         2 => {
-                            let start_index = self.try_to_usize(params[0].deref(), 0, || {
-                                self.param_must_be_num(self.func(), 0, params[0].deref())
-                            })?;
+                            let start_index = self.param_to_usize(&params[0], 0, 0)?;
                             let end_index =
-                                self.try_to_usize(params[1].deref(), str.chars().count(), || {
-                                    self.param_must_be_num(self.func(), 0, params[1].deref())
-                                })?;
+                                self.param_to_usize(&params[1], str.chars().count(), 1)?;
                             (start_index, end_index)
                         }
                         cnt => return self.param_count_too_many(self.func(), cnt),
