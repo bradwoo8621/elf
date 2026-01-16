@@ -68,8 +68,10 @@ impl<'a> InMemoryFuncCall<'a> {
             VariablePredefineFunctions::ConcatWith => {
                 self.resolve_concat_with_of_non_vec_or_map(context, params)
             }
-            VariablePredefineFunctions::Join => self.resolve_join_of_str_or_vec(context, params),
-            // VariablePredefineFunctions::Distinct => self.resolve_distinct(context, params),
+            VariablePredefineFunctions::Join => self.resolve_join_of_non_map(context, params),
+            VariablePredefineFunctions::Distinct => {
+                self.resolve_distinct_of_non_map(context, params)
+            }
             // VariablePredefineFunctions::Sum => self.resolve_sum(context, params),
             // VariablePredefineFunctions::Avg => self.resolve_avg(context, params),
             // VariablePredefineFunctions::Max => self.resolve_max(context, params),

@@ -257,7 +257,7 @@ pub enum VariablePredefineFunctions {
     /// - join with comma: [x.join], [x.&join()], [&join(x)]
     /// - join with separator: [x.&join(separator)], [&join(x, separator)].
     ///
-    /// - [context]: vec, none.
+    /// - [context]: non map.
     /// - [none context], returns empty string.
     /// - [separator]: string, none. if none, treat as comma.
     ///
@@ -268,7 +268,7 @@ pub enum VariablePredefineFunctions {
     /// get a distinct vec, [only in-memory].
     /// [x.&distinct], [x.&distinct()], [&distinct(x)]
     ///
-    /// - [context]: vec, none.
+    /// - [context]: non map.
     /// - [none context], returns empty vec.
     #[restrict(none_context = true, max_param_count = 0)]
     Distinct,

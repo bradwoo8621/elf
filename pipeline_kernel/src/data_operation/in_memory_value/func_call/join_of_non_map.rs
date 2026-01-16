@@ -1,16 +1,19 @@
 use crate::{ArcFrom, ArcTopicDataValue, InMemoryFuncCall};
-use elf_base::StdR;
+use elf_base::{StdR, StringConverter};
 use std::ops::Deref;
 use std::sync::Arc;
 
 impl InMemoryFuncCall<'_> {
     /// [VariablePredefineFunctions::Join]
     ///
-    /// concat strings with separator, context and params must, can be cast to string.
-    /// - zero parameter use comma as separator (env variable enabled), otherwise default use empty string.
+    /// for vec, join elements as string;
+    /// for other non-map values, return to string value.
+    /// - context can be anything but map,
+    /// - when zero parameter, use empty string as joiner.
+    ///   or use comma as joiner when [FUNC_JOIN_DEFAULT_USE_COMMA] is enabled (default disabled),
+    /// - when one parameter, must be string, as joiner,
     /// - the rest parameters are parts, even part is none or empty string, still count in.
-    /// - return self when self is string
-    /// - return joined string when self is vec, and element of vec cannot be vec or map.
+    /// - element of vec cannot be vec or map.
     ///
     /// TIP differences with the python version as below,
     ///
@@ -18,8 +21,7 @@ impl InMemoryFuncCall<'_> {
     /// | ------- | ------ | ---- | ----------- |
     /// | zero parameter use comma | default enabled | default disabled, enabled by env variable `FUNC_JOIN_DEFAULT_USE_COMMA` | |
     /// | none value to `None` | yes | no | it is incorrect, none value should be treated as empty string |
-    ///
-    pub fn resolve_join_of_str_or_vec(
+    pub fn resolve_join_of_non_map(
         &self,
         context: Arc<ArcTopicDataValue>,
         params: Vec<Arc<ArcTopicDataValue>>,
@@ -38,7 +40,15 @@ impl InMemoryFuncCall<'_> {
         };
 
         match context.deref() {
+            ArcTopicDataValue::None => Ok(ArcTopicDataValue::arc_from("".to_string())),
             ArcTopicDataValue::Str(s) => Ok(Arc::new(ArcTopicDataValue::Str(s.clone()))),
+            ArcTopicDataValue::Num(n) => Ok(ArcTopicDataValue::arc_from(String::from_decimal(n))),
+            ArcTopicDataValue::Bool(b) => Ok(ArcTopicDataValue::arc_from(String::from_bool(b))),
+            ArcTopicDataValue::DateTime(dt) => {
+                Ok(ArcTopicDataValue::arc_from(String::from_datetime(dt)))
+            }
+            ArcTopicDataValue::Date(d) => Ok(ArcTopicDataValue::arc_from(String::from_date(d))),
+            ArcTopicDataValue::Time(t) => Ok(ArcTopicDataValue::arc_from(String::from_time(t))),
             ArcTopicDataValue::Vec(vec) => {
                 if vec.is_empty() {
                     Ok(ArcTopicDataValue::arc_from("".to_string()))
@@ -50,7 +60,7 @@ impl InMemoryFuncCall<'_> {
                     Ok(ArcTopicDataValue::arc_from(str_vec.join(separator)))
                 }
             }
-            other => self.func_not_supported(other)?,
+            ArcTopicDataValue::Map(_) => self.func_not_supported(context.deref())?,
         }
     }
 }
