@@ -2,6 +2,7 @@ use crate::{BaseDataModel, ModelErrorCode, Parameter, ParameterKind, Storable};
 use elf_base::{ErrorCode, StdR};
 use elf_model_marco::{adapt_model, Display, Serde, StrEnum, VPF};
 
+// noinspection SpellCheckingInspection
 /// predefined functions for variable parameters.
 ///
 /// each function has restrictions:

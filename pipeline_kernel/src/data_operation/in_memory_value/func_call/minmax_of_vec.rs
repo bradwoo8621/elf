@@ -57,33 +57,33 @@ impl MinmaxState<'_> {
     fn check_indicators(&self) -> VoidR {
         // check allowable indicators
         match (
-			self.allow_decimal,
-			self.allow_datetime,
-			self.allow_date,
-			self.allow_time,
-		) {
-			(true, false, false, false)
-			| (false, true, false, false)
-			| (false, false, true, false)
-			| (false, false, false, true)
-			| (true, true, true, true) => {
-				// allowed, do nothing
-				Ok(())
-			}
-			_ => {
-				PipelineKernelErrorCode::VariableFuncNotSupported.msg(format!(
-					"Cannot retrieve[key={}, current={}], \
+            self.allow_decimal,
+            self.allow_datetime,
+            self.allow_date,
+            self.allow_time,
+        ) {
+            (true, false, false, false)
+            | (false, true, false, false)
+            | (false, false, true, false)
+            | (false, false, false, true)
+            | (true, true, true, true) => {
+                // allowed, do nothing
+                Ok(())
+            }
+            _ => {
+                PipelineKernelErrorCode::VariableFuncNotSupported.msg(format!(
+                    "Cannot retrieve[key={}, current={}], \
                     caused by only one of decimal/date/datetime/time is allowed or all 4 types are allowed, \
                     and current is [allow_decimal={}, allow_datetime={}, allow_date={}, allow_time={}].",
-					self.func_call.full_path(),
-					self.func_call.this_path(),
-					self.allow_decimal,
-					self.allow_datetime,
-					self.allow_date,
-					self.allow_time
-				))
-			}
-		}
+                    self.func_call.full_path(),
+                    self.func_call.this_path(),
+                    self.allow_decimal,
+                    self.allow_datetime,
+                    self.allow_date,
+                    self.allow_time
+                ))
+            }
+        }
     }
 
     fn func_not_supported<R>(&self) -> StdR<R> {
@@ -120,7 +120,22 @@ impl MinmaxState<'_> {
         }
     }
 
-    // noinspection DuplicatedCode
+    /// compare given decimal value with found min/max result (if exists)
+    /// and return true when needs to replace the min/max result
+    fn should_replace_decimal_result(&self, decimal: &BigDecimal) -> bool {
+        if let Some(found) = self.decimal_result.as_ref() {
+            if self.ask_min_value {
+                // this value is less than the found one, should replace
+                found.deref() > decimal
+            } else {
+                // this value is greater than the found one, should replace
+                found.deref() < decimal
+            }
+        } else {
+            true
+        }
+    }
+
     /// - raise error when [allow_decimal] is false,
     /// - set [allow_datetime], [allow_date], [allow_time] to false,
     /// - replace [decimal_result] by given value if no result detected yet,
@@ -132,28 +147,29 @@ impl MinmaxState<'_> {
             self.allow_datetime = false;
             self.allow_date = false;
             self.allow_time = false;
-            let should_replace = self
-                .decimal_result
-                .as_ref()
-                .map(|found| {
-                    // result of decimal already detected
-                    if self.ask_min_value {
-                        // this value is less than the found one, should replace
-                        found.deref() > value.deref()
-                    } else {
-                        // this value is greater than the found one, should replace
-                        found.deref() < value.deref()
-                    }
-                    // no result detected yet
-                })
-                .unwrap_or(true);
-            if should_replace {
+            if self.should_replace_decimal_result(value.deref()) {
                 self.decimal_result = Some(value.clone());
             }
             Ok(())
         } else {
             // decimal is disallowed
             self.func_not_supported()
+        }
+    }
+
+    /// compare given datetime value with found min/max result (if exists)
+    /// and return true when needs to replace the min/max result
+    fn should_replace_datetime_result(&self, datetime: &NaiveDateTime) -> bool {
+        if let Some(found) = self.datetime_result.as_ref() {
+            if self.ask_min_value {
+                // this value is less than the found one, should replace
+                found.deref() > datetime
+            } else {
+                // this value is greater than the found one, should replace
+                found.deref() < datetime
+            }
+        } else {
+            true
         }
     }
 
@@ -174,23 +190,8 @@ impl MinmaxState<'_> {
             self.allow_time = false;
             // on cast date to datetime, always use the 00:00:00.000,
             // the found date and datetime are always set together.
-            // will replace found value with this value
-            // - no found value existing
             date.and_hms_nano_opt(0, 0, 0, 0).map(|datetime| {
-                let should_replace = self
-                    .datetime_result
-                    .as_ref()
-                    .map(|found| {
-                        if self.ask_min_value {
-                            // - this value is less than the found value
-                            found.deref() > &datetime
-                        } else {
-                            // - this value is greater than the found value
-                            found.deref() < &datetime
-                        }
-                    })
-                    .unwrap_or(true);
-                if should_replace {
+                if self.should_replace_datetime_result(&datetime) {
                     self.date_result = Some(date.clone());
                     self.datetime_result = Some(Arc::new(datetime));
                 }
@@ -203,7 +204,6 @@ impl MinmaxState<'_> {
         }
     }
 
-    // noinspection DuplicatedCode
     /// - raise error when [allow_date] and [allow_datetime] are false,
     /// - set [allow_decimal], [allow_time] to false,
     /// - replace [date_result] by given value (truncate the time part) if no result detected yet,
@@ -219,22 +219,7 @@ impl MinmaxState<'_> {
             self.allow_decimal = false;
             self.allow_time = false;
             // the found date and datetime are always set together.
-            // will replace found value with this value
-            // - no found value existing
-            let should_replace = self
-                .datetime_result
-                .as_ref()
-                .map(|found| {
-                    if self.ask_min_value {
-                        // - this value is less than the found value
-                        found.deref() > datetime.deref()
-                    } else {
-                        // - this value is greater than the found value
-                        found.deref() < datetime.deref()
-                    }
-                })
-                .unwrap_or(true);
-            if should_replace {
+            if self.should_replace_datetime_result(datetime.deref()) {
                 self.date_result = Some(Arc::new(datetime.date()));
                 self.datetime_result = Some(datetime.clone());
             }
@@ -245,7 +230,22 @@ impl MinmaxState<'_> {
         }
     }
 
-    // noinspection DuplicatedCode
+    /// compare given time value with found min/max result (if exists)
+    /// and return true when needs to replace the min/max result
+    fn should_replace_time_result(&self, time: &NaiveTime) -> bool {
+        if let Some(found) = self.time_result.as_ref() {
+            if self.ask_min_value {
+                // this value is less than the found one, should replace
+                found.deref() > time
+            } else {
+                // this value is greater than the found one, should replace
+                found.deref() < time
+            }
+        } else {
+            true
+        }
+    }
+
     /// - raise error when [allow_time] is false,
     /// - set [allow_decimal], [allow_datetime], [allow_date] to false,
     /// - replace [time_result] by given value if no result detected yet,
@@ -256,22 +256,7 @@ impl MinmaxState<'_> {
             self.allow_decimal = false;
             self.allow_datetime = false;
             self.allow_date = false;
-            let should_replace = self
-                .time_result
-                .as_ref()
-                .map(|found| {
-                    // result of time already detected
-                    if self.ask_min_value {
-                        // this value is less than the found one, should replace
-                        found.deref() > time.deref()
-                    } else {
-                        // this value is greater than the found one, should replace
-                        found.deref() < time.deref()
-                    }
-                    // no result detected yet
-                })
-                .unwrap_or(true);
-            if should_replace {
+            if self.should_replace_time_result(time.deref()) {
                 self.time_result = Some(time.clone());
             }
             Ok(())
@@ -318,18 +303,7 @@ impl MinmaxState<'_> {
     fn continue_find_decimal_on_str_elements(&mut self) -> VoidR {
         for element in self.str_elements.iter() {
             if let Ok(decimal) = element.to_decimal() {
-                if let Some(found) = self.decimal_result.as_ref() {
-                    let should_replace = if self.ask_min_value {
-                        // this value is less than the found one, should replace
-                        found.deref() > &decimal
-                    } else {
-                        // this value is greater than the found one, should replace
-                        found.deref() < &decimal
-                    };
-                    if should_replace {
-                        self.decimal_result = Some(Arc::new(decimal));
-                    }
-                } else {
+                if self.should_replace_decimal_result(&decimal) {
                     self.decimal_result = Some(Arc::new(decimal));
                 }
             } else {
@@ -348,22 +322,7 @@ impl MinmaxState<'_> {
         for element in self.str_elements.iter() {
             if let Ok(datetime) = element.to_datetime_loose() {
                 // the found date and datetime are always set together.
-                // will replace found value with this value
-                // - no found value existing
-                let should_replace = self
-                    .datetime_result
-                    .as_ref()
-                    .map(|found| {
-                        if self.ask_min_value {
-                            // - this value is less than the found value
-                            found.deref() > &datetime
-                        } else {
-                            // - this value is greater than the found value
-                            found.deref() < &datetime
-                        }
-                    })
-                    .unwrap_or(true);
-                if should_replace {
+                if self.should_replace_datetime_result(&datetime) {
                     self.date_result = Some(Arc::new(datetime.date()));
                     self.datetime_result = Some(Arc::new(datetime));
                 }
@@ -378,18 +337,7 @@ impl MinmaxState<'_> {
     fn continue_find_time_on_str_elements(&mut self) -> VoidR {
         for element in self.str_elements.iter() {
             if let Ok(time) = element.to_time() {
-                if let Some(found) = self.time_result.as_ref() {
-                    let should_replace = if self.ask_min_value {
-                        // this value is less than the found one, should replace
-                        found.deref() > &time
-                    } else {
-                        // this value is greater than the found one, should replace
-                        found.deref() < &time
-                    };
-                    if should_replace {
-                        self.time_result = Some(Arc::new(time));
-                    }
-                } else {
+                if self.should_replace_time_result(&time) {
                     self.time_result = Some(Arc::new(time));
                 }
             } else {
@@ -400,6 +348,7 @@ impl MinmaxState<'_> {
         Ok(())
     }
 
+    // noinspection DuplicatedCode
     /// so far, the logic above may not have obtained any min/max values based on type.
     /// therefore, when analyzing string values,
     /// they could still be any of the following types: decimal, date, datetime, or time.
@@ -410,8 +359,89 @@ impl MinmaxState<'_> {
     /// - if any element can be identified as date/datetime/time,
     ///   and it cannot be cast to decimal, the possibility of decimal should be ignored,
     /// - priority of date/datetime is higher than time,
-    ///
     fn continue_find_any_on_str_elements(&mut self) -> VoidR {
+        let mut hold_elements = vec![];
+        for element in self.str_elements.iter() {
+            if self.allow_decimal
+                && let Ok(decimal) = element.to_decimal()
+            {
+                // hold this element, many some after will be date/datetime/time
+                // so this element needs to be reparsed
+                hold_elements.push(element);
+                // decimal has top priority
+                if self.should_replace_decimal_result(&decimal) {
+                    self.decimal_result = Some(Arc::new(decimal));
+                }
+            } else if (self.allow_date || self.allow_datetime)
+                && let Ok(mut datetime) = element.to_datetime_loose()
+            {
+                // check the hold elements
+                if !hold_elements.is_empty() {
+                    for hold_element in hold_elements.iter() {
+                        if let Ok(hold_datetime) = hold_element.to_datetime_loose() {
+                            if self.ask_min_value {
+                                if datetime > hold_datetime {
+                                    datetime = hold_datetime;
+                                }
+                            } else if datetime < hold_datetime {
+                                datetime = hold_datetime;
+                            }
+                        } else {
+                            // hold element cannot be cast to datetime, raise error
+                            return self.func_not_supported();
+                        }
+                    }
+                    // and clear hold elements
+                    hold_elements.clear();
+                }
+
+                self.allow_decimal = false;
+                self.allow_time = false;
+                if self.should_replace_datetime_result(&datetime) {
+                    self.date_result = Some(Arc::new(datetime.date()));
+                    self.datetime_result = Some(Arc::new(datetime));
+                }
+            } else if self.allow_time
+                && let Ok(mut time) = element.to_time()
+            {
+                // check the hold elements
+                if !hold_elements.is_empty() {
+                    for hold_element in hold_elements.iter() {
+                        if let Ok(hold_time) = hold_element.to_time() {
+                            if self.ask_min_value {
+                                if time > hold_time {
+                                    time = hold_time;
+                                }
+                            } else if time < hold_time {
+                                time = hold_time;
+                            }
+                        } else {
+                            // hold element cannot be cast to time, raise error
+                            return self.func_not_supported();
+                        }
+                    }
+                    // and clear hold elements
+                    hold_elements.clear();
+                }
+
+                self.allow_decimal = false;
+                self.allow_date = false;
+                self.allow_datetime = false;
+                if self.should_replace_time_result(&time) {
+                    self.time_result = Some(Arc::new(time));
+                }
+            } else {
+                // this string value cannot be cast to any of decimal/date/datetime/time
+                // raise error
+                return self.func_not_supported();
+            }
+        }
+
+        // everything is ok, then make sure if date/datetime allowed, return datetime
+        if self.allow_date {
+            self.allow_date = false;
+        }
+
         Ok(())
     }
 
@@ -542,5 +572,13 @@ impl InMemoryFuncCall<'_> {
         state.check_indicators()?;
 
         self.no_param(&params, || state.find())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn test_decimal() {
+        // TODO
     }
 }
