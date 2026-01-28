@@ -1,6 +1,7 @@
 mod errors;
 mod utils;
 
+mod avg_of_vec;
 mod concat_of_non_vec_and_map;
 mod concat_with_of_non_vec_and_map;
 mod contains_of_str;
@@ -12,10 +13,12 @@ mod find_of_str;
 mod join_of_non_map;
 mod length_of_str_or_num;
 mod lower_of_str;
+mod minmax_of_vec;
 mod replace_first_of_str;
 mod replace_of_str;
 mod slice_of_str;
 mod split_of_str;
 mod starts_with_of_str;
+mod sum_of_vec;
 mod trim_of_str;
 mod upper_of_str;

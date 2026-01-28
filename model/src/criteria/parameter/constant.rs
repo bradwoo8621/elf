@@ -278,7 +278,8 @@ pub enum VariablePredefineFunctions {
     /// - [context]: vec, none.
     /// - [none context], returns 0.
     ///
-    /// each value in vec should be a decimal, or can cast to decimal, or none which treated as 0,
+    /// each value in vec should be a decimal, or can cast to decimal,
+    /// or none/empty string which treated as 0,
     /// otherwise error raised.
     #[restrict(none_context = true, max_param_count = 0)]
     Sum,
@@ -288,8 +289,9 @@ pub enum VariablePredefineFunctions {
     /// - [context]: vec, none.
     /// - [none context], returns 0.
     ///
-    /// each value in vec should be a decimal, or can cast to decimal, or none which treated as 0,
+    /// each value in vec should be a decimal, or can cast to decimal,
     /// otherwise error raised.
+    /// none/empty string doesn't count in
     #[restrict(none_context = true, max_param_count = 0)]
     Avg,
     /// max of elements of vec, [only in-memory].
@@ -315,7 +317,7 @@ pub enum VariablePredefineFunctions {
     /// [x.&maxNum], [x.&maxNum()], [&maxNum(x)]
     ///
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
+    /// - [none context], returns none.
     ///
     /// each value in vec should be a decimal, or can cast to decimal, or none which ignored,
     /// otherwise error raised.
@@ -326,7 +328,7 @@ pub enum VariablePredefineFunctions {
     /// [x.&maxDate], [x.&maxDate()], [&maxDate(x)]
     ///
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
+    /// - [none context], returns none.
     ///
     /// each value in vec should be a date/datetime, or can cast to date/datetime, or none which ignored,
     /// otherwise error raised.
@@ -337,7 +339,7 @@ pub enum VariablePredefineFunctions {
     /// [x.&maxDatetime], [x.&maxDatetime()], [&maxDatetime(x)]
     ///
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
+    /// - [none context], returns none.
     ///
     /// each value in vec should be a datetime, or can cast to datetime, or none which ignored,
     /// otherwise error raised.
@@ -352,7 +354,7 @@ pub enum VariablePredefineFunctions {
     /// [x.&maxTime], [x.&maxTime()], [&maxTime(x)]
     ///
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
+    /// - [none context], returns none.
     ///
     /// each value in vec should be a time, or can cast to time, or none which ignored,
     /// otherwise error raised.
@@ -363,7 +365,7 @@ pub enum VariablePredefineFunctions {
     /// [x.&min], [x.&min()], [&min(x)]
     ///
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
+    /// - [none context], returns none.
     ///
     /// each value in vec should be a decimal/date/datetime/time,
     /// or can cast to decimal/date/datetime/tim, or none which treated as min value,
@@ -382,7 +384,7 @@ pub enum VariablePredefineFunctions {
     /// [x.&minNum], [x.&minNum()], [&minNum(x)]
     ///
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
+    /// - [none context], returns none.
     ///
     /// each value in vec should be a decimal, or can cast to decimal, or none which treated as min value,
     /// otherwise error raised.
@@ -393,7 +395,7 @@ pub enum VariablePredefineFunctions {
     /// [x.&minDate], [x.&minDate()], [&minDate(x)]
     ///
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
+    /// - [none context], returns none.
     ///
     /// each value in vec should be a date/datetime, or can cast to date/datetime, or none which treated as min value,
     /// otherwise error raised.
@@ -404,7 +406,7 @@ pub enum VariablePredefineFunctions {
     /// [x.&minDatetime], [x.&minDatetime()], [&minDatetime(x)]
     ///
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
+    /// - [none context], returns none.
     ///
     /// each value in vec should be a datetime, or can cast to datetime, or none which treated as min value,
     /// otherwise error raised.
@@ -419,7 +421,7 @@ pub enum VariablePredefineFunctions {
     /// [x.&minTime], [x.&minTime()], [&minTime(x)]
     ///
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
+    /// - [none context], returns none.
     ///
     /// each value in vec should be a time, or can cast to time, or none which treated as min value,
     /// otherwise error raised.

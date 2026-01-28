@@ -72,20 +72,38 @@ impl<'a> InMemoryFuncCall<'a> {
             VariablePredefineFunctions::Distinct => {
                 self.resolve_distinct_of_non_map(context, params)
             }
-            // VariablePredefineFunctions::Sum => self.resolve_sum(context, params),
-            // VariablePredefineFunctions::Avg => self.resolve_avg(context, params),
-            // VariablePredefineFunctions::Max => self.resolve_max(context, params),
-            // VariablePredefineFunctions::MaxNum => self.resolve_max_num(context, params),
-            // VariablePredefineFunctions::MaxDate => self.resolve_max_date(context, params),
-            // VariablePredefineFunctions::MaxDatetime => self.resolve_max_datetime(context, params),
-            // VariablePredefineFunctions::MaxDt => self.resolve_max_datetime(context, params),
-            // VariablePredefineFunctions::MaxTime => self.resolve_max_time(context, params),
-            // VariablePredefineFunctions::Min => self.resolve_min(context, params),
-            // VariablePredefineFunctions::MinNum => self.resolve_min_num(context, params),
-            // VariablePredefineFunctions::MinDate => self.resolve_min_date(context, params),
-            // VariablePredefineFunctions::MinDatetime => self.resolve_min_datetime(context, params),
-            // VariablePredefineFunctions::MinDt => self.resolve_min_datetime(context, params),
-            // VariablePredefineFunctions::MinTime => self.resolve_min_time(context, params),
+            VariablePredefineFunctions::Sum => self.resolve_sum_of_vec(context, params),
+            VariablePredefineFunctions::Avg => self.resolve_avg_of_vec(context, params),
+            VariablePredefineFunctions::Max => {
+                self.resolve_minmax_of_vec(context, params, true, true, true, true, false)
+            }
+            VariablePredefineFunctions::MaxNum => {
+                self.resolve_minmax_of_vec(context, params, true, false, false, false, false)
+            }
+            VariablePredefineFunctions::MaxDate => {
+                self.resolve_minmax_of_vec(context, params, false, false, true, false, false)
+            }
+            VariablePredefineFunctions::MaxDatetime | VariablePredefineFunctions::MaxDt => {
+                self.resolve_minmax_of_vec(context, params, false, true, false, false, false)
+            }
+            VariablePredefineFunctions::MaxTime => {
+                self.resolve_minmax_of_vec(context, params, false, false, false, true, false)
+            }
+            VariablePredefineFunctions::Min => {
+                self.resolve_minmax_of_vec(context, params, true, true, true, true, true)
+            }
+            VariablePredefineFunctions::MinNum => {
+                self.resolve_minmax_of_vec(context, params, true, false, false, false, true)
+            }
+            VariablePredefineFunctions::MinDate => {
+                self.resolve_minmax_of_vec(context, params, false, false, true, false, true)
+            }
+            VariablePredefineFunctions::MinDatetime | VariablePredefineFunctions::MinDt => {
+                self.resolve_minmax_of_vec(context, params, false, true, false, false, true)
+            }
+            VariablePredefineFunctions::MinTime => {
+                self.resolve_minmax_of_vec(context, params, false, false, false, true, true)
+            }
             VariablePredefineFunctions::FromCurrentTriggerData => self.context_disallowed(),
             VariablePredefineFunctions::FromPreviousTriggerData => self.context_disallowed(),
             // VariablePredefineFunctions::DayDiff => self.resolve_day_diff(context, params),

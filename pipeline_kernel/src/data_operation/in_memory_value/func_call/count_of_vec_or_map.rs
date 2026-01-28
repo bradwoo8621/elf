@@ -7,7 +7,8 @@ use std::sync::Arc;
 impl InMemoryFuncCall<'_> {
     /// [VariablePredefineFunctions::Count]
     ///
-    /// count of vec or map
+    /// count of vec or map.
+    /// - no parameter allowed.
     pub fn resolve_count_of_vec_or_map(
         &self,
         context: Arc<ArcTopicDataValue>,
