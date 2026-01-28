@@ -1,6 +1,7 @@
 use crate::{ArcFrom, ArcTopicDataValue, InMemoryFuncCall};
 use bigdecimal::BigDecimal;
-use elf_base::{StdR, StringConverter};
+use chrono::NaiveDate;
+use elf_base::{DateTimeUtils, StdR, StringConverter};
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -29,6 +30,22 @@ impl InMemoryFuncCall<'_> {
             ArcTopicDataValue::Vec(_) => self.str_parse_error(value)?,
         };
         Ok(str)
+    }
+
+    pub fn unwrap_as_date(&self, value: &ArcTopicDataValue) -> StdR<NaiveDate> {
+        let date = match value {
+            ArcTopicDataValue::Str(str) => {
+                if let Ok(date) = str.to_date_loose() {
+                    date
+                } else {
+                    return self.date_parse_error(value);
+                }
+            }
+            ArcTopicDataValue::Date(date) => date.deref().clone(),
+            ArcTopicDataValue::DateTime(datetime) => datetime.date(),
+            _ => return self.date_parse_error(value),
+        };
+        Ok(date)
     }
 
     pub fn no_param<R, DoWhenNoParam>(

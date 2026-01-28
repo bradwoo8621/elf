@@ -51,6 +51,7 @@ pub enum StdErrCode {
     DateTimeParse,
     DateParse,
     TimeParse,
+    StrParse,
     /// environment variables
     EnvInit,
     EnvFileFormatNotSupported,
@@ -71,6 +72,7 @@ impl ErrorCode for StdErrCode {
             Self::DateTimeParse => "STDE-00003",
             Self::DateParse => "STDE-00004",
             Self::TimeParse => "STDE-00005",
+            Self::StrParse => "STDE-00006",
 
             Self::EnvInit => "STDE-00100",
             Self::EnvFileFormatNotSupported => "STDE-00101",

@@ -23,8 +23,17 @@ impl InMemoryFuncCall<'_> {
     }
 
     pub fn str_parse_error<R>(&self, value: impl Display) -> StdR<R> {
-        StdErrCode::DecimalParse.msg(format!(
+        StdErrCode::StrParse.msg(format!(
             "Cannot retrieve[key={}, current={}] as str, cause by current value is [{}].",
+            self.full_path(),
+            self.this_path(),
+            value
+        ))
+    }
+
+    pub fn date_parse_error<R>(&self, value: impl Display) -> StdR<R> {
+        StdErrCode::DateParse.msg(format!(
+            "Cannot retrieve[key={}, current={}] as date, cause by current value is [{}].",
             self.full_path(),
             self.this_path(),
             value
