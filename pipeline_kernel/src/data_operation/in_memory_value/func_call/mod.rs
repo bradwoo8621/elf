@@ -6,6 +6,7 @@ mod concat_of_non_vec_and_map;
 mod concat_with_of_non_vec_and_map;
 mod contains_of_str;
 mod count_of_vec_or_map;
+mod date_format;
 mod day_diff;
 mod distinct_of_non_map;
 mod ends_with_of_str;
