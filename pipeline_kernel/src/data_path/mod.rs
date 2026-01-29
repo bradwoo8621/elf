@@ -5,6 +5,7 @@ mod data_path_plain;
 mod data_path_segment;
 mod parser;
 mod path_str;
+mod static_values;
 
 pub use data_path::*;
 pub use data_path_func::*;
@@ -13,3 +14,4 @@ pub use data_path_plain::*;
 pub use data_path_segment::*;
 pub use parser::*;
 pub use path_str::*;
+pub use static_values::*;

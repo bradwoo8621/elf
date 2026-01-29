@@ -109,10 +109,9 @@ impl<'a> InMemoryFuncCall<'a> {
             VariablePredefineFunctions::DayDiff => self.resolve_day_diff(context, params),
             VariablePredefineFunctions::MonthDiff => self.resolve_month_diff(context, params),
             VariablePredefineFunctions::YearDiff => self.resolve_year_diff(context, params),
-            // VariablePredefineFunctions::MoveDate => self.resolve_move_date(context, params),
+            VariablePredefineFunctions::MoveDate => self.resolve_move_date(context, params),
             VariablePredefineFunctions::DateFormat => self.resolve_date_format(context, params),
             VariablePredefineFunctions::Now => self.context_disallowed(),
-            _ => self.context_disallowed(),
         }
     }
 

@@ -26,3 +26,4 @@ mod sum_of_vec;
 mod trim_of_str;
 mod upper_of_str;
 mod year_diff;
+mod move_date;
