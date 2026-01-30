@@ -76,110 +76,150 @@ impl DateTimeMovement {
 
 pub type DateTimeMovements = Vec<DateTimeMovement>;
 
-pub struct DateTimeMoveSupport;
+pub struct DateTimeMoveSupport<'a> {
+    str: &'a str,
+    current_move: Option<DateTimeMovement>,
+    digits: Vec<char>,
 
-impl DateTimeMoveSupport {
-    fn parse_fail<R>(str: &String) -> StdR<R> {
-        StdErrCode::DateMovementParse.msg(format!("Cannot parse given movement[{}].", str))
+    // results
+    movements: DateTimeMovements,
+}
+
+impl DateTimeMoveSupport<'_> {
+    fn parse_fail<R>(&self) -> StdR<R> {
+        StdErrCode::DateMovementParse.msg(format!("Cannot parse given movement[{}].", self.str))
     }
 
     /// create movement when current movement not declared,
     /// otherwise raise error
-    fn create_move(
-        current_movement: &Option<DateTimeMovement>,
-        unit: DateTimeMovementUnit,
-        str: &String,
-    ) -> StdR<Option<DateTimeMovement>> {
-        if current_movement.is_none() {
-            Ok(Some(DateTimeMovement::create(unit)))
+    fn create_move(&mut self, unit: DateTimeMovementUnit) -> VoidR {
+        if self.current_move.is_none() {
+            self.current_move = Some(DateTimeMovement::create(unit));
+            Ok(())
         } else {
-            Self::parse_fail(str)
+            self.parse_fail()?
         }
     }
 
     /// set type when movement declared, and type not declared,
     /// otherwise raise error
-    fn update_move_type(
-        movement: &mut Option<DateTimeMovement>,
-        r#type: DateTimeMovementType,
-        str: &String,
-    ) -> VoidR {
-        if let Some(movement) = movement {
+    fn update_current_move_type(&mut self, r#type: DateTimeMovementType) -> VoidR {
+        if let Some(movement) = &mut self.current_move {
             match movement.r#type {
                 DateTimeMovementType::Set => {
                     movement.r#type = r#type;
                     Ok(())
                 }
-                _ => Self::parse_fail(str),
+                _ => self.parse_fail(),
             }
         } else {
-            Self::parse_fail(&str)
+            self.parse_fail()
         }
     }
 
-    pub fn parse(str: &String) -> StdR<DateTimeMovements> {
-        let mut movements: DateTimeMovements = vec![];
+    /// try to update movement offset
+    /// - has current movement, no offset: parse fail
+    /// - has current movement, has offset,
+    ///   - offset parse to u16, set offset, clear offset digits,
+    ///   - offset cannot parse to u16, parse fail,
+    /// - no current movement, no offset: do nothing,
+    /// - no current movement, has offset: parse fail.
+    fn try_update_move_offset(&mut self) -> VoidR {
+        match (&self.current_move, self.digits.is_empty()) {
+            (Some(_), true) => self.parse_fail(),
+            (Some(_), false) => {
+                if let Ok(offset) = u16::from_str(self.digits.iter().collect::<String>().as_str()) {
+                    self.digits.clear();
+                    // take over current movement
+                    let mut movement = self.current_move.take().unwrap();
+                    movement.offset = offset;
+                    self.movements.push(movement);
+                    Ok(())
+                } else {
+                    self.parse_fail()
+                }
+            }
+            (None, true) => Ok(()),
+            (None, false) => self.parse_fail(),
+        }
+    }
 
-        let mut current_move = None;
-        let mut digits = vec![];
+    fn with_unit_detected(&mut self, unit: DateTimeMovementUnit) -> VoidR {
+        self.try_update_move_offset()?;
+        self.create_move(unit)
+    }
 
-        for char in str.trim().chars() {
+    /// - The string must follow the format [Move1Move2...MoveN], where each Move has the format [Unit\[Type\]Offset],
+    /// - Unit is one of Y, M, D, h, m, s, representing year, month, day, hour, minute, second respectively,
+    /// - Type is one of + or -, representing addition or subtraction.
+    ///   If Type is omitted, it indicates direct setting.
+    /// - Offset is a number,
+    ///   - If it's an addition or subtraction, it must be a positive integer
+    ///   - If it's a setting, the valid range varies depending on the Unit:
+    ///     - Year: 4 digits,
+    ///     - Month: 1 - 12, any value greater than 12, treated as 12,
+    ///     - Day: 1 - days of month, any value greater than days of month, treated as last day of month,
+    ///     - Hour: 0 - 23, any value greater than 23, treated as 23,
+    ///     - Minute: 0 - 59, any value greater than 59, treated as 59,
+    ///     - Second: 0 - 59, any value greater than 59, treated as 59,
+    /// - whitespaces between moves are allowed, and will be ignored,
+    /// - whitespaces between unit and type are allowed, and will be ignored,
+    /// - whitespaces between type and offset are allowed, and will be ignored
+    fn do_parse(mut self) -> StdR<DateTimeMovements> {
+        for char in self.str.trim().chars() {
             match char {
-                'Y' => {
-                    current_move =
-                        Self::create_move(&current_move, DateTimeMovementUnit::Year, str)?
-                }
-                'M' => {
-                    current_move =
-                        Self::create_move(&current_move, DateTimeMovementUnit::Month, str)?
-                }
-                'D' => {
-                    current_move = Self::create_move(&current_move, DateTimeMovementUnit::Day, str)?
-                }
-                'h' => {
-                    current_move =
-                        Self::create_move(&current_move, DateTimeMovementUnit::Hour, str)?
-                }
-                'm' => {
-                    current_move =
-                        Self::create_move(&current_move, DateTimeMovementUnit::Minute, str)?
-                }
-                's' => {
-                    current_move =
-                        Self::create_move(&current_move, DateTimeMovementUnit::Second, str)?
-                }
-                '+' => Self::update_move_type(&mut current_move, DateTimeMovementType::Plus, str)?,
-                '-' => Self::update_move_type(&mut current_move, DateTimeMovementType::Minus, str)?,
+                'Y' => self.with_unit_detected(DateTimeMovementUnit::Year)?,
+                'M' => self.with_unit_detected(DateTimeMovementUnit::Month)?,
+                'D' => self.with_unit_detected(DateTimeMovementUnit::Day)?,
+                'h' => self.with_unit_detected(DateTimeMovementUnit::Hour)?,
+                'm' => self.with_unit_detected(DateTimeMovementUnit::Minute)?,
+                's' => self.with_unit_detected(DateTimeMovementUnit::Second)?,
+                '+' => self.update_current_move_type(DateTimeMovementType::Plus)?,
+                '-' => self.update_current_move_type(DateTimeMovementType::Minus)?,
                 '0'..='9' => {
                     // 0-9 only allowed after unit or type declared
-                    if current_move.is_none() {
-                        return Self::parse_fail(str);
+                    if self.current_move.is_none() {
+                        return self.parse_fail();
                     }
-                    digits.push(char);
+                    self.digits.push(char);
                 }
                 c if c.is_whitespace() => {
-                    if current_move.is_none() || digits.is_empty() {
-                        // no movement created, or digits part not start, ignore whitespace
-                        continue;
+                    if self.current_move.is_some() {
+                        if let Some(movement) = &self.current_move {
+                            match movement.r#type {
+                                DateTimeMovementType::Set => {
+                                    if self.digits.is_empty() {
+                                        // whitespace is between unit and type
+                                        continue;
+                                    }
+                                }
+                                _ => {}
+                            }
+                        }
                     }
-
-                    if let Ok(offset) = u16::from_str(digits.iter().collect::<String>().as_str()) {
-                        // take over movement, set offset, and push to movements
-                        let mut movement = current_move.take().unwrap();
-                        movement.offset = offset;
-                        movements.push(movement);
-                    } else {
-                        return Self::parse_fail(str);
-                    }
+                    self.try_update_move_offset()?;
                 }
-                _ => return Self::parse_fail(str),
+                _ => return self.parse_fail(),
             }
         }
 
-        if current_move.is_some() {
-            Self::parse_fail(str)
+        if self.current_move.is_some() {
+            self.parse_fail()
         } else {
-            Ok(movements)
+            Ok(self.movements)
         }
+    }
+}
+
+impl DateTimeMoveSupport<'_> {
+    pub fn parse(str: &String) -> StdR<DateTimeMovements> {
+        DateTimeMoveSupport {
+            str: str.trim(),
+
+            current_move: None,
+            digits: vec![],
+            movements: vec![],
+        }
+        .do_parse()
     }
 }

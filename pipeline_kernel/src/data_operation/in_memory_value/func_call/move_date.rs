@@ -97,7 +97,7 @@ impl DateMoveHelper {
         movements: &ArcTopicDataValue,
     ) -> StdR<Arc<DateTimeMovements>> {
         match movements {
-            ArcTopicDataValue::Str(str) => Ok(Arc::new(DateTimeMoveSupport::parse(str)?)),
+            ArcTopicDataValue::Str(str) => Ok(Arc::new(DateTimeMoveSupport::parse(str.deref())?)),
             ArcTopicDataValue::Vec(vec) => {
                 if vec.len() != 2 {
                     return func_call.func_not_supported(movements);
