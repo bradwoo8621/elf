@@ -284,7 +284,7 @@ mod tests {
     fn test_compute_concat_with() {
         let path = create_test_path(VariablePredefineFunctions::ConcatWith);
         let context = create_string("hello");
-        let params = vec![create_string("world"), create_string("-")];
+        let params = vec![create_string("-"), create_string("world")];
 
         let result = InMemoryFuncCall::compute(&path, context, params).unwrap();
         assert!(matches!(result.deref(), ArcTopicDataValue::Str(_)));

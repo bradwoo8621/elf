@@ -246,10 +246,9 @@ pub enum VariablePredefineFunctions {
     /// concatenate multiple strings in vec to one string with separator
     /// - [x.&concatWith(separator, y, ...)], [&concatWith(x, separator, y, ...)].
     ///
-    /// - [context]: string, none.
-    /// - [none context], simply ignore it.
-    /// - [separator]: string or none. none value is treated as empty string.
-    /// - [y, ...]: strings or nones. none values are ignored.
+    /// - [context]: not vec/map values. none treated as empty string
+    /// - [separator]: not vec/map values. none value is treated as empty string.
+    /// - [y, ...]: not vec/map values. none treated as empty string
     ///
     /// return empty string when values are all none.
     #[restrict(none_context = true, blank_context = true, min_param_count = 2)]

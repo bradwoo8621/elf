@@ -15,7 +15,8 @@ impl InMemoryFuncCall<'_> {
         params: Vec<Arc<ArcTopicDataValue>>,
     ) -> StdR<Arc<ArcTopicDataValue>> {
         match params.len() {
-            0 | 1 => self.param_count_not_enough(self.func(), 0),
+            0 => self.param_count_not_enough(self.func(), 0),
+            1 => self.param_count_not_enough(self.func(), 1),
             _ => {
                 let mut result = self.unwrap_as_str(&context)?;
                 let separator = self.unwrap_as_str(&params[0])?;
