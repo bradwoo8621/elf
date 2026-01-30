@@ -184,30 +184,17 @@ impl DateTimeMoveSupport<'_> {
                     self.digits.push(char);
                 }
                 c if c.is_whitespace() => {
-                    if self.current_move.is_some() {
-                        if let Some(movement) = &self.current_move {
-                            match movement.r#type {
-                                DateTimeMovementType::Set => {
-                                    if self.digits.is_empty() {
-                                        // whitespace is between unit and type
-                                        continue;
-                                    }
-                                }
-                                _ => {}
-                            }
-                        }
+                    if self.current_move.is_some() && !self.digits.is_empty() {
+                        self.try_update_move_offset()?;
                     }
-                    self.try_update_move_offset()?;
                 }
                 _ => return self.parse_fail(),
             }
         }
-
         if self.current_move.is_some() {
-            self.parse_fail()
-        } else {
-            Ok(self.movements)
+            self.try_update_move_offset()?;
         }
+        Ok(self.movements)
     }
 }
 
