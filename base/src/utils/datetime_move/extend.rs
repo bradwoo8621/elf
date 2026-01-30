@@ -5,7 +5,7 @@ pub trait MoveUtilsForDate
 where
     Self: Datelike + Clone,
 {
-    fn move_to_year(&self, r#type: &DateTimeMovementType, offset_or_year: u16) -> Option<Self> {
+    fn move_to_year(&self, r#type: &DateTimeMovementType, offset_or_year: u32) -> Option<Self> {
         let year = match r#type {
             DateTimeMovementType::Plus => self.year() + offset_or_year as i32,
             DateTimeMovementType::Minus => self.year() - offset_or_year as i32,
@@ -38,13 +38,13 @@ where
         }
     }
 
-    fn move_to_month(&self, r#type: &DateTimeMovementType, offset_or_month: u16) -> Option<Self> {
+    fn move_to_month(&self, r#type: &DateTimeMovementType, offset_or_month: u32) -> Option<Self> {
         let current_year = self.year();
         let current_month = self.month();
         let (year, month) = match r#type {
             DateTimeMovementType::Plus => {
                 let offset_year = (offset_or_month / 12) as i32;
-                let offset_month = (offset_or_month % 12) as u32;
+                let offset_month = offset_or_month % 12;
                 if offset_month + current_month > 12 {
                     (
                         current_year + offset_year + 1,
@@ -56,7 +56,7 @@ where
             }
             DateTimeMovementType::Minus => {
                 let offset_year = (offset_or_month / 12) as i32;
-                let offset_month = (offset_or_month % 12) as u32;
+                let offset_month = offset_or_month % 12;
                 if current_month > offset_month {
                     (current_year - offset_year, current_month - offset_month)
                 } else {
@@ -73,7 +73,7 @@ where
                 } else if offset_or_month < 1 {
                     1
                 } else {
-                    offset_or_month as u32
+                    offset_or_month
                 },
             ),
         };
@@ -109,16 +109,16 @@ where
         }
     }
 
-    fn move_to_day(&self, r#type: &DateTimeMovementType, offset_or_day: u16) -> Option<Self>;
+    fn move_to_day(&self, r#type: &DateTimeMovementType, offset_or_day: u32) -> Option<Self>;
 }
 
 pub trait MoveUtilsForTime
 where
     Self: Timelike + Clone,
 {
-    fn move_to_hour(&self, r#type: &DateTimeMovementType, offset_or_hour: u16) -> Option<Self>;
-    fn move_to_minute(&self, r#type: &DateTimeMovementType, offset_or_minute: u16) -> Option<Self>;
-    fn move_to_second(&self, r#type: &DateTimeMovementType, offset_or_second: u16) -> Option<Self>;
+    fn move_to_hour(&self, r#type: &DateTimeMovementType, offset_or_hour: u32) -> Option<Self>;
+    fn move_to_minute(&self, r#type: &DateTimeMovementType, offset_or_minute: u32) -> Option<Self>;
+    fn move_to_second(&self, r#type: &DateTimeMovementType, offset_or_second: u32) -> Option<Self>;
 }
 
 pub trait DateMoveUtils<S> {

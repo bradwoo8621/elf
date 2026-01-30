@@ -1,5 +1,5 @@
 use crate::{
-    DateMoveUtils, DateTimeMovementType, DateTimeMovementUnit, DateTimeMovements, MoveUtilsForTime,
+	DateMoveUtils, DateTimeMovementType, DateTimeMovementUnit, DateTimeMovements, MoveUtilsForTime,
 };
 use chrono::{NaiveTime, Timelike};
 
@@ -28,22 +28,22 @@ impl DateMoveUtils<NaiveTime> for NaiveTime {
 }
 
 impl MoveUtilsForTime for NaiveTime {
-    fn move_to_hour(&self, r#type: &DateTimeMovementType, offset_or_hour: u16) -> Option<Self> {
+    fn move_to_hour(&self, r#type: &DateTimeMovementType, offset_or_hour: u32) -> Option<Self> {
         let current_hour = self.hour();
         let hour = match r#type {
-            DateTimeMovementType::Plus => (current_hour + offset_or_hour as u32) % 24,
+            DateTimeMovementType::Plus => (current_hour + offset_or_hour) % 24,
             DateTimeMovementType::Minus => {
-                if (offset_or_hour as u32) < current_hour {
-                    current_hour - offset_or_hour as u32
+                if (offset_or_hour) < current_hour {
+                    current_hour - offset_or_hour
                 } else {
-                    current_hour + 24 - (offset_or_hour as u32 % 24)
+                    current_hour + 24 - (offset_or_hour % 24)
                 }
             }
             DateTimeMovementType::Set => {
                 if offset_or_hour > 23 {
                     23
                 } else {
-                    offset_or_hour as u32
+                    offset_or_hour
                 }
             }
         };
@@ -54,13 +54,13 @@ impl MoveUtilsForTime for NaiveTime {
         }
     }
 
-    fn move_to_minute(&self, r#type: &DateTimeMovementType, offset_or_minute: u16) -> Option<Self> {
+    fn move_to_minute(&self, r#type: &DateTimeMovementType, offset_or_minute: u32) -> Option<Self> {
         let current_hour = self.hour();
         let current_minute = self.minute();
         let (hour, minute) = match r#type {
             DateTimeMovementType::Plus => {
-                let offset_hour = (offset_or_minute / 60) as u32;
-                let offset_minute = (offset_or_minute % 60) as u32;
+                let offset_hour = offset_or_minute / 60;
+                let offset_minute = offset_or_minute % 60;
                 if current_minute + offset_minute > 60 {
                     (
                         (current_hour + offset_hour + 1) % 24,
@@ -74,8 +74,8 @@ impl MoveUtilsForTime for NaiveTime {
                 }
             }
             DateTimeMovementType::Minus => {
-                let offset_hour = (offset_or_minute / 60) as u32;
-                let offset_minute = (offset_or_minute % 60) as u32;
+                let offset_hour = offset_or_minute / 60;
+                let offset_minute = offset_or_minute % 60;
                 if current_minute > offset_minute {
                     (
                         (current_hour - offset_hour) % 24,
@@ -92,7 +92,7 @@ impl MoveUtilsForTime for NaiveTime {
                 if offset_or_minute > 59 {
                     (current_hour, 59)
                 } else {
-                    (current_hour, offset_or_minute as u32)
+                    (current_hour, offset_or_minute)
                 }
             }
         };
@@ -105,15 +105,15 @@ impl MoveUtilsForTime for NaiveTime {
         }
     }
 
-    fn move_to_second(&self, r#type: &DateTimeMovementType, offset_or_second: u16) -> Option<Self> {
+    fn move_to_second(&self, r#type: &DateTimeMovementType, offset_or_second: u32) -> Option<Self> {
         let current_hour = self.hour();
         let current_minute = self.minute();
         let current_second = self.second();
         let (hour, minute, second) = match r#type {
             DateTimeMovementType::Plus => {
-                let mut offset_hour = (offset_or_second / 3600) as u32;
-                let mut offset_minute = (offset_or_second % 3600 / 60) as u32;
-                let mut offset_second = (offset_or_second % 60) as u32;
+                let mut offset_hour = offset_or_second / 3600;
+                let mut offset_minute = offset_or_second % 3600 / 60;
+                let mut offset_second = offset_or_second % 60;
                 if current_second + offset_second > 60 {
                     offset_second -= 60;
                     offset_minute += 1
@@ -129,9 +129,9 @@ impl MoveUtilsForTime for NaiveTime {
                 )
             }
             DateTimeMovementType::Minus => {
-                let mut offset_hour = (offset_or_second / 3600) as u32;
-                let mut offset_minute = (offset_or_second % 3600 / 60) as u32;
-                let mut offset_second = (offset_or_second % 60) as u32;
+                let mut offset_hour = offset_or_second / 3600;
+                let mut offset_minute = offset_or_second % 3600 / 60;
+                let mut offset_second = offset_or_second % 60;
                 if current_second < offset_second {
                     offset_second -= 60;
                     offset_minute += 1
@@ -161,7 +161,7 @@ impl MoveUtilsForTime for NaiveTime {
                 if offset_or_second > 59 {
                     (current_hour, current_minute, 59)
                 } else {
-                    (current_hour, current_minute, offset_or_second as u32)
+                    (current_hour, current_minute, offset_or_second)
                 }
             }
         };

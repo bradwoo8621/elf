@@ -20,7 +20,7 @@ pub enum DateTimeMovementType {
 pub struct DateTimeMovement {
     pub unit: DateTimeMovementUnit,
     pub r#type: DateTimeMovementType,
-    pub offset: u16,
+    pub offset: u32,
 }
 
 impl DateTimeMovement {
@@ -57,7 +57,7 @@ impl DateTimeMovement {
                 "Movement offset[{}] must be integer and cannot be negative.",
                 offset
             ));
-        } else if let Some(value) = offset.to_u16() {
+        } else if let Some(value) = offset.to_u32() {
             value
         } else {
             return StdErrCode::DateMovementParse.msg(format!(
@@ -128,7 +128,7 @@ impl DateTimeMoveSupport<'_> {
         match (&self.current_move, self.digits.is_empty()) {
             (Some(_), true) => self.parse_fail(),
             (Some(_), false) => {
-                if let Ok(offset) = u16::from_str(self.digits.iter().collect::<String>().as_str()) {
+                if let Ok(offset) = u32::from_str(self.digits.iter().collect::<String>().as_str()) {
                     self.digits.clear();
                     // take over current movement
                     let mut movement = self.current_move.take().unwrap();
@@ -221,5 +221,138 @@ impl DateTimeMoveSupport<'_> {
             movements: vec![],
         }
         .do_parse()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_date_time_move_support_parse_simple_set() {
+        let input = String::from("Y2024");
+        let movements = DateTimeMoveSupport::parse(&input).unwrap();
+        assert_eq!(movements.len(), 1);
+        assert!(matches!(movements[0].unit, DateTimeMovementUnit::Year));
+        assert!(matches!(movements[0].r#type, DateTimeMovementType::Set));
+        assert_eq!(movements[0].offset, 2024);
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_plus() {
+        let input = String::from("M+5");
+        let movements = DateTimeMoveSupport::parse(&input).unwrap();
+        assert_eq!(movements.len(), 1);
+        assert!(matches!(movements[0].unit, DateTimeMovementUnit::Month));
+        assert!(matches!(movements[0].r#type, DateTimeMovementType::Plus));
+        assert_eq!(movements[0].offset, 5);
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_minus() {
+        let input = String::from("D-10");
+        let movements = DateTimeMoveSupport::parse(&input).unwrap();
+        assert_eq!(movements.len(), 1);
+        assert!(matches!(movements[0].unit, DateTimeMovementUnit::Day));
+        assert!(matches!(movements[0].r#type, DateTimeMovementType::Minus));
+        assert_eq!(movements[0].offset, 10);
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_multiple_moves() {
+        let input = String::from("Y2024 M+5 D-10");
+        let movements = DateTimeMoveSupport::parse(&input).unwrap();
+        assert_eq!(movements.len(), 3);
+        assert!(matches!(movements[0].unit, DateTimeMovementUnit::Year));
+        assert!(matches!(movements[1].unit, DateTimeMovementUnit::Month));
+        assert!(matches!(movements[2].unit, DateTimeMovementUnit::Day));
+        assert!(matches!(movements[0].r#type, DateTimeMovementType::Set));
+        assert!(matches!(movements[1].r#type, DateTimeMovementType::Plus));
+        assert!(matches!(movements[2].r#type, DateTimeMovementType::Minus));
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_with_whitespace() {
+        let input = String::from("  h + 30   m - 15  ");
+        let movements = DateTimeMoveSupport::parse(&input).unwrap();
+        assert_eq!(movements.len(), 2);
+        assert!(matches!(movements[0].unit, DateTimeMovementUnit::Hour));
+        assert!(matches!(movements[1].unit, DateTimeMovementUnit::Minute));
+        assert!(matches!(movements[0].r#type, DateTimeMovementType::Plus));
+        assert!(matches!(movements[1].r#type, DateTimeMovementType::Minus));
+        assert_eq!(movements[0].offset, 30);
+        assert_eq!(movements[1].offset, 15);
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_time_units() {
+        let input = String::from("h12 m30 s45");
+        let movements = DateTimeMoveSupport::parse(&input).unwrap();
+        assert_eq!(movements.len(), 3);
+        assert!(matches!(movements[0].unit, DateTimeMovementUnit::Hour));
+        assert!(matches!(movements[1].unit, DateTimeMovementUnit::Minute));
+        assert!(matches!(movements[2].unit, DateTimeMovementUnit::Second));
+        assert!(matches!(movements[0].r#type, DateTimeMovementType::Set));
+        assert!(matches!(movements[1].r#type, DateTimeMovementType::Set));
+        assert!(matches!(movements[2].r#type, DateTimeMovementType::Set));
+        assert_eq!(movements[0].offset, 12);
+        assert_eq!(movements[1].offset, 30);
+        assert_eq!(movements[2].offset, 45);
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_empty_string() {
+        let input = String::from("");
+        let movements = DateTimeMoveSupport::parse(&input).unwrap();
+        assert_eq!(movements.len(), 0);
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_whitespace_only() {
+        let input = String::from("   ");
+        let movements = DateTimeMoveSupport::parse(&input).unwrap();
+        assert_eq!(movements.len(), 0);
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_invalid_unit() {
+        let input = String::from("X123");
+        let result = DateTimeMoveSupport::parse(&input);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_no_offset() {
+        let input = String::from("Y");
+        let result = DateTimeMoveSupport::parse(&input);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_digit_without_unit() {
+        let input = String::from("123");
+        let result = DateTimeMoveSupport::parse(&input);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_multiple_types_without_offset() {
+        let input = String::from("Y+-10");
+        let result = DateTimeMoveSupport::parse(&input);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_invalid_character() {
+        let input = String::from("Y@123");
+        let result = DateTimeMoveSupport::parse(&input);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_date_time_move_support_parse_incomplete_move() {
+        let input = String::from("Y123 M");
+        let result = DateTimeMoveSupport::parse(&input);
+        assert!(result.is_err());
     }
 }

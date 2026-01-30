@@ -1,6 +1,5 @@
 use crate::{
-    DateMoveUtils, DateTimeMovementType, DateTimeMovementUnit, DateTimeMovements, MoveUtilsForDate
-    ,
+	DateMoveUtils, DateTimeMovementType, DateTimeMovementUnit, DateTimeMovements, MoveUtilsForDate,
 };
 use chrono::{Datelike, Duration, NaiveDate};
 
@@ -28,7 +27,7 @@ impl DateMoveUtils<NaiveDate> for NaiveDate {
 
 impl MoveUtilsForDate for NaiveDate {
     // noinspection DuplicatedCode
-    fn move_to_day(&self, r#type: &DateTimeMovementType, offset_or_day: u16) -> Option<NaiveDate> {
+    fn move_to_day(&self, r#type: &DateTimeMovementType, offset_or_day: u32) -> Option<NaiveDate> {
         match r#type {
             DateTimeMovementType::Plus => {
                 if offset_or_day == 0 {
@@ -45,16 +44,16 @@ impl MoveUtilsForDate for NaiveDate {
                 }
             }
             DateTimeMovementType::Set => {
-                if offset_or_day as u32 == self.day() {
+                if offset_or_day == self.day() {
                     Some(self.clone())
                 } else if offset_or_day < 1 {
                     self.with_day(1)
                 } else {
                     let days_of_month = self.num_days_in_month() as u16;
-                    if offset_or_day > days_of_month {
+                    if offset_or_day > days_of_month as u32 {
                         self.with_day(days_of_month as u32)
                     } else {
-                        self.with_day(offset_or_day as u32)
+                        self.with_day(offset_or_day)
                     }
                 }
             }

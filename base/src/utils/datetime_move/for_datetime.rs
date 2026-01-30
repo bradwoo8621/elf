@@ -38,7 +38,7 @@ impl MoveUtilsForDate for NaiveDateTime {
     fn move_to_day(
         &self,
         r#type: &DateTimeMovementType,
-        offset_or_day: u16,
+        offset_or_day: u32,
     ) -> Option<NaiveDateTime> {
         match r#type {
             DateTimeMovementType::Plus => {
@@ -56,16 +56,16 @@ impl MoveUtilsForDate for NaiveDateTime {
                 }
             }
             DateTimeMovementType::Set => {
-                if offset_or_day as u32 == self.day() {
+                if offset_or_day == self.day() {
                     Some(self.clone())
                 } else if offset_or_day < 1 {
                     self.with_day(1)
                 } else {
                     let days_of_month = self.num_days_in_month() as u16;
-                    if offset_or_day > days_of_month {
+                    if offset_or_day > days_of_month as u32 {
                         self.with_day(days_of_month as u32)
                     } else {
-                        self.with_day(offset_or_day as u32)
+                        self.with_day(offset_or_day)
                     }
                 }
             }
@@ -74,7 +74,7 @@ impl MoveUtilsForDate for NaiveDateTime {
 }
 
 impl MoveUtilsForTime for NaiveDateTime {
-    fn move_to_hour(&self, r#type: &DateTimeMovementType, offset_or_hour: u16) -> Option<Self> {
+    fn move_to_hour(&self, r#type: &DateTimeMovementType, offset_or_hour: u32) -> Option<Self> {
         match r#type {
             DateTimeMovementType::Plus => {
                 if offset_or_hour == 0 {
@@ -91,18 +91,18 @@ impl MoveUtilsForTime for NaiveDateTime {
                 }
             }
             DateTimeMovementType::Set => {
-                if offset_or_hour as u32 == self.hour() {
+                if offset_or_hour == self.hour() {
                     Some(self.clone())
                 } else if offset_or_hour > 23 {
                     self.with_hour(23)
                 } else {
-                    self.with_hour(offset_or_hour as u32)
+                    self.with_hour(offset_or_hour)
                 }
             }
         }
     }
 
-    fn move_to_minute(&self, r#type: &DateTimeMovementType, offset_or_minute: u16) -> Option<Self> {
+    fn move_to_minute(&self, r#type: &DateTimeMovementType, offset_or_minute: u32) -> Option<Self> {
         match r#type {
             DateTimeMovementType::Plus => {
                 if offset_or_minute == 0 {
@@ -119,18 +119,18 @@ impl MoveUtilsForTime for NaiveDateTime {
                 }
             }
             DateTimeMovementType::Set => {
-                if offset_or_minute as u32 == self.minute() {
+                if offset_or_minute == self.minute() {
                     Some(self.clone())
                 } else if offset_or_minute > 59 {
                     self.with_minute(59)
                 } else {
-                    self.with_minute(offset_or_minute as u32)
+                    self.with_minute(offset_or_minute)
                 }
             }
         }
     }
 
-    fn move_to_second(&self, r#type: &DateTimeMovementType, offset_or_second: u16) -> Option<Self> {
+    fn move_to_second(&self, r#type: &DateTimeMovementType, offset_or_second: u32) -> Option<Self> {
         match r#type {
             DateTimeMovementType::Plus => {
                 if offset_or_second == 0 {
@@ -147,12 +147,12 @@ impl MoveUtilsForTime for NaiveDateTime {
                 }
             }
             DateTimeMovementType::Set => {
-                if offset_or_second as u32 == self.second() {
+                if offset_or_second == self.second() {
                     Some(self.clone())
                 } else if offset_or_second > 59 {
                     self.with_second(59)
                 } else {
-                    self.with_second(offset_or_second as u32)
+                    self.with_second(offset_or_second)
                 }
             }
         }
