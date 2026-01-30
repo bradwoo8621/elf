@@ -574,11 +574,3 @@ impl InMemoryFuncCall<'_> {
         self.no_param(&params, || state.find())
     }
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn test_decimal() {
-        // TODO
-    }
-}
