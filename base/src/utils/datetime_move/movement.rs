@@ -1,5 +1,6 @@
 use crate::{ErrorCode, StdErrCode, StdR, VoidR};
 use bigdecimal::{BigDecimal, Signed, ToPrimitive};
+use std::fmt::Display;
 use std::str::FromStr;
 
 pub enum DateTimeMovementUnit {
@@ -11,16 +12,45 @@ pub enum DateTimeMovementUnit {
     Second,
 }
 
+impl Display for DateTimeMovementUnit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DateTimeMovementUnit::Year => write!(f, "Year"),
+            DateTimeMovementUnit::Month => write!(f, "Month"),
+            DateTimeMovementUnit::Day => write!(f, "Day"),
+            DateTimeMovementUnit::Hour => write!(f, "Hour"),
+            DateTimeMovementUnit::Minute => write!(f, "Minute"),
+            DateTimeMovementUnit::Second => write!(f, "Second"),
+        }
+    }
+}
+
 pub enum DateTimeMovementType {
     Plus,
     Minus,
     Set,
 }
 
+impl Display for DateTimeMovementType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DateTimeMovementType::Plus => write!(f, "+"),
+            DateTimeMovementType::Minus => write!(f, "-"),
+            DateTimeMovementType::Set => write!(f, "->"),
+        }
+    }
+}
+
 pub struct DateTimeMovement {
     pub unit: DateTimeMovementUnit,
     pub r#type: DateTimeMovementType,
     pub offset: u32,
+}
+
+impl Display for DateTimeMovement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} {} {}", self.r#type, self.unit, self.offset)
+    }
 }
 
 impl DateTimeMovement {
