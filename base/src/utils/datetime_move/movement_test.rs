@@ -129,4 +129,11 @@ mod tests {
         let result = DateTimeMoveSupport::parse(&input);
         assert!(result.is_err());
     }
+
+    #[test]
+    fn test_date_time_move_support_parse_digit_after_move() {
+        let input = String::from("Y2024 123");
+        let result = DateTimeMoveSupport::parse(&input);
+        assert!(result.is_err());
+    }
 }
