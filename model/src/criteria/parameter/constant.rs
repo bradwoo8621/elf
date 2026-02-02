@@ -139,7 +139,7 @@ pub enum VariablePredefineFunctions {
     /// - returns false when context is none and substring is not empty string.
     ///
     /// - [syntax]: [x.&endsWith(substring)], [&endsWith(x, substring)]
-    /// - [context]: string, none.
+    /// - [context]: string or none.
     /// - [parameter]:
     ///   - [substring]: string, none. if none, treat as empty string and returns true.
     #[restrict(
@@ -218,26 +218,27 @@ pub enum VariablePredefineFunctions {
     )]
     ReplaceFirst,
     /// convert string to upper case.
-    /// [x.&upper], [x.&upper()], [&upper(x)]
+    /// - when context is none, return empty string.
     ///
-    /// - [context]: string, none.
-    /// - [none context] returns empty string.
+    /// - [syntax]: [x.&upper], [x.&upper()], [&upper(x)]
+    /// - [context]: string or none,
+    /// - [parameter]: not allowed.
     #[restrict(none_context = true, blank_context = true, max_param_count = 0)]
     Upper,
-    /// convert string to lower case.
-    /// [x.&lower], [x.&lower()], [&lower(x)]
+    /// - convert string to lower case,
+    /// - when context is none, return empty string.
     ///
-    /// - [context]: string, none.
-    /// - [none context] returns empty string.
+    /// - [syntax]: [x.&lower], [x.&lower()], [&lower(x)]
+    /// - [context]: string or none,
+    /// - [parameter]: not allowed.
     #[restrict(none_context = true, blank_context = true, max_param_count = 0)]
     Lower,
-    /// check if string contains substring, return boolean.
-    /// [x.&contains(substring)], [&contains(x, substring)]
+    /// - check if string contains substring,
+    /// - when context is none, returns true when param is empty string,
+    /// - when context is none, returns false when param is not empty string.
     ///
+    /// - [syntax]: [x.&contains(substring)], [&contains(x, substring)]
     /// - [context]: string, none.
-    /// - [none context]:
-    ///   - returns false when given substring is not empty.
-    ///   - returns true when given substring is empty,
     /// - [substring]: string, none. if none, treat as empty string.
     #[restrict(
         none_context = true,
@@ -246,15 +247,15 @@ pub enum VariablePredefineFunctions {
         max_param_count = 1
     )]
     Contains,
-    /// split string to vec by given separator string (default comma).
-    /// - split by comma: [x.&split], [x.&split()], [&split(x)],
-    /// - split by separator: [x.&split(separator)], [&split(x, separator)].
+    /// - split string to vec by given separator string (default comma),
+    /// - when context is none, returns a vec which has one empty string as the only element,
     ///
+    /// - [syntax]:
+    ///   - split by comma: [x.&split], [x.&split()], [&split(x)],
+    ///   - split by separator: [x.&split(separator)], [&split(x, separator)].
     /// - [context]: string, none.
-    /// - [none context]
-    ///   - returns vec with single empty string element when given separator is not empty.
-    ///   - returns empty vec when given separator is empty,
-    /// - [separator]: string, none. if none, treat as comma.
+    /// - [parameter]:
+    ///   - [separator]: string, none. if none, treat as comma.
     #[restrict(
         none_context = true,
         blank_context = true,

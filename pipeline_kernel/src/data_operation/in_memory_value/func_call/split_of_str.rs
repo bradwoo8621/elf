@@ -17,7 +17,13 @@ impl InMemoryFuncCall<'_> {
         let separator = self.zero_or_one_param(
             &params,
             || Ok(",".to_string()),
-            |param| Ok(self.param_to_str(param, 0)?.to_string()),
+            |param| {
+                if self.param_is_none(param) {
+                    Ok(",".to_string())
+                } else {
+                    Ok(self.param_to_str(param, 0)?.to_string())
+                }
+            },
         )?;
         match context.deref() {
             ArcTopicDataValue::Str(str) => match str.len() {
