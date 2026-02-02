@@ -10,12 +10,14 @@ impl DateMoveUtils<NaiveDate> for NaiveDate {
         for movement in movements.iter() {
             current = match movement.unit {
                 DateTimeMovementUnit::Year => {
-                    self.move_to_year(&movement.r#type, movement.offset)?
+                    current.move_to_year(&movement.r#type, movement.offset)?
                 }
                 DateTimeMovementUnit::Month => {
-                    self.move_to_month(&movement.r#type, movement.offset)?
+                    current.move_to_month(&movement.r#type, movement.offset)?
                 }
-                DateTimeMovementUnit::Day => self.move_to_day(&movement.r#type, movement.offset)?,
+                DateTimeMovementUnit::Day => {
+                    current.move_to_day(&movement.r#type, movement.offset)?
+                }
                 // ignore the time part
                 _ => current,
             };
@@ -27,25 +29,25 @@ impl DateMoveUtils<NaiveDate> for NaiveDate {
 
 impl MoveUtilsForDate for NaiveDate {
     // noinspection DuplicatedCode
-    fn move_to_day(&self, r#type: &DateTimeMovementType, offset_or_day: u32) -> Option<NaiveDate> {
+    fn move_to_day(self, r#type: &DateTimeMovementType, offset_or_day: u32) -> Option<NaiveDate> {
         match r#type {
             DateTimeMovementType::Plus => {
                 if offset_or_day == 0 {
-                    Some(self.clone())
+                    Some(self)
                 } else {
                     self.checked_add_signed(Duration::days(offset_or_day as i64))
                 }
             }
             DateTimeMovementType::Minus => {
                 if offset_or_day == 0 {
-                    Some(self.clone())
+                    Some(self)
                 } else {
                     self.checked_sub_signed(Duration::days(offset_or_day as i64))
                 }
             }
             DateTimeMovementType::Set => {
                 if offset_or_day == self.day() {
-                    Some(self.clone())
+                    Some(self)
                 } else if offset_or_day < 1 {
                     self.with_day(1)
                 } else {

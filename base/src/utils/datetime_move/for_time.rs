@@ -10,13 +10,13 @@ impl DateMoveUtils<NaiveTime> for NaiveTime {
         for movement in movements.iter() {
             current = match movement.unit {
                 DateTimeMovementUnit::Hour => {
-                    self.move_to_hour(&movement.r#type, movement.offset)?
+                    current.move_to_hour(&movement.r#type, movement.offset)?
                 }
                 DateTimeMovementUnit::Minute => {
-                    self.move_to_minute(&movement.r#type, movement.offset)?
+                    current.move_to_minute(&movement.r#type, movement.offset)?
                 }
                 DateTimeMovementUnit::Second => {
-                    self.move_to_second(&movement.r#type, movement.offset)?
+                    current.move_to_second(&movement.r#type, movement.offset)?
                 }
                 // ignore the date part
                 _ => current,
@@ -28,7 +28,7 @@ impl DateMoveUtils<NaiveTime> for NaiveTime {
 }
 
 impl MoveUtilsForTime for NaiveTime {
-    fn move_to_hour(&self, r#type: &DateTimeMovementType, offset_or_hour: u32) -> Option<Self> {
+    fn move_to_hour(self, r#type: &DateTimeMovementType, offset_or_hour: u32) -> Option<Self> {
         let current_hour = self.hour();
         let hour = match r#type {
             DateTimeMovementType::Plus => (current_hour + offset_or_hour) % 24,
@@ -48,13 +48,13 @@ impl MoveUtilsForTime for NaiveTime {
             }
         };
         if hour == current_hour {
-            Some(self.clone())
+            Some(self)
         } else {
             self.with_hour(hour)
         }
     }
 
-    fn move_to_minute(&self, r#type: &DateTimeMovementType, offset_or_minute: u32) -> Option<Self> {
+    fn move_to_minute(self, r#type: &DateTimeMovementType, offset_or_minute: u32) -> Option<Self> {
         let current_hour = self.hour();
         let current_minute = self.minute();
         let (hour, minute) = match r#type {
@@ -98,14 +98,14 @@ impl MoveUtilsForTime for NaiveTime {
         };
 
         match (current_hour == hour, current_minute == minute) {
-            (true, true) => Some(self.clone()),
+            (true, true) => Some(self),
             (true, false) => self.with_hour(hour),
             (false, true) => self.with_minute(minute),
             (false, false) => self.with_hour(hour)?.with_minute(minute),
         }
     }
 
-    fn move_to_second(&self, r#type: &DateTimeMovementType, offset_or_second: u32) -> Option<Self> {
+    fn move_to_second(self, r#type: &DateTimeMovementType, offset_or_second: u32) -> Option<Self> {
         let current_hour = self.hour();
         let current_minute = self.minute();
         let current_second = self.second();
@@ -171,7 +171,7 @@ impl MoveUtilsForTime for NaiveTime {
             current_minute == minute,
             current_second == second,
         ) {
-            (true, true, true) => Some(self.clone()),
+            (true, true, true) => Some(self),
             (true, true, false) => self.with_second(second),
             (true, false, true) => self.with_minute(minute),
             (true, false, false) => self.with_minute(hour)?.with_second(second),

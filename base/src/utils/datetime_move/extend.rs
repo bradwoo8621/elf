@@ -5,7 +5,7 @@ pub trait MoveUtilsForDate
 where
     Self: Datelike + Clone,
 {
-    fn move_to_year(&self, r#type: &DateTimeMovementType, offset_or_year: u32) -> Option<Self> {
+    fn move_to_year(self, r#type: &DateTimeMovementType, offset_or_year: u32) -> Option<Self> {
         let year = match r#type {
             DateTimeMovementType::Plus => self.year() + offset_or_year as i32,
             DateTimeMovementType::Minus => self.year() - offset_or_year as i32,
@@ -13,7 +13,7 @@ where
         };
 
         if year == self.year() {
-            return Some(self.clone());
+            return Some(self);
         }
 
         let month = self.month();
@@ -38,7 +38,7 @@ where
         }
     }
 
-    fn move_to_month(&self, r#type: &DateTimeMovementType, offset_or_month: u32) -> Option<Self> {
+    fn move_to_month(self, r#type: &DateTimeMovementType, offset_or_month: u32) -> Option<Self> {
         let current_year = self.year();
         let current_month = self.month();
         let (year, month) = match r#type {
@@ -79,7 +79,7 @@ where
         };
 
         if current_year == year && current_month == month {
-            return Some(self.clone());
+            return Some(self);
         }
 
         let moved = match month {
@@ -109,16 +109,16 @@ where
         }
     }
 
-    fn move_to_day(&self, r#type: &DateTimeMovementType, offset_or_day: u32) -> Option<Self>;
+    fn move_to_day(self, r#type: &DateTimeMovementType, offset_or_day: u32) -> Option<Self>;
 }
 
 pub trait MoveUtilsForTime
 where
     Self: Timelike + Clone,
 {
-    fn move_to_hour(&self, r#type: &DateTimeMovementType, offset_or_hour: u32) -> Option<Self>;
-    fn move_to_minute(&self, r#type: &DateTimeMovementType, offset_or_minute: u32) -> Option<Self>;
-    fn move_to_second(&self, r#type: &DateTimeMovementType, offset_or_second: u32) -> Option<Self>;
+    fn move_to_hour(self, r#type: &DateTimeMovementType, offset_or_hour: u32) -> Option<Self>;
+    fn move_to_minute(self, r#type: &DateTimeMovementType, offset_or_minute: u32) -> Option<Self>;
+    fn move_to_second(self, r#type: &DateTimeMovementType, offset_or_second: u32) -> Option<Self>;
 }
 
 pub trait DateMoveUtils<S> {
