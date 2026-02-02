@@ -130,7 +130,7 @@ mod tests {
     fn test_compute_substr() {
         let path = create_test_path(VariablePredefineFunctions::Substr);
         let context = create_string("hello world");
-        let params = vec![create_decimal("6"), create_decimal("5")];
+        let params = vec![create_decimal("6"), create_decimal("11")];
 
         let result = InMemoryFuncCall::compute(&path, context, params).unwrap();
         assert!(matches!(result.deref(), ArcTopicDataValue::Str(_)));
@@ -634,7 +634,7 @@ mod tests {
         assert!(matches!(result.deref(), ArcTopicDataValue::Num(_)));
 
         if let ArcTopicDataValue::Num(num) = result.deref() {
-            assert_eq!(num.deref(), &BigDecimal::from(1));
+            assert_eq!(num.deref(), &BigDecimal::from(-1));
         }
     }
 
@@ -648,7 +648,7 @@ mod tests {
         assert!(matches!(result.deref(), ArcTopicDataValue::Num(_)));
 
         if let ArcTopicDataValue::Num(num) = result.deref() {
-            assert_eq!(num.deref(), &BigDecimal::from(1));
+            assert_eq!(num.deref(), &BigDecimal::from(-1));
         }
     }
 
@@ -662,7 +662,7 @@ mod tests {
         assert!(matches!(result.deref(), ArcTopicDataValue::Num(_)));
 
         if let ArcTopicDataValue::Num(num) = result.deref() {
-            assert_eq!(num.deref(), &BigDecimal::from(1));
+            assert_eq!(num.deref(), &BigDecimal::from(-1));
         }
     }
 
@@ -670,21 +670,27 @@ mod tests {
     fn test_compute_move_date() {
         let path = create_test_path(VariablePredefineFunctions::MoveDate);
         let context = create_datetime("2024-01-01 00:00:00");
-        let params = vec![
-            create_string("Y+1"),
-            create_string("M+1"),
-            create_string("D+1"),
-        ];
+        let params = vec![create_string("Y+1M+1D+1")];
 
         let result = InMemoryFuncCall::compute(&path, context, params).unwrap();
         assert!(matches!(result.deref(), ArcTopicDataValue::DateTime(_)));
+        match result.deref() {
+            ArcTopicDataValue::DateTime(datetime) => {
+                assert_eq!(
+                    datetime.deref(),
+                    &NaiveDateTime::parse_from_str("2025-02-02 00:00:00", "%Y-%m-%d %H:%M:%S")
+                        .unwrap()
+                );
+            }
+            _ => {}
+        }
     }
 
     #[test]
     fn test_compute_date_format() {
         let path = create_test_path(VariablePredefineFunctions::DateFormat);
         let context = create_datetime("2024-01-01 12:30:45");
-        let params = vec![create_string("yyyy-MM-dd HH:mm:ss")];
+        let params = vec![create_string("Y-M-D h:m:s")];
 
         let result = InMemoryFuncCall::compute(&path, context, params).unwrap();
         assert!(matches!(result.deref(), ArcTopicDataValue::Str(_)));

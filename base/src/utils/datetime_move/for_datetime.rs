@@ -11,20 +11,20 @@ impl DateMoveUtils<NaiveDateTime> for NaiveDateTime {
         for movement in movements.iter() {
             current = match movement.unit {
                 DateTimeMovementUnit::Year => {
-                    self.move_to_year(&movement.r#type, movement.offset)?
+                    current.move_to_year(&movement.r#type, movement.offset)?
                 }
                 DateTimeMovementUnit::Month => {
-                    self.move_to_month(&movement.r#type, movement.offset)?
+                    current.move_to_month(&movement.r#type, movement.offset)?
                 }
-                DateTimeMovementUnit::Day => self.move_to_day(&movement.r#type, movement.offset)?,
+                DateTimeMovementUnit::Day => current.move_to_day(&movement.r#type, movement.offset)?,
                 DateTimeMovementUnit::Hour => {
-                    self.move_to_hour(&movement.r#type, movement.offset)?
+                    current.move_to_hour(&movement.r#type, movement.offset)?
                 }
                 DateTimeMovementUnit::Minute => {
-                    self.move_to_minute(&movement.r#type, movement.offset)?
+                    current.move_to_minute(&movement.r#type, movement.offset)?
                 }
                 DateTimeMovementUnit::Second => {
-                    self.move_to_second(&movement.r#type, movement.offset)?
+                    current.move_to_second(&movement.r#type, movement.offset)?
                 }
             };
         }
