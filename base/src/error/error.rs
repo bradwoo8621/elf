@@ -66,6 +66,8 @@ impl Display for StdErr {
     }
 }
 
+/// - print backtrace if environment variables [RUST_BACKTRACE] or [RUST_LIB_BACKTRACE] turns on.
+/// - always with caller location
 impl StdErr {
     //noinspection RsUnstableItemUsage
     /// copy from [Backtrace::enabled]
@@ -130,6 +132,7 @@ impl StdErr {
         M: Into<String>,
     {
         Self::print_backtrace();
+
         Err(Self {
             code,
             details: Some(StdErrDetail::Str(msg.into())),
@@ -146,6 +149,7 @@ impl StdErr {
 
     pub fn code_only_with_location<R>(code: &'static str, location: &Location) -> Result<R, Self> {
         Self::print_backtrace();
+
         Err(Self {
             code,
             details: None,
@@ -187,6 +191,7 @@ impl StdErr {
 
     pub fn accumulate_with_location<R>(details: Vec<StdErr>, location: &Location) -> StdR<R> {
         Self::print_backtrace();
+
         Err(Self {
             code: StdErrCode::Multiple.code(),
             details: Some(StdErrDetail::Sub(details)),
