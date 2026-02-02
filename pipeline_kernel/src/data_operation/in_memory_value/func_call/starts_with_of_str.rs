@@ -19,21 +19,29 @@ impl InMemoryFuncCall<'_> {
     ) -> StdR<Arc<ArcTopicDataValue>> {
         self.one_param(&params, |param| match context.deref() {
             ArcTopicDataValue::None => {
-                let sub = self.param_to_str(param, 0)?;
-                if sub.len() == 0 {
+                if self.param_is_none(param) {
                     Ok(ArcTopicDataValue::arc_from(true))
                 } else {
-                    Ok(ArcTopicDataValue::arc_from(false))
+                    let sub = self.param_to_str(param, 0)?;
+                    if sub.len() == 0 {
+                        Ok(ArcTopicDataValue::arc_from(true))
+                    } else {
+                        Ok(ArcTopicDataValue::arc_from(false))
+                    }
                 }
             }
             ArcTopicDataValue::Str(str) => {
-                let sub = self.param_to_str(param, 0)?;
-                if sub.len() == 0 {
+                if self.param_is_none(param) {
                     Ok(ArcTopicDataValue::arc_from(true))
-                } else if str.len() == 0 {
-                    Ok(ArcTopicDataValue::arc_from(false))
                 } else {
-                    Ok(ArcTopicDataValue::arc_from(str.starts_with(sub)))
+                    let sub = self.param_to_str(param, 0)?;
+                    if sub.len() == 0 {
+                        Ok(ArcTopicDataValue::arc_from(true))
+                    } else if str.len() == 0 {
+                        Ok(ArcTopicDataValue::arc_from(false))
+                    } else {
+                        Ok(ArcTopicDataValue::arc_from(str.starts_with(sub)))
+                    }
                 }
             }
             other => self.func_not_supported(other),

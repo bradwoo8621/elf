@@ -108,12 +108,14 @@ pub enum VariablePredefineFunctions {
         max_param_count = 1
     )]
     Index,
-    /// check if string starts with substring, return boolean.
-    /// [x.&startsWith(substring)], [&startsWith(x, substring)]
+    /// - check if string starts with substring,
+    /// - returns true when context is none and substring is empty string,
+    /// - returns false when context is none and substring is not empty string.
     ///
-    /// - [context]: string, none.
-    /// - [none context] returns true.
-    /// - [substring]: string, none. if none, treat as empty string and returns true.
+    /// - [syntax]: [x.&startsWith(substring)], [&startsWith(x, substring)]
+    /// - [context]: string or none.
+    /// - [parameter]:
+    ///   - [substring]: string, none. if none, treat as empty string and returns true.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -122,7 +124,8 @@ pub enum VariablePredefineFunctions {
     )]
     StartsWith,
     /// alias of [VariablePredefineFunctions::StartsWith].
-    /// [x.&startswith(substring)], [&startswith(x, substring)]
+    ///
+    /// - [syntax]: [x.&startswith(substring)], [&startswith(x, substring)]
     #[display = "&startswith"]
     #[restrict(
         none_context = true,
@@ -131,12 +134,14 @@ pub enum VariablePredefineFunctions {
         max_param_count = 1
     )]
     Startswith,
-    /// check if string ends with substring, return boolean.
-    /// [x.&endsWith(substring)], [&endsWith(x, substring)]
+    /// - check if string ends with substring,
+    /// - returns true when context is none and substring is empty string,
+    /// - returns false when context is none and substring is not empty string.
     ///
+    /// - [syntax]: [x.&endsWith(substring)], [&endsWith(x, substring)]
     /// - [context]: string, none.
-    /// - [none context] returns true.
-    /// - [substring]: string, none. if none, treat as empty string and returns true.
+    /// - [parameter]:
+    ///   - [substring]: string, none. if none, treat as empty string and returns true.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -145,7 +150,8 @@ pub enum VariablePredefineFunctions {
     )]
     EndsWith,
     /// alias of [VariablePredefineFunctions::EndsWith].
-    /// [x.&endswith(substring)], [&endswith(x, substring)]
+    ///
+    /// - [syntax]: [x.&endswith(substring)], [&endswith(x, substring)]
     #[display = "&endswith"]
     #[restrict(
         none_context = true,
