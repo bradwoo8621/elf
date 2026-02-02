@@ -59,9 +59,10 @@ pub enum VariablePredefineFunctions {
     ///   - from start (included) to end of string: [x.&slice(start)], [x.&slice(start, )], [&slice(x, start)], [&slice(x, start, )],
     ///   - from 0 to end (excluded): [x.&slice(, end)], [&slice(x, , end)],
     /// - [context]: string or none.
-    /// - [start]: zero-based index, negative not allowed. none treat as 0.
-    /// - [end]: zero-based index, negative not allowed. none treat as maximum length of the string.
-    ///   the maximum length of the string will be used as the limit when end is out of range.
+    /// - [parameter]:
+    ///   - [start]: zero-based index, negative not allowed. none treat as 0.
+    ///   - [end]: zero-based index, negative not allowed. none treat as maximum length of the string.
+    ///     the maximum length of the string will be used as the limit when end is out of range.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -82,14 +83,14 @@ pub enum VariablePredefineFunctions {
         max_param_count = 2
     )]
     Substr,
-    /// find substring in string, return the start index, -1 if not found.
-    /// [x.&find(substring)], [&find(x, substring)]
+    /// - find substring in string, return the start index, -1 if not found.
+    /// - index of not empty substring of none is -1,
+    /// - index of empty substring of none is 0
     ///
-    /// - [context]: string, none.
-    /// - [none context]:
-    ///   - returns -1 when substring is not empty.
-    ///   - returns 0 when substring is empty or none.
-    /// - [substring]: string, none. if none, treat as empty string and returns 0.
+    /// - [syntax]: [x.&find(substring)], [&find(x, substring)]
+    /// - [context]: string or none.
+    /// - [parameter]:
+    ///   - [substring]: string or none. if none, treat as empty string and returns 0.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -98,7 +99,8 @@ pub enum VariablePredefineFunctions {
     )]
     Find,
     /// alias of [VariablePredefineFunctions::Find].
-    /// [x.&index(substring)], [&index(x, substring)]
+    ///
+    /// - [syntax]: [x.&index(substring)], [&index(x, substring)]
     #[restrict(
         none_context = true,
         blank_context = true,

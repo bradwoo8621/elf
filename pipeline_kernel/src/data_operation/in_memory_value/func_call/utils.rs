@@ -130,6 +130,14 @@ impl InMemoryFuncCall<'_> {
         }
     }
 
+    /// check the given parameter is none or not
+    pub fn param_is_none(&self, param: &ArcTopicDataValue) -> bool {
+        match param {
+            ArcTopicDataValue::None => true,
+            _ => false,
+        }
+    }
+
     /// convert [ArcTopicDataValue::Str] to string, otherwise raise error
     pub fn param_to_str<'a>(
         &self,
@@ -138,7 +146,7 @@ impl InMemoryFuncCall<'_> {
     ) -> StdR<&'a String> {
         match param {
             ArcTopicDataValue::Str(sub) => Ok(sub.deref()),
-            other => return self.param_must_be_str(self.func(), param_index, other),
+            other => self.param_must_be_str(self.func(), param_index, other),
         }
     }
 

@@ -21,23 +21,31 @@ impl InMemoryFuncCall<'_> {
     ) -> StdR<Arc<ArcTopicDataValue>> {
         self.one_param(&params, |param| match context.deref() {
             ArcTopicDataValue::None => {
-                let sub = self.param_to_str(param, 0)?;
-                if sub.len() == 0 {
+                if self.param_is_none(param) {
                     Ok(ArcTopicDataValue::arc_from(BigDecimal::zero()))
                 } else {
-                    Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
+                    let sub = self.param_to_str(param, 0)?;
+                    if sub.len() == 0 {
+                        Ok(ArcTopicDataValue::arc_from(BigDecimal::zero()))
+                    } else {
+                        Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
+                    }
                 }
             }
             ArcTopicDataValue::Str(str) => {
-                let sub = self.param_to_str(param, 0)?;
-                if sub.len() == 0 {
+                if self.param_is_none(param) {
                     Ok(ArcTopicDataValue::arc_from(BigDecimal::zero()))
-                } else if str.len() == 0 {
-                    Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
-                } else if let Some(index) = str.find(sub) {
-                    Ok(ArcTopicDataValue::arc_from(BigDecimal::from(index as u128)))
                 } else {
-                    Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
+                    let sub = self.param_to_str(param, 0)?;
+                    if sub.len() == 0 {
+                        Ok(ArcTopicDataValue::arc_from(BigDecimal::zero()))
+                    } else if str.len() == 0 {
+                        Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
+                    } else if let Some(index) = str.find(sub) {
+                        Ok(ArcTopicDataValue::arc_from(BigDecimal::from(index as u64)))
+                    } else {
+                        Ok(ArcTopicDataValue::arc_from(BigDecimal::from(-1)))
+                    }
                 }
             }
             other => self.func_not_supported(other),
