@@ -29,7 +29,7 @@ pub enum VariablePredefineFunctions {
     NextSeq,
     // Aggregation functions
     /// - count of vec or map,
-    /// - count of none returns 0,
+    /// - when context is none, returns 0,
     /// - [only in-memory].
     ///
     /// - [syntax]: [x.&count], [x.&count()], \[&count(x)],
@@ -39,7 +39,7 @@ pub enum VariablePredefineFunctions {
     Count,
     // String functions
     /// - chars count of string or decimal (to string),
-    /// - chars count of none returns 0.
+    /// - when context is none, returns 0.
     ///
     /// - [syntax]: [x.&length], [x.&length()], \[&length(x)],
     /// - [context]: string, decimal or none,
@@ -52,7 +52,7 @@ pub enum VariablePredefineFunctions {
     #[restrict(none_context = true, blank_context = true, max_param_count = 0)]
     Len,
     /// - get substring from start (included) to end (excluded) of string,
-    /// - substring of none returns none.
+    /// - when context is none, returns none.
     ///
     /// - [syntax]:
     ///   - from start (included) to end (excluded): [x.&slice(start, end)], [&slice(x, start, end)],
@@ -83,9 +83,9 @@ pub enum VariablePredefineFunctions {
         max_param_count = 2
     )]
     Substr,
-    /// - find substring in string, return the start index, -1 if not found.
-    /// - index of not empty substring of none is -1,
-    /// - index of empty substring of none is 0
+    /// - find start index of substring in string, -1 if not found.
+    /// - when context is none, index of not empty substring is -1,
+    /// - when context is none, index of empty substring is 0.
     ///
     /// - [syntax]: [x.&find(substring)], [&find(x, substring)]
     /// - [context]: string or none.
@@ -160,12 +160,13 @@ pub enum VariablePredefineFunctions {
         max_param_count = 1
     )]
     Endswith,
-    /// strip leading and trailing string (default whitespaces) from string.
-    /// - strip whitespaces: [x.&strip], [x.&strip()], [&strip(x)],
-    /// - strip given string: [x.&strip(stripString)], [&strip(x, stripString)]
+    /// - strip leading and trailing string (default whitespaces) from string,
+    /// - returns empty string when context is none.
     ///
-    /// - [context]: string, none.
-    /// - [none context] returns empty string.
+    /// - [syntax]:
+    ///   - strip whitespaces: [x.&strip], [x.&strip()], [&strip(x)],
+    ///   - strip given string: [x.&strip(stripString)], [&strip(x, stripString)]
+    /// - [context]: string, or none.
     /// - [stripString]: string, none. if none, treat as whitespaces.
     #[restrict(
         none_context = true,
@@ -175,8 +176,10 @@ pub enum VariablePredefineFunctions {
     )]
     Strip,
     /// alias of [VariablePredefineFunctions::Strip]
-    /// - trim whitespaces: [x.&trim], [x.&trim()], [&trim(x)],
-    /// - trim given string: [x.&trim(trimString)], [&trim(x, trimString)]
+    ///
+    /// - [syntax]:
+    ///   - trim whitespaces: [x.&trim], [x.&trim()], [&trim(x)],
+    ///   - trim given string: [x.&trim(trimString)], [&trim(x, trimString)]
     #[restrict(
         none_context = true,
         blank_context = true,

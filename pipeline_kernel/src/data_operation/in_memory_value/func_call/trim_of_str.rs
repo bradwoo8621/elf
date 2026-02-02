@@ -21,11 +21,15 @@ impl InMemoryFuncCall<'_> {
                 _ => match params.len() {
                     0 => Ok(ArcTopicDataValue::arc_from(str.trim().to_string())),
                     1 => {
-                        let matches = self.param_to_str(&params[0], 0)?;
-                        Ok(ArcTopicDataValue::arc_from(
-                            str.trim_matches(&matches.chars().collect::<Vec<char>>()[..])
-                                .to_string(),
-                        ))
+                        if self.param_is_none(&params[0]) {
+                            Ok(ArcTopicDataValue::arc_from(str.trim().to_string()))
+                        } else {
+                            let matches = self.param_to_str(&params[0], 0)?;
+                            Ok(ArcTopicDataValue::arc_from(
+                                str.trim_matches(&matches.chars().collect::<Vec<char>>()[..])
+                                    .to_string(),
+                            ))
+                        }
                     }
                     cnt => self.param_count_too_many(self.func(), cnt),
                 },
