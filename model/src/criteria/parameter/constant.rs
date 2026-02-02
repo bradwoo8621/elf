@@ -115,7 +115,7 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&startsWith(substring)], [&startsWith(x, substring)]
     /// - [context]: string or none.
     /// - [parameter]:
-    ///   - [substring]: string, none. if none, treat as empty string and returns true.
+    ///   - [substring]: string or none. if none, treat as empty string and returns true.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -141,7 +141,7 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&endsWith(substring)], [&endsWith(x, substring)]
     /// - [context]: string or none.
     /// - [parameter]:
-    ///   - [substring]: string, none. if none, treat as empty string and returns true.
+    ///   - [substring]: string or none. if none, treat as empty string and returns true.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -167,7 +167,7 @@ pub enum VariablePredefineFunctions {
     ///   - strip whitespaces: [x.&strip], [x.&strip()], [&strip(x)],
     ///   - strip given string: [x.&strip(stripString)], [&strip(x, stripString)]
     /// - [context]: string, or none.
-    /// - [stripString]: string, none. if none, treat as whitespaces.
+    /// - [stripString]: string or none. if none, treat as whitespaces.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -193,8 +193,8 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&replace(oldSubstring, newSubstring)], [&replace(x, oldSubstring, newSubstring)]
     /// - [context]: string or none.
     /// - [parameter]:
-    ///   - [oldSubstring]: string, none. if none, treat as empty string.
-    ///   - [newSubstring]: string, none. if none, treat as empty string.
+    ///   - [oldSubstring]: string or none. if none, treat as empty string.
+    ///   - [newSubstring]: string or none. if none, treat as empty string.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -206,10 +206,10 @@ pub enum VariablePredefineFunctions {
     /// - when context is none, returns empty string.
     ///
     /// - [syntax]: [x.&replaceFirst(oldSubstring, newSubstring)], [&replaceFirst(x, oldSubstring, newSubstring)]
-    /// - [context]: string, none.
+    /// - [context]: string or none.
     /// - [parameter]
-    ///   - [oldSubstring]: string, none. if none, treat as empty string.
-    ///   - [newSubstring]: string, none. if none, treat as empty string.
+    ///   - [oldSubstring]: string or none. if none, treat as empty string.
+    ///   - [newSubstring]: string or none. if none, treat as empty string.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -238,8 +238,8 @@ pub enum VariablePredefineFunctions {
     /// - when context is none, returns false when param is not empty string.
     ///
     /// - [syntax]: [x.&contains(substring)], [&contains(x, substring)]
-    /// - [context]: string, none.
-    /// - [substring]: string, none. if none, treat as empty string.
+    /// - [context]: string or none.
+    /// - [substring]: string or none. if none, treat as empty string.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -253,9 +253,9 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]:
     ///   - split by comma: [x.&split], [x.&split()], [&split(x)],
     ///   - split by separator: [x.&split(separator)], [&split(x, separator)].
-    /// - [context]: string, none.
+    /// - [context]: string or none.
     /// - [parameter]:
-    ///   - [separator]: string, none. if none, treat as comma.
+    ///   - [separator]: string or none. if none, treat as comma.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -267,12 +267,12 @@ pub enum VariablePredefineFunctions {
     /// - when context is none, treated as empty string.
     ///
     /// - [syntax]: [x.&concat(y, ...)], [&concat(x, y, ...)]
-    /// - [context]: string, none.
+    /// - [context]: string or none.
     /// - [parameter]:
     ///   - [y, ...]: strings or nones. treated as empty string.
     #[restrict(none_context = true, blank_context = true, min_param_count = 1)]
     Concat,
-    /// - concatenate multiple strings in vec to one string with separator,
+    /// - concatenate multiple strings to one string with separator,
     /// - when context is none, treated as empty string.
     ///
     /// - [syntax]: [x.&concatWith(separator, y, ...)], [&concatWith(x, separator, y, ...)].
@@ -284,23 +284,31 @@ pub enum VariablePredefineFunctions {
     /// return empty string when values are all none.
     #[restrict(none_context = true, blank_context = true, min_param_count = 2)]
     ConcatWith,
-    /// join the elements of vec to a string, [only in-memory]
-    /// - join with comma: [x.join], [x.&join()], [&join(x)]
-    /// - join with separator: [x.&join(separator)], [&join(x, separator)].
+    // Vec functions
+    /// - join the elements of vec to a string,
+    /// - if context is not a vec, and not a map, convert to string,
+    /// - if context is vec, each element in vec cannot be vec or map,
+    /// - any none value of context, treated as empty string,
+    /// - [only in-memory].
     ///
-    /// - [context]: non map.
-    /// - [none context], returns empty string.
-    /// - [separator]: string, none. if none, treat as comma.
-    ///
-    /// none values in vec are ignored. return empty string when values are all none.
+    /// - [syntax]:
+    ///   - join with comma: [x.join], [x.&join()], [&join(x)]
+    ///   - join with separator: [x.&join(separator)], [&join(x, separator)].
+    /// - [context]: not map.
+    /// - [parameter]:
+    ///   - [separator]: string or none. if none, treat as comma.
     #[restrict(none_context = true, min_param_count = 0, max_param_count = 1)]
     Join,
-    // Statistical functions
-    /// get a distinct vec, [only in-memory].
-    /// [x.&distinct], [x.&distinct()], [&distinct(x)]
+    /// - get a distinct values of vec,
+    /// - if context is not a vec, and not a map, returns a vec which has the context as only element,
+    /// - if context is vec,
+    ///   - if element is vec or map, always treated as distinct value,
+    ///   - otherwise, compare with other, and leave the distinct value,
+    /// - [only in-memory].
     ///
-    /// - [context]: non map.
-    /// - [none context], returns empty vec.
+    /// - [syntax]: [x.&distinct], [x.&distinct()], [&distinct(x)]
+    /// - [context]: not map,
+    /// - [parameter]: not allowed.
     #[restrict(none_context = true, max_param_count = 0)]
     Distinct,
     /// sum of elements of vec, [only in-memory].

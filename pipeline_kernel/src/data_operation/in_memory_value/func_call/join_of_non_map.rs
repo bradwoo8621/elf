@@ -31,13 +31,6 @@ impl InMemoryFuncCall<'_> {
             || Ok(false),
             |_| Ok(true),
         )?;
-        let separator = if has_separator_param {
-            self.param_to_str(&params[0], 0)?
-        } else if Self::is_func_join_default_use_comma() {
-            &",".to_string()
-        } else {
-            &"".to_string()
-        };
 
         match context.deref() {
             ArcTopicDataValue::None => Ok(ArcTopicDataValue::arc_from("".to_string())),
@@ -53,6 +46,21 @@ impl InMemoryFuncCall<'_> {
                 if vec.is_empty() {
                     Ok(ArcTopicDataValue::arc_from("".to_string()))
                 } else {
+                    let separator = if has_separator_param {
+                        if self.param_is_none(&params[0]) {
+                            if Self::is_func_join_default_use_comma() {
+                                &",".to_string()
+                            } else {
+                                &"".to_string()
+                            }
+                        } else {
+                            self.param_to_str(&params[0], 0)?
+                        }
+                    } else if Self::is_func_join_default_use_comma() {
+                        &",".to_string()
+                    } else {
+                        &"".to_string()
+                    };
                     let mut str_vec = vec![];
                     for elm in vec.iter() {
                         str_vec.push(self.unwrap_as_str(elm)?);
