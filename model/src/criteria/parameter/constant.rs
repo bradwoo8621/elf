@@ -187,13 +187,14 @@ pub enum VariablePredefineFunctions {
         max_param_count = 1
     )]
     Trim,
-    /// replace all occurrences of a substring with another substring in string.
-    /// [x.&replace(oldSubstring, newSubstring)], [&replace(x, oldSubstring, newSubstring)]
+    /// - replace all occurrences of a substring with another substring in string,
+    /// - when context is none, returns empty string.
     ///
-    /// - [context]: string, none.
-    /// - [none context] returns empty string.
-    /// - [oldSubstring]: string, none. if none, treat as empty string.
-    /// - [newSubstring]: string, none. if none, treat as empty string.
+    /// - [syntax]: [x.&replace(oldSubstring, newSubstring)], [&replace(x, oldSubstring, newSubstring)]
+    /// - [context]: string or none.
+    /// - [parameter]:
+    ///   - [oldSubstring]: string, none. if none, treat as empty string.
+    ///   - [newSubstring]: string, none. if none, treat as empty string.
     #[restrict(
         none_context = true,
         blank_context = true,
@@ -201,13 +202,14 @@ pub enum VariablePredefineFunctions {
         max_param_count = 2
     )]
     Replace,
-    /// replace first occurrence of a substring with another substring in string.
-    /// [x.&replaceFirst(oldSubstring, newSubstring)], [&replaceFirst(x, oldSubstring, newSubstring)]
+    /// - replace first occurrence of a substring with another substring in string,
+    /// - when context is none, returns empty string.
     ///
+    /// - [syntax]: [x.&replaceFirst(oldSubstring, newSubstring)], [&replaceFirst(x, oldSubstring, newSubstring)]
     /// - [context]: string, none.
-    /// - [none context] returns empty string.
-    /// - [oldSubstring]: string, none. if none, treat as empty string.
-    /// - [newSubstring]: string, none. if none, treat as empty string.
+    /// - [parameter]
+    ///   - [oldSubstring]: string, none. if none, treat as empty string.
+    ///   - [newSubstring]: string, none. if none, treat as empty string.
     #[restrict(
         none_context = true,
         blank_context = true,
