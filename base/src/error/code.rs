@@ -22,26 +22,16 @@ pub trait ErrorCode {
     where
         M: Into<String>,
     {
-        let caller = Location::caller();
-        StdErr {
-            code: self.code(),
-            details: Some(StdErrDetail::Str(msg.into())),
-            filename: caller.file().to_string(),
-            line: caller.line(),
-            column: caller.column(),
-        }
+        StdErr::create(
+            self.code(),
+            Some(StdErrDetail::Str(msg.into())),
+            Location::caller(),
+        )
     }
 
     #[track_caller]
     fn e(&self) -> StdErr {
-        let caller = Location::caller();
-        StdErr {
-            code: self.code(),
-            details: None,
-            filename: caller.file().to_string(),
-            line: caller.line(),
-            column: caller.column(),
-        }
+        StdErr::create(self.code(), None, Location::caller())
     }
 }
 

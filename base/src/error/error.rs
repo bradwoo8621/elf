@@ -1,7 +1,10 @@
 use crate::{ErrorCode, StdErrCode, StdR};
 use serde::Serialize;
+use std::backtrace::{Backtrace, BacktraceStatus};
 use std::fmt::{Display, Formatter};
 use std::panic::Location;
+use std::sync::atomic::AtomicU8;
+use std::sync::atomic::Ordering::Relaxed;
 
 #[derive(Serialize, Debug)]
 #[serde(untagged)]
@@ -37,13 +40,13 @@ impl Display for StdErrDetail {
 #[derive(Serialize, Debug)]
 pub struct StdErr {
     /// code must be [XXXX-99999], each module has its own code prefix [XXXX]
-    pub code: &'static str,
-    pub details: Option<StdErrDetail>,
+    code: &'static str,
+    details: Option<StdErrDetail>,
 
     // location
-    pub filename: String,
-    pub line: u32,
-    pub column: u32,
+    filename: String,
+    line: u32,
+    column: u32,
 }
 
 impl Display for StdErr {
@@ -64,6 +67,52 @@ impl Display for StdErr {
 }
 
 impl StdErr {
+    //noinspection RsUnstableItemUsage
+    /// copy from [Backtrace::enabled]
+    fn backtrace_enabled() -> bool {
+        // Cache the result of reading the environment variables to make
+        // backtrace captures speedy, because otherwise reading environment
+        // variables every time can be somewhat slow.
+        static ENABLED: AtomicU8 = AtomicU8::new(0);
+        match ENABLED.load(Relaxed) {
+            0 => {}
+            1 => return false,
+            _ => return true,
+        }
+        // do capture, and check status
+        let enabled = Backtrace::capture().status() == BacktraceStatus::Captured;
+        // println!("RUST_BACKTRACE={:?}, {}", std::env::var("RUST_BACKTRACE"), enabled);
+        ENABLED.store(enabled as u8 + 1, Relaxed);
+        enabled
+    }
+
+    fn print_backtrace() {
+        if !Self::backtrace_enabled() {
+            return;
+        }
+
+        let backtrace = Backtrace::capture();
+        match backtrace.status() {
+            BacktraceStatus::Captured => {
+                println!("{:#?}", backtrace);
+            }
+            _ => {}
+        }
+    }
+
+    #[track_caller]
+    pub fn create(code: &'static str, details: Option<StdErrDetail>, caller: &Location) -> Self {
+        Self::print_backtrace();
+
+        Self {
+            code,
+            details,
+            filename: caller.file().to_string(),
+            line: caller.line(),
+            column: caller.column(),
+        }
+    }
+
     #[track_caller]
     pub fn of<R, M>(code: &'static str, msg: M) -> Result<R, Self>
     where
@@ -80,6 +129,7 @@ impl StdErr {
     where
         M: Into<String>,
     {
+        Self::print_backtrace();
         Err(Self {
             code,
             details: Some(StdErrDetail::Str(msg.into())),
@@ -95,6 +145,7 @@ impl StdErr {
     }
 
     pub fn code_only_with_location<R>(code: &'static str, location: &Location) -> Result<R, Self> {
+        Self::print_backtrace();
         Err(Self {
             code,
             details: None,
@@ -118,6 +169,8 @@ impl StdErr {
     where
         M: Into<String>,
     {
+        Self::print_backtrace();
+
         Err(Self {
             code: StdErrCode::Unknown.code(),
             details: Some(StdErrDetail::Str(msg.into())),
@@ -133,6 +186,7 @@ impl StdErr {
     }
 
     pub fn accumulate_with_location<R>(details: Vec<StdErr>, location: &Location) -> StdR<R> {
+        Self::print_backtrace();
         Err(Self {
             code: StdErrCode::Multiple.code(),
             details: Some(StdErrDetail::Sub(details)),

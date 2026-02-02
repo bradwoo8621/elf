@@ -4,6 +4,7 @@ use elf_base::StdR;
 /// error raise helper of data path, function parser
 impl DataPathFuncParser {
     /// report error at [index of ampersand, current char index)
+    #[track_caller]
     pub fn incorrect_function_has_context<R>(&self) -> StdR<R> {
         let start_char_index = self.start_char_index_of_func;
         let end_char_index = self.inner.current_char_index();
@@ -17,6 +18,7 @@ impl DataPathFuncParser {
     }
 
     /// report error at [index of ampersand, current char index)
+    #[track_caller]
     pub fn incorrect_function_has_no_context<R>(&self) -> StdR<R> {
         let start_char_index = self.start_char_index_of_func;
         let end_char_index = self.inner.current_char_index();
@@ -30,6 +32,7 @@ impl DataPathFuncParser {
     }
 
     /// report error at [index of left parenthesis]
+    #[track_caller]
     pub fn incorrect_function_params_not_close<R>(
         &self,
         index_of_left_parenthesis: usize,
@@ -41,6 +44,7 @@ impl DataPathFuncParser {
     }
 
     /// report error at [index of left parenthesis, current char index)
+    #[track_caller]
     pub fn incorrect_function_param_over_max_count<R>(
         &self,
         index_of_left_parenthesis: usize,
@@ -57,6 +61,7 @@ impl DataPathFuncParser {
     }
 
     /// report error at [index of left parenthesis, current char index)
+    #[track_caller]
     pub fn incorrect_function_param_below_min_count<R>(
         &self,
         index_of_left_parenthesis: usize,
@@ -73,6 +78,7 @@ impl DataPathFuncParser {
     }
 
     /// report error at [current char index - in memory chars count, current char index)
+    #[track_caller]
     pub fn incorrect_function_param_tailing_whitespaces<R>(
         &self,
         in_memory_chars_count: usize,
@@ -87,6 +93,7 @@ impl DataPathFuncParser {
     }
 
     /// report error at [current char index - in memory chars count, current char index)
+    #[track_caller]
     pub fn incorrect_function_invalid_context<R>(&self, chars_count: usize) -> StdR<R> {
         self.inner.error(format!(
             "Incorrect data path[{}], caused by context of function[{}] is invalid at index[{}, {}].",

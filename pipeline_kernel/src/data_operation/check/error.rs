@@ -16,9 +16,10 @@ impl ArcTopicDataValue {
         }
     }
 
+    #[track_caller]
     pub fn must_compare_between_num_or_datetime<R>(&self, another: &ArcTopicDataValue) -> StdR<R> {
         PipelineKernelErrorCode::ValuesNotComparable.msg(
-			format!("Comparison of [none|str|decimal|date|time|datetime] are supported, current are [one={:?}, another={:?}].",
-			        Self::display_in_error(self), Self::display_in_error(another)), )
+            format!("Comparison of [none|str|decimal|date|time|datetime] are supported, current are [one={:?}, another={:?}].",
+                    Self::display_in_error(self), Self::display_in_error(another)), )
     }
 }

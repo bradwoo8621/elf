@@ -116,6 +116,7 @@ pub struct DateTimeMoveSupport<'a> {
 }
 
 impl DateTimeMoveSupport<'_> {
+    #[track_caller]
     fn parse_fail<R>(&self) -> StdR<R> {
         StdErrCode::DateMovementParse.msg(format!("Cannot parse given movement[{}].", self.str))
     }

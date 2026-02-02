@@ -49,6 +49,7 @@ impl DateTimeFormatterBase<NaiveDateTime> for FullDateTimeFormatter {
         }
     }
 
+    #[track_caller]
     fn format_not_found<R>(str: &String) -> StdR<R> {
         StdErrCode::FullDateTimeParse.msg(format!(
             "No suitable format for parsing the given string[{}] into a datetime.",
@@ -56,6 +57,7 @@ impl DateTimeFormatterBase<NaiveDateTime> for FullDateTimeFormatter {
         ))
     }
 
+    #[track_caller]
     fn parse_failed<R>(str: &String) -> StdR<R> {
         StdErrCode::FullDateTimeParse.msg(format!(
             "The given string[{}] cannot be parsed into a datetime.",

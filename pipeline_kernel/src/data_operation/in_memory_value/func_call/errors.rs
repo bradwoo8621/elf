@@ -5,6 +5,7 @@ use std::fmt::Display;
 
 /// for errors
 impl InMemoryFuncCall<'_> {
+    #[track_caller]
     pub fn context_disallowed<R>(&self) -> StdR<R> {
         PipelineKernelErrorCode::IncorrectDataPath.msg(format!(
             "Function[path={}, name={}] doesn't allow context.",
@@ -13,6 +14,7 @@ impl InMemoryFuncCall<'_> {
         ))
     }
 
+    #[track_caller]
     pub fn decimal_parse_error<R>(&self, value: impl Display) -> StdR<R> {
         StdErrCode::DecimalParse.msg(format!(
             "Cannot retrieve[key={}, current={}] as decimal, cause by current value is [{}].",
@@ -22,6 +24,7 @@ impl InMemoryFuncCall<'_> {
         ))
     }
 
+    #[track_caller]
     pub fn str_parse_error<R>(&self, value: impl Display) -> StdR<R> {
         StdErrCode::StrParse.msg(format!(
             "Cannot retrieve[key={}, current={}] as str, cause by current value is [{}].",
@@ -31,6 +34,7 @@ impl InMemoryFuncCall<'_> {
         ))
     }
 
+    #[track_caller]
     pub fn date_parse_error<R>(&self, value: impl Display) -> StdR<R> {
         StdErrCode::DateParse.msg(format!(
             "Cannot retrieve[key={}, current={}] as date, cause by current value is [{}].",
@@ -40,6 +44,7 @@ impl InMemoryFuncCall<'_> {
         ))
     }
 
+    #[track_caller]
     pub fn func_not_supported<R>(&self, value: impl Display) -> StdR<R> {
         PipelineKernelErrorCode::VariableFuncNotSupported.msg(format!(
             "Cannot retrieve[key={}, current={}], caused by function not supports value [{}].",
@@ -49,6 +54,7 @@ impl InMemoryFuncCall<'_> {
         ))
     }
 
+    #[track_caller]
     pub fn param_count_not_enough<R>(
         &self,
         func: &VariablePredefineFunctions,
@@ -63,6 +69,7 @@ impl InMemoryFuncCall<'_> {
         ))
     }
 
+    #[track_caller]
     pub fn param_count_too_many<R>(
         &self,
         func: &VariablePredefineFunctions,
@@ -77,6 +84,7 @@ impl InMemoryFuncCall<'_> {
         ))
     }
 
+    #[track_caller]
     pub fn param_must_be_str<R>(
         &self,
         func: &VariablePredefineFunctions,
@@ -93,6 +101,7 @@ impl InMemoryFuncCall<'_> {
         ))
     }
 
+    #[track_caller]
     pub fn param_must_be_num<R>(
         &self,
         func: &VariablePredefineFunctions,

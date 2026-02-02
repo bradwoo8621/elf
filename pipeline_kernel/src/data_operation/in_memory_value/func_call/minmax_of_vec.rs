@@ -86,6 +86,7 @@ impl MinmaxState<'_> {
         }
     }
 
+    #[track_caller]
     fn func_not_supported<R>(&self) -> StdR<R> {
         self.func_call.func_not_supported(self.context.deref())
     }
