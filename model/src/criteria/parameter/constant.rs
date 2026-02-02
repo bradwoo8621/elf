@@ -353,7 +353,7 @@ pub enum VariablePredefineFunctions {
     /// - [1, 100, "204"] -> 204, string cast to decimal.
     /// - ["1980-01-02 12:23:45", "1979-11-30", None] -> "1980-01-02", datetime downgrade to date.
     /// - ["1979-11-30 12:23:45", "12:23:45"] -> error, incompatible types date/datetime and date.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     Max,
     /// - max decimal elements of vec,
     /// - each value in vec should be
@@ -366,7 +366,7 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&maxNum], [x.&maxNum()], [&maxNum(x)]
     /// - [context]: vec,
     /// - [parameter]: not allowed.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MaxNum,
     /// - max date of elements of vec,
     /// - each value in vec should be
@@ -379,7 +379,7 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&maxDate], [x.&maxDate()], [&maxDate(x)]
     /// - [context]: vec,
     /// - [parameter]: not allowed.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MaxDate,
     /// - max datetime of elements of vec,
     /// - each value in vec should be
@@ -392,12 +392,12 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&maxDatetime], [x.&maxDatetime()], [&maxDatetime(x)]
     /// - [context]: vec,
     /// - [parameter]: not allowed.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MaxDatetime,
     /// alias of [VariablePredefineFunctions::MaxDatetime].
     ///
     /// - [syntax]: [x.&maxDt], [x.&maxDt()], [&maxDt(x)]
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MaxDt,
     /// - max time of elements of vec,
     /// - each value in vec should be
@@ -410,7 +410,7 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&maxTime], [x.&maxTime()], [&maxTime(x)]
     /// - [context]: vec,
     /// - [parameter]: not allowed.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MaxTime,
     /// - min of elements of vec,
     /// - each value in vec should be
@@ -431,7 +431,7 @@ pub enum VariablePredefineFunctions {
     /// - [1, 100, "204"] -> 1, string cast to decimal.
     /// - ["1980-01-02", "1979-11-30 12:23:45", None] -> "1979-11-30", datetime downgrade to date.
     /// - ["1979-11-30 12:23:45", "12:23:45"] -> error, incompatible types date/datetime and date.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     Min,
     /// - min decimal elements of vec,
     /// - each value in vec should be
@@ -444,7 +444,7 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&minNum], [x.&minNum()], [&minNum(x)]
     /// - [context]: vec,
     /// - [parameter]: not allowed.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MinNum,
     /// - min date of elements of vec,
     /// - each value in vec should be
@@ -457,7 +457,7 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&minDate], [x.&minDate()], [&minDate(x)]
     /// - [context]: vec,
     /// - [parameter]: not allowed.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MinDate,
     /// - min date time of elements of vec,
     /// - each value in vec should be
@@ -470,12 +470,12 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&minDatetime], [x.&minDatetime()], [&minDatetime(x)]
     /// - [context]: vec,
     /// - [parameter]: not allowed.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MinDatetime,
     /// alias of [VariablePredefineFunctions::MinDatetime].
     ///
     /// - [syntax]: [x.&minDt], [x.&minDt()], [&minDt(x)]
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MinDt,
     /// - min time of elements of vec,
     /// - each value in vec should be
@@ -488,7 +488,7 @@ pub enum VariablePredefineFunctions {
     /// - [syntax]: [x.&minTime], [x.&minTime()], [&minTime(x)]
     /// - [context]: vec,
     /// - [parameter]: not allowed.
-    #[restrict(none_context = false, max_param_count = 0)]
+    #[restrict(max_param_count = 0)]
     MinTime,
     /// - retrieve value from current context, include variables and current trigger data,
     /// - [only in-memory].
@@ -516,7 +516,7 @@ pub enum VariablePredefineFunctions {
     /// - [context]: date/datetime, string can cast to date/datetime.
     /// - [parameter]:
     ///   - [otherDate]: date/datetime, string can cast to date/datetime.
-    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
+    #[restrict(min_param_count = 1, max_param_count = 1)]
     DayDiff,
     /// - get month difference between context and parameter.
     /// - time part of datetime ignored.
@@ -525,7 +525,7 @@ pub enum VariablePredefineFunctions {
     /// - [context]: date/datetime, string can cast to date/datetime.
     /// - [parameter]:
     ///   - [otherDate]: date/datetime, string can cast to date/datetime.
-    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
+    #[restrict(min_param_count = 1, max_param_count = 1)]
     MonthDiff,
     /// - get year difference between context and parameter.
     /// - time part of datetime ignored.
@@ -534,7 +534,7 @@ pub enum VariablePredefineFunctions {
     /// - [context]: date/datetime, string can cast to date/datetime.
     /// - [parameter]:
     ///   - [otherDate]: date/datetime, string can cast to date/datetime.
-    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
+    #[restrict(min_param_count = 1, max_param_count = 1)]
     YearDiff,
     /// - move date by given days, months, years.
     /// - if context has no corresponding part of movement, ignore the movement.
@@ -563,7 +563,7 @@ pub enum VariablePredefineFunctions {
     /// - hour set to 23, now is 2000-12-29 23:00:00 (original no time, default is 00:00:00),
     /// - minute plus 5, to 5, now is 2000-12-29 23:05:00,
     /// - second minus 6, to 54, and minute minus 1. result is 2000-12-29 23:04:54.
-    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
+    #[restrict(min_param_count = 1, max_param_count = 1)]
     MoveDate,
     /// - format date to string by given format.
     ///
@@ -588,7 +588,7 @@ pub enum VariablePredefineFunctions {
     /// e.g. [date.&fmtDate(%Y-%M-%D)],
     /// if date is 2000-12-29, then result is 2000-12-29 00:00:00.
     #[display = "&fmtDate"]
-    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
+    #[restrict(min_param_count = 1, max_param_count = 1)]
     DateFormat,
     /// - get current date time.
     ///
