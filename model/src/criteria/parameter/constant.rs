@@ -21,8 +21,10 @@ use elf_model_marco::{adapt_model, Display, Serde, StrEnum, VPF};
 #[pattern = "ampersand-prefix"]
 pub enum VariablePredefineFunctions {
     // Sequence functions
-    /// get next sequence number, [only in-memory]. \[&nextSeq], \[&nextSeq()]
+    /// - get next sequence number,
+    /// - [only in-memory].
     ///
+    /// - [syntax]: \[&nextSeq], \[&nextSeq()]
     /// - [context]: not allowed,
     /// - [parameter]: not allowed.
     #[restrict(context = false, max_param_count = 0)]
@@ -339,7 +341,7 @@ pub enum VariablePredefineFunctions {
     ///   - or none which ignored,
     /// - all values must be same type,
     /// - date and datetime types are compatible,
-    /// - if all elements are none, returns none,
+    /// - if all elements are none or empty string, returns none,
     /// - [only in-memory].
     ///
     /// - [syntax]: [x.&max], [x.&max()], [&max(x)]
@@ -358,7 +360,7 @@ pub enum VariablePredefineFunctions {
     ///   - a decimal,
     ///   - or can cast to decimal,
     ///   - or none which ignored,
-    /// - if all elements are none, returns none,
+    /// - if all elements are none or empty string, returns none,
     /// - [only in-memory].
     ///
     /// - [syntax]: [x.&maxNum], [x.&maxNum()], [&maxNum(x)]
@@ -371,7 +373,7 @@ pub enum VariablePredefineFunctions {
     ///   - a date/datetime,
     ///   - or can cast to date/datetime,
     ///   - or none which ignored,
-    /// - if all elements are none, returns none,
+    /// - if all elements are none or empty string, returns none,
     /// - [only in-memory].
     ///
     /// - [syntax]: [x.&maxDate], [x.&maxDate()], [&maxDate(x)]
@@ -384,7 +386,7 @@ pub enum VariablePredefineFunctions {
     ///   - a date/datetime,
     ///   - or can cast to date/datetime,
     ///   - or none which ignored,
-    /// - if all elements are none, returns none,
+    /// - if all elements are none or empty string, returns none,
     /// - [only in-memory].
     ///
     /// - [syntax]: [x.&maxDatetime], [x.&maxDatetime()], [&maxDatetime(x)]
@@ -402,7 +404,7 @@ pub enum VariablePredefineFunctions {
     ///   - a time,
     ///   - or can cast to time,
     ///   - or none which ignored,
-    /// - if all elements are none, returns none,
+    /// - if all elements are none or empty string, returns none,
     /// - [only in-memory].
     ///
     /// - [syntax]: [x.&maxTime], [x.&maxTime()], [&maxTime(x)]
@@ -410,17 +412,19 @@ pub enum VariablePredefineFunctions {
     /// - [parameter]: not allowed.
     #[restrict(none_context = false, max_param_count = 0)]
     MaxTime,
-    /// min of elements of vec, [only in-memory].
-    /// [x.&min], [x.&min()], [&min(x)]
+    /// - min of elements of vec,
+    /// - each value in vec should be
+    ///   - a decimal/date/datetime/time,
+    ///   - or can cast to decimal/date/datetime/time,
+    ///   - or none which ignored,
+    /// - all values must be same type,
+    /// - date and datetime types are compatible,
+    /// - if any element is none or empty string, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns none.
-    ///
-    /// each value in vec should be a decimal/date/datetime/time,
-    /// or can cast to decimal/date/datetime/tim, or none which treated as min value,
-    /// otherwise error raised.
-    /// and all values must be same type, except datetime will be automatically cast to date if there is date type existing,
-    /// if any value is none, returns none.
+    /// - [syntax]: [x.&min], [x.&min()], [&min(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
     ///
     /// e.g.
     /// - ["1", "1980-01-02", None] -> error, incompatible types decimal and date.
@@ -429,103 +433,127 @@ pub enum VariablePredefineFunctions {
     /// - ["1979-11-30 12:23:45", "12:23:45"] -> error, incompatible types date/datetime and date.
     #[restrict(none_context = false, max_param_count = 0)]
     Min,
-    /// min decimal elements of vec, [only in-memory].
-    /// [x.&minNum], [x.&minNum()], [&minNum(x)]
+    /// - min decimal elements of vec,
+    /// - each value in vec should be
+    ///   - a decimal,
+    ///   - or can cast to decimal,
+    ///   - or none which ignored,
+    /// - if any element is none or empty string, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns none.
-    ///
-    /// each value in vec should be a decimal, or can cast to decimal, or none which treated as min value,
-    /// otherwise error raised.
-    /// if any value is none, returns none.
+    /// - [syntax]: [x.&minNum], [x.&minNum()], [&minNum(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
     #[restrict(none_context = false, max_param_count = 0)]
     MinNum,
-    /// min date of elements of vec, [only in-memory].
-    /// [x.&minDate], [x.&minDate()], [&minDate(x)]
+    /// - min date of elements of vec,
+    /// - each value in vec should be
+    ///   - a date/datetime,
+    ///   - or can cast to date/datetime,
+    ///   - or none which ignored,
+    /// - if any element is none or empty string, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns none.
-    ///
-    /// each value in vec should be a date/datetime, or can cast to date/datetime, or none which treated as min value,
-    /// otherwise error raised.
-    /// if any value is none, returns none.
+    /// - [syntax]: [x.&minDate], [x.&minDate()], [&minDate(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
     #[restrict(none_context = false, max_param_count = 0)]
     MinDate,
-    /// min date time of elements of vec, [only in-memory].
-    /// [x.&minDatetime], [x.&minDatetime()], [&minDatetime(x)]
+    /// - min date time of elements of vec,
+    /// - each value in vec should be
+    ///   - a date/datetime,
+    ///   - or can cast to date/datetime,
+    ///   - or none which ignored,
+    /// - if any element is none or empty string, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns none.
-    ///
-    /// each value in vec should be a datetime, or can cast to datetime, or none which treated as min value,
-    /// otherwise error raised.
-    /// if any value is none, returns none.
+    /// - [syntax]: [x.&minDatetime], [x.&minDatetime()], [&minDatetime(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
     #[restrict(none_context = false, max_param_count = 0)]
     MinDatetime,
     /// alias of [VariablePredefineFunctions::MinDatetime].
-    /// [x.&minDt], [x.&minDt()], [&minDt(x)]
+    ///
+    /// - [syntax]: [x.&minDt], [x.&minDt()], [&minDt(x)]
     #[restrict(none_context = false, max_param_count = 0)]
     MinDt,
-    /// min time of elements of vec, [only in-memory].
-    /// [x.&minTime], [x.&minTime()], [&minTime(x)]
+    /// - min time of elements of vec,
+    /// - each value in vec should be
+    ///   - a time,
+    ///   - or can cast to time,
+    ///   - or none which ignored,
+    /// - if any element is none or empty string, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns none.
-    ///
-    /// each value in vec should be a time, or can cast to time, or none which treated as min value,
-    /// otherwise error raised.
-    /// if any value is none, returns none.
+    /// - [syntax]: [x.&minTime], [x.&minTime()], [&minTime(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
     #[restrict(none_context = false, max_param_count = 0)]
     MinTime,
-    /// Retrieve value from current context, include variables and current trigger data
-    /// [&cur], [&cur()]
+    /// - retrieve value from current context, include variables and current trigger data,
+    /// - [only in-memory].
+    ///
+    /// - [syntax]: [&cur], [&cur()],
+    /// - [context]: not allowed,
+    /// - [parameter]: not allowed.
     #[display = "&cur"]
     #[restrict(context = false, max_param_count = 0)]
     FromCurrentTriggerData,
-    /// Retrieve value from previous trigger data
-    /// [&old], [&old()]
+    /// - retrieve value from previous trigger data,
+    /// - [only in-memory].
+    ///
+    /// - [syntax]: [&old], [&old()],
+    /// - [context]: not allowed,
+    /// - [parameter]: not allowed.
     #[display = "&old"]
     #[restrict(context = false, max_param_count = 0)]
     FromPreviousTriggerData,
     // Date related functions
-    /// get day difference between two dates.
-    /// [x.&dayDiff(otherDate)], [&dayDiff(x, otherDate)]
+    /// - get day difference between context and parameter.
+    /// - time part of datetime ignored.
     ///
+    /// - [syntax]: [x.&dayDiff(otherDate)], [&dayDiff(x, otherDate)]
     /// - [context]: date/datetime, string can cast to date/datetime.
-    /// - [otherDate]: date/datetime, string can cast to date/datetime.
+    /// - [parameter]:
+    ///   - [otherDate]: date/datetime, string can cast to date/datetime.
     #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     DayDiff,
-    /// get month difference between two dates.
-    /// [x.&monthDiff(otherDate)], [&monthDiff(x, otherDate)]
+    /// - get month difference between context and parameter.
+    /// - time part of datetime ignored.
     ///
+    /// - [syntax]: [x.&monthDiff(otherDate)], [&monthDiff(x, otherDate)]
     /// - [context]: date/datetime, string can cast to date/datetime.
-    /// - [otherDate]: date/datetime, string can cast to date/datetime.
+    /// - [parameter]:
+    ///   - [otherDate]: date/datetime, string can cast to date/datetime.
     #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     MonthDiff,
-    /// get year difference between two dates.
-    /// [x.&yearDiff(otherDate)], [&yearDiff(x, otherDate)]
+    /// - get year difference between context and parameter.
+    /// - time part of datetime ignored.
     ///
+    /// - [syntax]: [x.&yearDiff(otherDate)], [&yearDiff(x, otherDate)]
     /// - [context]: date/datetime, string can cast to date/datetime.
-    /// - [otherDate]: date/datetime, string can cast to date/datetime.
+    /// - [parameter]:
+    ///   - [otherDate]: date/datetime, string can cast to date/datetime.
     #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     YearDiff,
-    /// move date by given days, months, years.
-    /// [x.&moveDate(movement)], [&moveDate(x, movement)]
+    /// - move date by given days, months, years.
+    /// - if context has no corresponding part of movement, ignore the movement.
     ///
+    /// - [syntax]: [x.&moveDate(movement)], [&moveDate(x, movement)]
     /// - [context]: date/datetime, string can cast to date/datetime.
-    /// - [movement]: string. format:
-    ///   - unit: YMDhms,
-    ///   - positive/negative: +/-, optional,
-    ///   - if 2nd part is +/-, any number value; or
-    ///     -year(Y): 4 digits year,
-    ///		- month(M): 1 - 12. any value not in [1, 12] will be normalized to [1, 12],
-    ///		- date(D): 1 - end of month (28/29/30/31). 99 means end of month,
-    ///       otherwise any value not in [1, end of month] will be normalized to [1, end of month],
-    ///		- hour(h): 0 - 23. any value not in [0, 23] will be normalized to [0, 23],
-    ///		- minute(m): 0 - 59. any value not in [0, 59] will be normalized to [0, 59],
-    ///		- second(s): 0 - 59. any value not in [0, 59] will be normalized to [0, 59],
-    ///   - whitespaces between 3 parts are allowed, and ignored.
-    /// if no time moved, then original date returned. otherwise automatically upgrade date to datetime.
+    /// - [parameter]:
+    ///   - [movement]: string. format:
+    ///     - unit: YMDhms,
+    ///     - positive/negative: +/-, optional,
+    ///     - if 2nd part is +/-, any number value; or
+    ///       - year(Y): 4 digits year,
+    ///	  	  - month(M): 1 - 12. any value not in [1, 12] will be normalized to [1, 12],
+    ///	  	  - date(D): 1 - end of month (28/29/30/31). 99 means end of month,
+    ///           otherwise any value not in [1, end of month] will be normalized to [1, end of month],
+    ///	  	  - hour(h): 0 - 23. any value not in [0, 23] will be normalized to [0, 23],
+    ///	  	  - minute(m): 0 - 59. any value not in [0, 59] will be normalized to [0, 59],
+    ///	  	  - second(s): 0 - 59. any value not in [0, 59] will be normalized to [0, 59],
+    ///     - whitespaces between 3 parts are allowed, and ignored.
     ///
     /// e.g. [date.&moveDate(Y2000M+1D-1h23m+5s-6)],
     /// if date is 1999-11-30, then result is 2000-12-29 23:04:54:
@@ -537,32 +565,36 @@ pub enum VariablePredefineFunctions {
     /// - second minus 6, to 54, and minute minus 1. result is 2000-12-29 23:04:54.
     #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     MoveDate,
-    /// format date to string by given format.
-    /// [x.&dateFormat(format)], [&dateFormat(x, format)]
+    /// - format date to string by given format.
     ///
+    /// - [syntax]: [x.&dateFormat(format)], [&dateFormat(x, format)]
     /// - [context]: date/datetime, string can cast to date/datetime.
-    /// - [format]: string. date format.
-    ///   - 'Y': '%Y',  # 4 digits year
-    ///   - 'y': '%y',  # 2 digits year
-    ///   - 'M': '%m',  # 2 digits month
-    ///   - 'D': '%d',  # 2 digits day of month
-    ///   - 'h': '%H',  # 2 digits hour, 00 - 23
-    ///   - 'H': '%I',  # 2 digits hour, 01 - 12
-    ///   - 'm': '%M',  # 2 digits minute
-    ///   - 's': '%S',  # 2 digits second
-    ///   - 'W': '%A',  # Monday - Sunday
-    ///   - 'w': '%a',  # Mon - Sun
-    ///   - 'B': '%B',  # January - December
-    ///   - 'b': '%b',  # Jan - Dec
-    ///	  - 'p': '%p'  # AM/PM
+    /// - [parameter]:
+    ///   - [format]: string. date format.
+    ///     - 'Y': '%Y',  # 4 digits year
+    ///     - 'y': '%y',  # 2 digits year
+    ///     - 'M': '%m',  # 2 digits month
+    ///     - 'D': '%d',  # 2 digits day of month
+    ///     - 'h': '%H',  # 2 digits hour, 00 - 23
+    ///     - 'H': '%I',  # 2 digits hour, 01 - 12
+    ///     - 'm': '%M',  # 2 digits minute
+    ///     - 's': '%S',  # 2 digits second
+    ///     - 'W': '%A',  # Monday - Sunday
+    ///     - 'w': '%a',  # Mon - Sun
+    ///     - 'B': '%B',  # January - December
+    ///     - 'b': '%b',  # Jan - Dec
+    ///	    - 'p': '%p'  # AM/PM
     ///
     /// e.g. [date.&fmtDate(%Y-%M-%D)],
     /// if date is 2000-12-29, then result is 2000-12-29 00:00:00.
     #[display = "&fmtDate"]
     #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     DateFormat,
-    /// get current date time.
-    /// [&now], [&now()]
+    /// - get current date time.
+    ///
+    /// - [syntax]: [&now], [&now()]
+    /// - [context]: not allowed,
+    /// - [parameter]: not allowed.
     #[restrict(context = false, max_param_count = 0)]
     Now,
 }

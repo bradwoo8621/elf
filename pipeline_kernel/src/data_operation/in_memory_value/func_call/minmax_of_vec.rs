@@ -104,13 +104,15 @@ impl MinmaxState<'_> {
     /// - raise error when given string is blank,
     /// - push given string into string elements
     fn on_str_element(&mut self, str: &Arc<String>) -> StdR<Option<ArcTopicDataValue>> {
-        if self.ask_min_value {
-            if str.is_empty() {
+        if str.is_empty() {
+            if self.ask_min_value {
                 // empty string treated as none
-                return Ok(Some(ArcTopicDataValue::None));
+                Ok(Some(ArcTopicDataValue::None))
+            } else {
+                // ignore empty string
+                Ok(None)
             }
-        }
-        if str.is_blank() {
+        } else if str.is_blank() {
             // blank string cannot cast to any allowed type, raise error
             self.func_not_supported()
         } else {
