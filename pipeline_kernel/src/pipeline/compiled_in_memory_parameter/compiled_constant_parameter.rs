@@ -1,5 +1,5 @@
-use crate::{ArcTopicDataValue, DataPath, InMemoryData};
-use elf_base::StdR;
+use crate::{ArcTopicDataValue, DataPath, InMemoryData, PipelineKernelErrorCode};
+use elf_base::{ErrorCode, StdR, StringUtils};
 use elf_model::TenantId;
 use elf_runtime_model_kernel::ArcConstantParameter;
 use std::sync::Arc;
@@ -13,9 +13,18 @@ impl CompiledConstantParameter {
         parameter: &Arc<ArcConstantParameter>,
         _tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {
-        Ok(CompiledConstantParameter {
-            path: DataPath::from_str(parameter.value.as_str())?,
-        })
+        let value = &parameter.value;
+        if value.is_empty() {
+            PipelineKernelErrorCode::ConstantParameterIsEmpty
+                .msg("Value of constant parameter cannot be empty.")
+        } else if value.is_blank() {
+            PipelineKernelErrorCode::ConstantParameterIsBlank
+                .msg("Value of constant parameter cannot be blank.")
+        } else {
+            Ok(CompiledConstantParameter {
+                path: DataPath::from_str(parameter.value.as_str())?,
+            })
+        }
     }
 }
 

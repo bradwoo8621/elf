@@ -27,7 +27,12 @@ pub enum PipelineKernelErrorCode {
     FailedToGetNextSeq,
     // schema
     FactorNotFound,
-    TopicDataPropertySegmentMissed,
+    // parameter
+    ConstantParameterIsEmpty,
+    ConstantParameterIsBlank,
+    ComputeParameterTypeMissed,
+    ComputeParameterParameterMissed,
+    ComputeParameterValueNotSupported,
 }
 
 impl ErrorCode for PipelineKernelErrorCode {
@@ -58,7 +63,12 @@ impl ErrorCode for PipelineKernelErrorCode {
             Self::FailedToGetNextSeq => "PLKN-00107",
 
             Self::FactorNotFound => "PLKN-00200",
-            Self::TopicDataPropertySegmentMissed => "PLKN-00201",
+
+            Self::ConstantParameterIsEmpty => "PLKN-00300",
+            Self::ConstantParameterIsBlank => "PLKN-00301",
+            Self::ComputeParameterTypeMissed => "PLKN-00302",
+            Self::ComputeParameterParameterMissed => "PLKN-00303",
+            Self::ComputeParameterValueNotSupported => "PLKN-00304",
         }
     }
 }
