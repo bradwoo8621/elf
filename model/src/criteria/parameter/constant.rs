@@ -263,22 +263,23 @@ pub enum VariablePredefineFunctions {
         max_param_count = 1
     )]
     Split,
-    /// concatenate multiple strings to one string.
-    /// - [x.&concat(y, ...)], [&concat(x, y, ...)]
+    /// - concatenate multiple strings to one string,
+    /// - when context is none, treated as empty string.
     ///
+    /// - [syntax]: [x.&concat(y, ...)], [&concat(x, y, ...)]
     /// - [context]: string, none.
-    /// - [none context], simply ignore it.
-    /// - [y, ...]: strings or nones. none values are ignored.
-    ///
-    /// return empty string when values are all none.
+    /// - [parameter]:
+    ///   - [y, ...]: strings or nones. treated as empty string.
     #[restrict(none_context = true, blank_context = true, min_param_count = 1)]
     Concat,
-    /// concatenate multiple strings in vec to one string with separator
-    /// - [x.&concatWith(separator, y, ...)], [&concatWith(x, separator, y, ...)].
+    /// - concatenate multiple strings in vec to one string with separator,
+    /// - when context is none, treated as empty string.
     ///
-    /// - [context]: not vec/map values. none treated as empty string
-    /// - [separator]: not vec/map values. none value is treated as empty string.
-    /// - [y, ...]: not vec/map values. none treated as empty string
+    /// - [syntax]: [x.&concatWith(separator, y, ...)], [&concatWith(x, separator, y, ...)].
+    /// - [context]: not vec/map values,
+    /// - [parameter]:
+    ///   - [separator]: not vec/map values. if none, treated as empty string.
+    ///   - [y, ...]: not vec/map values. if none, treated as empty string
     ///
     /// return empty string when values are all none.
     #[restrict(none_context = true, blank_context = true, min_param_count = 2)]

@@ -20,13 +20,24 @@ impl InMemoryFuncCall<'_> {
             _ => {
                 let mut result = self.unwrap_as_str(&context)?;
                 let separator = self.unwrap_as_str(&params[0])?;
-                for param in params.iter().skip(1) {
-                    result.push_str(&separator);
-                    let str = self.unwrap_as_str(param.deref())?;
-                    if str.len() == 0 {
-                        continue;
-                    } else {
-                        result.push_str(&str);
+                if separator.is_empty() {
+                    for param in params.iter().skip(1) {
+                        let str = self.unwrap_as_str(param.deref())?;
+                        if str.len() == 0 {
+                            continue;
+                        } else {
+                            result.push_str(&str);
+                        }
+                    }
+                } else {
+                    for param in params.iter().skip(1) {
+                        result.push_str(&separator);
+                        let str = self.unwrap_as_str(param.deref())?;
+                        if str.len() == 0 {
+                            continue;
+                        } else {
+                            result.push_str(&str);
+                        }
                     }
                 }
 
