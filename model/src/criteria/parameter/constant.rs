@@ -14,37 +14,51 @@ use elf_model_marco::{adapt_model, Display, Serde, StrEnum, VPF};
 /// - min_param_count: minimum number of parameters the function requires.
 /// - max_param_count: maximum number of parameters the function can accept, if 0, then no parameter allowed.
 ///   if None, then no limit.
+///
+/// difference with python implementation:
+/// - most of the functions support none context now, to avoid the error in runtime.
 #[derive(Display, Serde, StrEnum, VPF)]
 #[pattern = "ampersand-prefix"]
 pub enum VariablePredefineFunctions {
     // Sequence functions
     /// get next sequence number, [only in-memory]. \[&nextSeq], \[&nextSeq()]
+    ///
+    /// - [context]: not allowed,
+    /// - [parameter]: not allowed.
     #[restrict(context = false, max_param_count = 0)]
     NextSeq,
     // Aggregation functions
-    /// count of vec or map, [only in-memory]. [x.&count], [x.&count()], \[&count(x)]
+    /// - count of vec or map,
+    /// - count of none returns 0,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, map or none.
-    /// - [none context]: returns 0.
+    /// - [syntax]: [x.&count], [x.&count()], \[&count(x)],
+    /// - [context]: vec, map or none,
+    /// - [parameter]: not allowed.
     #[restrict(none_context = true, max_param_count = 0)]
     Count,
     // String functions
-    /// chars count of string or decimal (to string). [x.&length], [x.&length()], \[&length(x)]
+    /// - chars count of string or decimal (to string),
+    /// - chars count of none returns 0.
     ///
-    /// - [context]: string, decimal or none.
-    /// - [none context]: returns 0.
+    /// - [syntax]: [x.&length], [x.&length()], \[&length(x)],
+    /// - [context]: string, decimal or none,
+    /// - [parameter]: not allowed.
     #[restrict(none_context = true, blank_context = true, max_param_count = 0)]
     Length,
-    /// alias of [VariablePredefineFunctions::Length]. [x.&len], [x.&len()], [&len(x)]
+    /// alias of [VariablePredefineFunctions::Length].
+    ///
+    /// - [syntax]: [x.&len], [x.&len()], \[&len(x)].
     #[restrict(none_context = true, blank_context = true, max_param_count = 0)]
     Len,
-    /// get substring of string.
-    /// - from start (included) to end (excluded): [x.&slice(start, end)], [&slice(x, start, end)],
-    /// - from start (included) to end of string: [x.&slice(start)], [x.&slice(start, )], [&slice(x, start)], [&slice(x, start, )]
-    /// - from 0 to end (excluded): [x.&slice(, end)], [&slice(x, , end)],
+    /// - get substring from start (included) to end (excluded) of string,
+    /// - substring of none returns none.
     ///
-    /// - [context]: string, none.
-    /// - [none context]: returns empty string.
+    /// - [syntax]:
+    ///   - from start (included) to end (excluded): [x.&slice(start, end)], [&slice(x, start, end)],
+    ///   - from start (included) to end of string: [x.&slice(start)], [x.&slice(start, )], [&slice(x, start)], [&slice(x, start, )],
+    ///   - from 0 to end (excluded): [x.&slice(, end)], [&slice(x, , end)],
+    /// - [context]: string or none.
     /// - [start]: zero-based index, negative not allowed. none treat as 0.
     /// - [end]: zero-based index, negative not allowed. none treat as maximum length of the string.
     ///   the maximum length of the string will be used as the limit when end is out of range.
@@ -56,9 +70,11 @@ pub enum VariablePredefineFunctions {
     )]
     Slice,
     /// alias of [VariablePredefineFunctions::Slice].
-    /// - from start (included) to end (excluded): [x.&substr(start, end)], [&substr(x, start, end)],
-    /// - from start (included) to end of string: [x.&substr(start)], [x.&substr(start, )], [&substr(x, start)], [&substr(x, start, )]
-    /// - from 0 to end (excluded): [x.&substr(, end)], [&substr(x, , end)],
+    ///
+    /// - [syntax]:
+    ///   - from start (included) to end (excluded): [x.&substr(start, end)], [&substr(x, start, end)],
+    ///   - from start (included) to end of string: [x.&substr(start)], [x.&substr(start, )], [&substr(x, start)], [&substr(x, start, )]
+    ///   - from 0 to end (excluded): [x.&substr(, end)], [&substr(x, , end)],
     #[restrict(
         none_context = true,
         blank_context = true,

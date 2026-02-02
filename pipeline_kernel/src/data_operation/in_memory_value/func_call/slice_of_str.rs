@@ -12,7 +12,6 @@ impl InMemoryFuncCall<'_> {
     /// - use 0 if the first parameter is none,
     /// - use chars count if then second parameter is none,
     /// - return the slice string of given string
-    // noinspection DuplicatedCode
     pub fn resolve_slice_of_str(
         &self,
         context: Arc<ArcTopicDataValue>,

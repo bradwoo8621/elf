@@ -1,5 +1,5 @@
 use crate::{ArcTopicDataValue, InMemoryFuncCall};
-use bigdecimal::{BigDecimal, FromPrimitive};
+use bigdecimal::{BigDecimal, FromPrimitive, Zero};
 use elf_base::StdR;
 use std::ops::Deref;
 use std::sync::Arc;
@@ -16,6 +16,7 @@ impl InMemoryFuncCall<'_> {
     ) -> StdR<Arc<ArcTopicDataValue>> {
         self.no_param(&params, || {
             let count = match context.deref() {
+                ArcTopicDataValue::None => Some(BigDecimal::zero()),
                 ArcTopicDataValue::Vec(vec) => BigDecimal::from_usize(vec.len()),
                 ArcTopicDataValue::Map(map) => BigDecimal::from_usize(map.len()),
                 other => return self.func_not_supported(other),
