@@ -311,94 +311,104 @@ pub enum VariablePredefineFunctions {
     /// - [parameter]: not allowed.
     #[restrict(none_context = true, max_param_count = 0)]
     Distinct,
-    /// sum of elements of vec, [only in-memory].
-    /// [x.&sum], [x.&sum()], [&sum(x)]
+    /// - sum of elements of vec,
+    /// - if context is none, returns 0,
+    /// - if context is vec, each element should be a decimal, or a string can cast to decimal,
+    /// - if element is none or empty string, treated as 0,
+    /// - [only in-memory].
     ///
+    /// - [syntax]: [x.&sum], [x.&sum()], [&sum(x)]
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
-    ///
-    /// each value in vec should be a decimal, or can cast to decimal,
-    /// or none/empty string which treated as 0,
-    /// otherwise error raised.
     #[restrict(none_context = true, max_param_count = 0)]
     Sum,
-    /// avg of elements of vec, [only in-memory].
-    /// [x.&avg], [x.&avg()], [&avg(x)]
+    /// - avg of elements of vec,
+    /// - if context is none, returns none,
+    /// - if context is vec, each element should be a decimal, or a string can cast to decimal,
+    /// - if element is none or empty string, ignore,
+    /// - if no valid element in vec, returns none,
+    /// - [only in-memory].
     ///
+    /// - [syntax]: [x.&avg], [x.&avg()], [&avg(x)]
     /// - [context]: vec, none.
-    /// - [none context], returns 0.
-    ///
-    /// each value in vec should be a decimal, or can cast to decimal,
-    /// otherwise error raised.
-    /// none/empty string doesn't count in
     #[restrict(none_context = true, max_param_count = 0)]
     Avg,
-    /// max of elements of vec, [only in-memory].
-    /// [x.&max], [x.&max()], [&max(x)]
+    /// - max of elements of vec,
+    /// - each value in vec should be
+    ///   - a decimal/date/datetime/time,
+    ///   - or can cast to decimal/date/datetime/time,
+    ///   - or none which ignored,
+    /// - all values must be same type,
+    /// - date and datetime types are compatible,
+    /// - if all elements are none, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns 0.
-    ///
-    /// each value in vec should be a decimal/date/datetime/time,
-    /// or can cast to decimal/date/datetime/tim, or none which ignored,
-    /// otherwise error raised.
-    /// and all values must be same type, except datetime will be automatically cast to date if there is date type existing,
-    /// if all values are none, returns none.
+    /// - [syntax]: [x.&max], [x.&max()], [&max(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
     ///
     /// e.g.
     /// - ["1", "1980-01-02", None] -> error, incompatible types decimal and date.
     /// - [1, 100, "204"] -> 204, string cast to decimal.
     /// - ["1980-01-02 12:23:45", "1979-11-30", None] -> "1980-01-02", datetime downgrade to date.
     /// - ["1979-11-30 12:23:45", "12:23:45"] -> error, incompatible types date/datetime and date.
-    #[restrict(none_context = true, max_param_count = 0)]
+    #[restrict(none_context = false, max_param_count = 0)]
     Max,
-    /// max decimal elements of vec, [only in-memory].
-    /// [x.&maxNum], [x.&maxNum()], [&maxNum(x)]
+    /// - max decimal elements of vec,
+    /// - each value in vec should be
+    ///   - a decimal,
+    ///   - or can cast to decimal,
+    ///   - or none which ignored,
+    /// - if all elements are none, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns none.
-    ///
-    /// each value in vec should be a decimal, or can cast to decimal, or none which ignored,
-    /// otherwise error raised.
-    /// if all values are none, returns none.
-    #[restrict(none_context = true, max_param_count = 0)]
+    /// - [syntax]: [x.&maxNum], [x.&maxNum()], [&maxNum(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
+    #[restrict(none_context = false, max_param_count = 0)]
     MaxNum,
-    /// max date of elements of vec, [only in-memory].
-    /// [x.&maxDate], [x.&maxDate()], [&maxDate(x)]
+    /// - max date of elements of vec,
+    /// - each value in vec should be
+    ///   - a date/datetime,
+    ///   - or can cast to date/datetime,
+    ///   - or none which ignored,
+    /// - if all elements are none, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns none.
-    ///
-    /// each value in vec should be a date/datetime, or can cast to date/datetime, or none which ignored,
-    /// otherwise error raised.
-    /// if all values are none, returns none.
-    #[restrict(none_context = true, max_param_count = 0)]
+    /// - [syntax]: [x.&maxDate], [x.&maxDate()], [&maxDate(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
+    #[restrict(none_context = false, max_param_count = 0)]
     MaxDate,
-    /// max date time of elements of vec, [only in-memory].
-    /// [x.&maxDatetime], [x.&maxDatetime()], [&maxDatetime(x)]
+    /// - max datetime of elements of vec,
+    /// - each value in vec should be
+    ///   - a date/datetime,
+    ///   - or can cast to date/datetime,
+    ///   - or none which ignored,
+    /// - if all elements are none, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns none.
-    ///
-    /// each value in vec should be a datetime, or can cast to datetime, or none which ignored,
-    /// otherwise error raised.
-    /// if all values are none, returns none.
-    #[restrict(none_context = true, max_param_count = 0)]
+    /// - [syntax]: [x.&maxDatetime], [x.&maxDatetime()], [&maxDatetime(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
+    #[restrict(none_context = false, max_param_count = 0)]
     MaxDatetime,
     /// alias of [VariablePredefineFunctions::MaxDatetime].
-    /// [x.&maxDt], [x.&maxDt()], [&maxDt(x)]
-    #[restrict(none_context = true, max_param_count = 0)]
+    ///
+    /// - [syntax]: [x.&maxDt], [x.&maxDt()], [&maxDt(x)]
+    #[restrict(none_context = false, max_param_count = 0)]
     MaxDt,
-    /// max time of elements of vec, [only in-memory].
-    /// [x.&maxTime], [x.&maxTime()], [&maxTime(x)]
+    /// - max time of elements of vec,
+    /// - each value in vec should be
+    ///   - a time,
+    ///   - or can cast to time,
+    ///   - or none which ignored,
+    /// - if all elements are none, returns none,
+    /// - [only in-memory].
     ///
-    /// - [context]: vec, none.
-    /// - [none context], returns none.
-    ///
-    /// each value in vec should be a time, or can cast to time, or none which ignored,
-    /// otherwise error raised.
-    /// if all values are none, returns none.
-    #[restrict(none_context = true, max_param_count = 0)]
+    /// - [syntax]: [x.&maxTime], [x.&maxTime()], [&maxTime(x)]
+    /// - [context]: vec,
+    /// - [parameter]: not allowed.
+    #[restrict(none_context = false, max_param_count = 0)]
     MaxTime,
     /// min of elements of vec, [only in-memory].
     /// [x.&min], [x.&min()], [&min(x)]
@@ -417,7 +427,7 @@ pub enum VariablePredefineFunctions {
     /// - [1, 100, "204"] -> 1, string cast to decimal.
     /// - ["1980-01-02", "1979-11-30 12:23:45", None] -> "1979-11-30", datetime downgrade to date.
     /// - ["1979-11-30 12:23:45", "12:23:45"] -> error, incompatible types date/datetime and date.
-    #[restrict(none_context = true, max_param_count = 0)]
+    #[restrict(none_context = false, max_param_count = 0)]
     Min,
     /// min decimal elements of vec, [only in-memory].
     /// [x.&minNum], [x.&minNum()], [&minNum(x)]
@@ -428,7 +438,7 @@ pub enum VariablePredefineFunctions {
     /// each value in vec should be a decimal, or can cast to decimal, or none which treated as min value,
     /// otherwise error raised.
     /// if any value is none, returns none.
-    #[restrict(none_context = true, max_param_count = 0)]
+    #[restrict(none_context = false, max_param_count = 0)]
     MinNum,
     /// min date of elements of vec, [only in-memory].
     /// [x.&minDate], [x.&minDate()], [&minDate(x)]
@@ -439,7 +449,7 @@ pub enum VariablePredefineFunctions {
     /// each value in vec should be a date/datetime, or can cast to date/datetime, or none which treated as min value,
     /// otherwise error raised.
     /// if any value is none, returns none.
-    #[restrict(none_context = true, max_param_count = 0)]
+    #[restrict(none_context = false, max_param_count = 0)]
     MinDate,
     /// min date time of elements of vec, [only in-memory].
     /// [x.&minDatetime], [x.&minDatetime()], [&minDatetime(x)]
@@ -450,11 +460,11 @@ pub enum VariablePredefineFunctions {
     /// each value in vec should be a datetime, or can cast to datetime, or none which treated as min value,
     /// otherwise error raised.
     /// if any value is none, returns none.
-    #[restrict(none_context = true, max_param_count = 0)]
+    #[restrict(none_context = false, max_param_count = 0)]
     MinDatetime,
     /// alias of [VariablePredefineFunctions::MinDatetime].
     /// [x.&minDt], [x.&minDt()], [&minDt(x)]
-    #[restrict(none_context = true, max_param_count = 0)]
+    #[restrict(none_context = false, max_param_count = 0)]
     MinDt,
     /// min time of elements of vec, [only in-memory].
     /// [x.&minTime], [x.&minTime()], [&minTime(x)]
@@ -465,7 +475,7 @@ pub enum VariablePredefineFunctions {
     /// each value in vec should be a time, or can cast to time, or none which treated as min value,
     /// otherwise error raised.
     /// if any value is none, returns none.
-    #[restrict(none_context = true, max_param_count = 0)]
+    #[restrict(none_context = false, max_param_count = 0)]
     MinTime,
     /// Retrieve value from current context, include variables and current trigger data
     /// [&cur], [&cur()]
@@ -483,21 +493,21 @@ pub enum VariablePredefineFunctions {
     ///
     /// - [context]: date/datetime, string can cast to date/datetime.
     /// - [otherDate]: date/datetime, string can cast to date/datetime.
-    #[restrict(min_param_count = 1, max_param_count = 1)]
+    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     DayDiff,
     /// get month difference between two dates.
     /// [x.&monthDiff(otherDate)], [&monthDiff(x, otherDate)]
     ///
     /// - [context]: date/datetime, string can cast to date/datetime.
     /// - [otherDate]: date/datetime, string can cast to date/datetime.
-    #[restrict(min_param_count = 1, max_param_count = 1)]
+    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     MonthDiff,
     /// get year difference between two dates.
     /// [x.&yearDiff(otherDate)], [&yearDiff(x, otherDate)]
     ///
     /// - [context]: date/datetime, string can cast to date/datetime.
     /// - [otherDate]: date/datetime, string can cast to date/datetime.
-    #[restrict(min_param_count = 1, max_param_count = 1)]
+    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     YearDiff,
     /// move date by given days, months, years.
     /// [x.&moveDate(movement)], [&moveDate(x, movement)]
@@ -525,7 +535,7 @@ pub enum VariablePredefineFunctions {
     /// - hour set to 23, now is 2000-12-29 23:00:00 (original no time, default is 00:00:00),
     /// - minute plus 5, to 5, now is 2000-12-29 23:05:00,
     /// - second minus 6, to 54, and minute minus 1. result is 2000-12-29 23:04:54.
-    #[restrict(min_param_count = 1, max_param_count = 1)]
+    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     MoveDate,
     /// format date to string by given format.
     /// [x.&dateFormat(format)], [&dateFormat(x, format)]
@@ -549,7 +559,7 @@ pub enum VariablePredefineFunctions {
     /// e.g. [date.&fmtDate(%Y-%M-%D)],
     /// if date is 2000-12-29, then result is 2000-12-29 00:00:00.
     #[display = "&fmtDate"]
-    #[restrict(min_param_count = 1, max_param_count = 1)]
+    #[restrict(none_context = false, min_param_count = 1, max_param_count = 1)]
     DateFormat,
     /// get current date time.
     /// [&now], [&now()]

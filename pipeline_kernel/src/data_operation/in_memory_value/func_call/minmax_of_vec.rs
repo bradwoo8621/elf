@@ -509,6 +509,11 @@ impl MinmaxState<'_> {
                     Ok(Arc::new(ArcTopicDataValue::None))
                 }
             }
+            (false, false, false, false) => {
+                // no typed value found, and there is no error raised,
+                // means all values are none
+                Ok(Arc::new(ArcTopicDataValue::None))
+            }
             // raise error, neve happen
             _ => self.func_not_supported(),
         }
@@ -560,17 +565,18 @@ impl InMemoryFuncCall<'_> {
         allow_time: bool,
         ask_min_value: bool,
     ) -> StdR<Arc<ArcTopicDataValue>> {
-        let state = MinmaxState::build(
-            &self,
-            &context,
-            allow_decimal,
-            allow_datetime,
-            allow_date,
-            allow_time,
-            ask_min_value,
-        );
-        state.check_indicators()?;
-
-        self.no_param(&params, || state.find())
+        self.no_param(&params, || {
+            let state = MinmaxState::build(
+                &self,
+                &context,
+                allow_decimal,
+                allow_datetime,
+                allow_date,
+                allow_time,
+                ask_min_value,
+            );
+            state.check_indicators()?;
+            state.find()
+        })
     }
 }

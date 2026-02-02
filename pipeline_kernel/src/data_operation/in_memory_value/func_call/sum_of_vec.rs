@@ -16,6 +16,7 @@ impl InMemoryFuncCall<'_> {
     ) -> StdR<Arc<ArcTopicDataValue>> {
         self.no_param(&params, || {
             match context.deref() {
+                ArcTopicDataValue::None => Ok(ArcTopicDataValue::arc_from(BigDecimal::zero())),
                 ArcTopicDataValue::Vec(vec) => {
                     let mut sum: BigDecimal = BigDecimal::zero();
                     for value in vec.iter() {
