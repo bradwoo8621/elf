@@ -43,11 +43,12 @@ impl ArcHelper for ArcCaseThenParameter {}
 
 impl ArcCaseThenParameter {
     pub fn new(parameter: CaseThenParameter) -> StdR<Arc<Self>> {
-        if parameter.parameters.is_none() {
+        let values = if let Some(parameters) = parameter.parameters {
+            parameters
+        } else {
             return RuntimeModelKernelErrorCode::ComputedParametersMissed
                 .msg("Computed parameter[case-then] must have sub parameter.");
-        }
-        let values = parameter.parameters.unwrap();
+        };
         if values.len() == 0 {
             return RuntimeModelKernelErrorCode::ComputedParametersMissed
                 .msg("Computed parameter[case-then] must have sub parameter.");

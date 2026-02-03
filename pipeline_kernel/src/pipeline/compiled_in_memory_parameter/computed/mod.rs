@@ -1,4 +1,5 @@
 mod compiled_add_parameter;
+mod compiled_case_then_parameter;
 mod compiled_day_of_month_parameter;
 mod compiled_day_of_week_parameter;
 mod compiled_divide_parameter;
@@ -13,6 +14,7 @@ mod compiled_week_of_year_parameter;
 mod compiled_year_of_parameter;
 
 pub use compiled_add_parameter::*;
+pub use compiled_case_then_parameter::*;
 pub use compiled_day_of_month_parameter::*;
 pub use compiled_day_of_week_parameter::*;
 pub use compiled_divide_parameter::*;

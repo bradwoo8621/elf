@@ -1,9 +1,10 @@
 use crate::{
-    ArcTopicDataValue, CompiledAddParameter, CompiledDayOfMonthParameter,
-    CompiledDayOfWeekParameter, CompiledDivideParameter, CompiledHalfYearOfParameter,
-    CompiledModulusParameter, CompiledMonthOfParameter, CompiledMultiplyParameter,
-    CompiledQuarterOfParameter, CompiledSubtractParameter, CompiledWeekOfMonthParameter,
-    CompiledWeekOfYearParameter, CompiledYearOfParameter, InMemoryData, PipelineKernelErrorCode,
+    ArcTopicDataValue, CompiledAddParameter, CompiledCaseThenParameter,
+    CompiledDayOfMonthParameter, CompiledDayOfWeekParameter, CompiledDivideParameter,
+    CompiledHalfYearOfParameter, CompiledModulusParameter, CompiledMonthOfParameter,
+    CompiledMultiplyParameter, CompiledQuarterOfParameter, CompiledSubtractParameter,
+    CompiledWeekOfMonthParameter, CompiledWeekOfYearParameter, CompiledYearOfParameter,
+    InMemoryData, PipelineKernelErrorCode,
 };
 use elf_base::{ErrorCode, StdR};
 use elf_model::TenantId;
@@ -25,7 +26,7 @@ pub enum CompiledComputedParameter {
     WeekOfMonth(Box<CompiledWeekOfMonthParameter>),
     DayOfMonth(Box<CompiledDayOfMonthParameter>),
     DayOfWeek(Box<CompiledDayOfWeekParameter>),
-    // CaseThen(CompiledCaseThenParameter),
+    CaseThen(Box<CompiledCaseThenParameter>),
 }
 
 impl CompiledComputedParameter {
@@ -83,11 +84,10 @@ impl CompiledComputedParameter {
                 CompiledDayOfWeekParameter::compile(param, tenant_id)
                     .map(|p| CompiledComputedParameter::DayOfWeek(Box::new(p)))
             }
-            // ArcComputedParameter::CaseThen(param) => {
-            //     CompiledCaseThenParameter::compile(param, tenant_id)
-            //         .map(|p| CompiledComputedParameter::CaseThen(p))
-            // }
-            _ => todo!(),
+            ArcComputedParameter::CaseThen(param) => {
+                CompiledCaseThenParameter::compile(param, tenant_id)
+                    .map(|p| CompiledComputedParameter::CaseThen(Box::new(p)))
+            }
         }
     }
 }
@@ -108,7 +108,7 @@ impl CompiledComputedParameter {
             Self::WeekOfMonth(v) => v.value_from(in_memory_data),
             Self::DayOfMonth(v) => v.value_from(in_memory_data),
             Self::DayOfWeek(v) => v.value_from(in_memory_data),
-            // Self::CaseThen(v) => v.value_from(in_memory_data),
+            Self::CaseThen(v) => v.value_from(in_memory_data),
         }
     }
 }

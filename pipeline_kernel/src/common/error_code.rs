@@ -35,7 +35,7 @@ pub enum PipelineKernelErrorCode {
     ComputeParameterValueNotSupported,
     ComputeParameterDivideZero,
     ComputeParameterModulusZero,
-    ComputeParameterNotADate
+    ComputeParameterNotADate,
 }
 
 impl ErrorCode for PipelineKernelErrorCode {
