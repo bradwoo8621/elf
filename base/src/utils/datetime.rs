@@ -49,6 +49,7 @@ impl DateTimeUtils for String {
 struct DateTimeUtilsBaseForNumber;
 
 impl DateTimeUtilsBaseForNumber {
+    #[track_caller]
     fn not_negative<R, V, EC>(value: V, error_code: EC, target_type: &str) -> StdR<R>
     where
         V: Display,
@@ -60,6 +61,7 @@ impl DateTimeUtilsBaseForNumber {
         ))
     }
 
+    #[track_caller]
     fn parse_failed<R, V, EC>(value: V, error_code: EC, target_type: &str) -> StdR<R>
     where
         V: Display,

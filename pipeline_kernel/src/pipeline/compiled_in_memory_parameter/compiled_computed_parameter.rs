@@ -1,4 +1,10 @@
-use crate::{ArcTopicDataValue, CompiledAddParameter, InMemoryData, PipelineKernelErrorCode};
+use crate::{
+    ArcTopicDataValue, CompiledAddParameter, CompiledDayOfMonthParameter,
+    CompiledDayOfWeekParameter, CompiledDivideParameter, CompiledHalfYearOfParameter,
+    CompiledModulusParameter, CompiledMonthOfParameter, CompiledMultiplyParameter,
+    CompiledQuarterOfParameter, CompiledSubtractParameter, CompiledWeekOfMonthParameter,
+    CompiledWeekOfYearParameter, CompiledYearOfParameter, InMemoryData, PipelineKernelErrorCode,
+};
 use elf_base::{ErrorCode, StdR};
 use elf_model::TenantId;
 use elf_runtime_model_kernel::ArcComputedParameter;
@@ -11,15 +17,15 @@ pub enum CompiledComputedParameter {
     Multiply(CompiledMultiplyParameter),
     Divide(CompiledDivideParameter),
     Modulus(CompiledModulusParameter),
-    YearOf(CompiledYearOfParameter),
-    HalfYearOf(CompiledHalfYearOfParameter),
-    QuarterOf(CompiledQuarterOfParameter),
-    MonthOf(CompiledMonthOfParameter),
-    WeekOfYear(CompiledWeekOfYearParameter),
-    WeekOfMonth(CompiledWeekOfMonthParameter),
-    DayOfMonth(CompiledDayOfMonthParameter),
-    DayOfWeek(CompiledDayOfWeekParameter),
-    CaseThen(CompiledCaseThenParameter),
+    YearOf(Box<CompiledYearOfParameter>),
+    HalfYearOf(Box<CompiledHalfYearOfParameter>),
+    QuarterOf(Box<CompiledQuarterOfParameter>),
+    MonthOf(Box<CompiledMonthOfParameter>),
+    WeekOfYear(Box<CompiledWeekOfYearParameter>),
+    WeekOfMonth(Box<CompiledWeekOfMonthParameter>),
+    DayOfMonth(Box<CompiledDayOfMonthParameter>),
+    DayOfWeek(Box<CompiledDayOfWeekParameter>),
+    // CaseThen(CompiledCaseThenParameter),
 }
 
 impl CompiledComputedParameter {
@@ -47,40 +53,41 @@ impl CompiledComputedParameter {
             }
             ArcComputedParameter::YearOf(param) => {
                 CompiledYearOfParameter::compile(param, tenant_id)
-                    .map(|p| CompiledComputedParameter::YearOf(p))
+                    .map(|p| CompiledComputedParameter::YearOf(Box::new(p)))
             }
             ArcComputedParameter::HalfYearOf(param) => {
                 CompiledHalfYearOfParameter::compile(param, tenant_id)
-                    .map(|p| CompiledComputedParameter::HalfYearOf(p))
+                    .map(|p| CompiledComputedParameter::HalfYearOf(Box::new(p)))
             }
             ArcComputedParameter::QuarterOf(param) => {
                 CompiledQuarterOfParameter::compile(param, tenant_id)
-                    .map(|p| CompiledComputedParameter::QuarterOf(p))
+                    .map(|p| CompiledComputedParameter::QuarterOf(Box::new(p)))
             }
             ArcComputedParameter::MonthOf(param) => {
                 CompiledMonthOfParameter::compile(param, tenant_id)
-                    .map(|p| CompiledComputedParameter::MonthOf(p))
+                    .map(|p| CompiledComputedParameter::MonthOf(Box::new(p)))
             }
             ArcComputedParameter::WeekOfYear(param) => {
                 CompiledWeekOfYearParameter::compile(param, tenant_id)
-                    .map(|p| CompiledComputedParameter::WeekOfYear(p))
+                    .map(|p| CompiledComputedParameter::WeekOfYear(Box::new(p)))
             }
             ArcComputedParameter::WeekOfMonth(param) => {
                 CompiledWeekOfMonthParameter::compile(param, tenant_id)
-                    .map(|p| CompiledComputedParameter::WeekOfMonth(p))
+                    .map(|p| CompiledComputedParameter::WeekOfMonth(Box::new(p)))
             }
             ArcComputedParameter::DayOfMonth(param) => {
                 CompiledDayOfMonthParameter::compile(param, tenant_id)
-                    .map(|p| CompiledComputedParameter::DayOfMonth(p))
+                    .map(|p| CompiledComputedParameter::DayOfMonth(Box::new(p)))
             }
             ArcComputedParameter::DayOfWeek(param) => {
                 CompiledDayOfWeekParameter::compile(param, tenant_id)
-                    .map(|p| CompiledComputedParameter::DayOfWeek(p))
+                    .map(|p| CompiledComputedParameter::DayOfWeek(Box::new(p)))
             }
-            ArcComputedParameter::CaseThen(param) => {
-                CompiledCaseThenParameter::compile(param, tenant_id)
-                    .map(|p| CompiledComputedParameter::CaseThen(p))
-            }
+            // ArcComputedParameter::CaseThen(param) => {
+            //     CompiledCaseThenParameter::compile(param, tenant_id)
+            //         .map(|p| CompiledComputedParameter::CaseThen(p))
+            // }
+            _ => todo!(),
         }
     }
 }
@@ -101,7 +108,7 @@ impl CompiledComputedParameter {
             Self::WeekOfMonth(v) => v.value_from(in_memory_data),
             Self::DayOfMonth(v) => v.value_from(in_memory_data),
             Self::DayOfWeek(v) => v.value_from(in_memory_data),
-            Self::CaseThen(v) => v.value_from(in_memory_data),
+            // Self::CaseThen(v) => v.value_from(in_memory_data),
         }
     }
 }

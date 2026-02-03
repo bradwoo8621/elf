@@ -1,3 +1,27 @@
 mod compiled_add_parameter;
+mod compiled_day_of_month_parameter;
+mod compiled_day_of_week_parameter;
+mod compiled_divide_parameter;
+mod compiled_half_year_of_parameter;
+mod compiled_modulus_parameter;
+mod compiled_month_of_parameter;
+mod compiled_multiply_parameter;
+mod compiled_quarter_of_parameter;
+mod compiled_subtract_parameter;
+mod compiled_week_of_month_parameter;
+mod compiled_week_of_year_parameter;
+mod compiled_year_of_parameter;
 
 pub use compiled_add_parameter::*;
+pub use compiled_day_of_month_parameter::*;
+pub use compiled_day_of_week_parameter::*;
+pub use compiled_divide_parameter::*;
+pub use compiled_half_year_of_parameter::*;
+pub use compiled_modulus_parameter::*;
+pub use compiled_month_of_parameter::*;
+pub use compiled_multiply_parameter::*;
+pub use compiled_quarter_of_parameter::*;
+pub use compiled_subtract_parameter::*;
+pub use compiled_week_of_month_parameter::*;
+pub use compiled_week_of_year_parameter::*;
+pub use compiled_year_of_parameter::*;

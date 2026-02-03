@@ -33,6 +33,9 @@ pub enum PipelineKernelErrorCode {
     ComputeParameterTypeMissed,
     ComputeParameterParameterMissed,
     ComputeParameterValueNotSupported,
+    ComputeParameterDivideZero,
+    ComputeParameterModulusZero,
+    ComputeParameterNotADate
 }
 
 impl ErrorCode for PipelineKernelErrorCode {
@@ -69,6 +72,9 @@ impl ErrorCode for PipelineKernelErrorCode {
             Self::ComputeParameterTypeMissed => "PLKN-00302",
             Self::ComputeParameterParameterMissed => "PLKN-00303",
             Self::ComputeParameterValueNotSupported => "PLKN-00304",
+            Self::ComputeParameterDivideZero => "PLKN-00305",
+            Self::ComputeParameterModulusZero => "PLKN-00306",
+            Self::ComputeParameterNotADate => "PLKN-00307",
         }
     }
 }

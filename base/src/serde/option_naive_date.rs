@@ -7,7 +7,7 @@ pub fn serialize<S: Serializer>(
     serializer: S,
 ) -> Result<S::Ok, S::Error> {
     match date {
-        Some(time) => serializer.serialize_str(&time.format("%Y-%m-%d").to_string()),
+        Some(date) => serializer.serialize_str(&date.format("%Y-%m-%d").to_string()),
         _ => serializer.serialize_none(),
     }
 }
