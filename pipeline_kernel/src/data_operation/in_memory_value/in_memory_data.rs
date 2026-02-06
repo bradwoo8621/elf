@@ -6,13 +6,13 @@ use elf_base::{ErrorCode, StdR};
 use std::collections::HashMap;
 use std::sync::Arc;
 
-pub struct InMemoryData<'a> {
-    variables: &'a PipelineExecutionVariables,
+pub struct InMemoryData {
+    variables: PipelineExecutionVariables,
     current_data_only: bool,
 }
 
-impl<'a> InMemoryData<'a> {
-    pub fn new(variables: &'a PipelineExecutionVariables) -> Self {
+impl InMemoryData {
+    pub fn new(variables: PipelineExecutionVariables) -> Self {
         Self {
             variables,
             current_data_only: false,
@@ -52,7 +52,7 @@ impl<'a> InMemoryData<'a> {
     }
 }
 
-impl InMemoryData<'_> {
+impl InMemoryData {
     /// get value from current data by given property.
     pub fn get_from_current_data(&self, prop: &String) -> StdR<Arc<ArcTopicDataValue>> {
         let current_data = self.get_current_data()?;

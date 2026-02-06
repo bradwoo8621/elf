@@ -7,10 +7,10 @@ use std::sync::Arc;
 /// and it is also the context for executing the pipeline
 /// values created during the pipeline execution are saved into variables
 pub struct PipelineExecutable {
-    variables: PipelineExecutionVariables,
+    pub variables: PipelineExecutionVariables,
 
-    principal: Arc<Principal>,
-    trace_id: Arc<PipelineTriggerTraceId>,
+    pub principal: Arc<Principal>,
+    pub trace_id: Arc<PipelineTriggerTraceId>,
 }
 
 impl PipelineExecutable {
@@ -27,17 +27,5 @@ impl PipelineExecutable {
             principal,
             trace_id,
         }
-    }
-
-    pub fn variables(&self) -> &PipelineExecutionVariables {
-        &self.variables
-    }
-
-    pub fn trace_id(&self) -> &Arc<PipelineTriggerTraceId> {
-        &self.trace_id
-    }
-
-    pub fn principal(&self) -> &Arc<Principal> {
-        &self.principal
     }
 }
