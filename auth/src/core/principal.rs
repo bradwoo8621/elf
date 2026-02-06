@@ -4,10 +4,28 @@ use elf_model::{TenantId, User, UserId, UserRole};
 
 #[derive(Clone)]
 pub struct Principal {
-    pub tenant_id: TenantId,
-    pub user_id: UserId,
-    pub name: String,
-    pub role: UserRole,
+    tenant_id: TenantId,
+    user_id: UserId,
+    user_name: String,
+    role: UserRole,
+}
+
+impl Principal {
+    pub fn tenant_id(&self) -> &TenantId {
+        &self.tenant_id
+    }
+
+    pub fn user_id(&self) -> &UserId {
+        &self.user_id
+    }
+
+    pub fn username(&self) -> &String {
+        &self.user_name
+    }
+
+    pub fn role(&self) -> &UserRole {
+        &self.role
+    }
 }
 
 impl Principal {
@@ -17,7 +35,7 @@ impl Principal {
         Self {
             tenant_id,
             user_id: self.user_id.clone(),
-            name: self.name.clone(),
+            user_name: self.user_name.clone(),
             role,
         }
     }
@@ -43,7 +61,7 @@ impl Principal {
         }
     }
 
-    pub fn from_user(user: User) -> StdR<Principal> {
+    pub fn from_user(user: User) -> StdR<Self> {
         if user.tenant_id.is_none() {
             return AuthErrorCode::TenantIdMissedInUser.msg("Tenant id is missing in user.");
         }
@@ -57,10 +75,10 @@ impl Principal {
             return AuthErrorCode::RoleMissedInUser.msg("Role is missing in user.");
         }
 
-        Ok(Principal {
+        Ok(Self {
             tenant_id: user.tenant_id.unwrap(),
             user_id: user.user_id.unwrap(),
-            name: user.name.unwrap(),
+            user_name: user.name.unwrap(),
             role: user.role.unwrap(),
         })
     }
@@ -69,11 +87,11 @@ impl Principal {
     /// - [user_id]: 1,
     /// - [user_name]: imma-super
     /// - [role]: always be [UserRole::SuperAdmin]
-    pub fn fake_super_admin() -> Principal {
-        Principal {
+    pub fn fake_super_admin() -> Self {
+        Self {
             tenant_id: String::from("-1"),
             user_id: String::from("1"),
-            name: String::from("imma-super"),
+            user_name: String::from("imma-super"),
             role: UserRole::SuperAdmin,
         }
     }
@@ -87,11 +105,11 @@ impl Principal {
         tenant_id: Option<TenantId>,
         user_id: Option<UserId>,
         user_name: Option<String>,
-    ) -> Principal {
-        Principal {
+    ) -> Self {
+        Self {
             tenant_id: tenant_id.unwrap_or(String::from("-1")),
             user_id: user_id.unwrap_or(String::from("1")),
-            name: user_name.unwrap_or(String::from("imma-super")),
+            user_name: user_name.unwrap_or(String::from("imma-super")),
             role: UserRole::Admin,
         }
     }

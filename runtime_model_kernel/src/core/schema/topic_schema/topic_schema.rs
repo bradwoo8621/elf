@@ -27,15 +27,15 @@ impl TopicSchema {
     }
 
     pub fn topic_id(&self) -> &Arc<TopicId> {
-        &self.topic().topic_id
+        &self.topic.topic_id
     }
 
     pub fn name(&self) -> &Arc<TopicCode> {
-        &self.topic().name
+        &self.topic.name
     }
 
     pub fn factor_by_id(&self, factor_id: &FactorId) -> Option<&ArcFactor> {
-        self.topic()
+        self.topic
             .factors
             .iter()
             .find(|f| f.factor_id.deref() == factor_id)
@@ -43,7 +43,7 @@ impl TopicSchema {
     }
 
     pub fn factor_by_name(&self, factor_name: &String) -> Option<&ArcFactor> {
-        self.topic()
+        self.topic
             .factors
             .iter()
             .find(|f| f.name.deref() == factor_name)
@@ -51,7 +51,7 @@ impl TopicSchema {
     }
 
     pub fn tenant_id(&self) -> &Arc<TenantId> {
-        &self.topic().tenant_id
+        &self.topic.tenant_id
     }
 
     fn should_init_default_values(&self) -> bool {
@@ -60,7 +60,7 @@ impl TopicSchema {
 
     /// returns true when topic kind is not system
     fn should_encrypt(&self) -> bool {
-        !self.topic().kind.is_system()
+        !self.topic.kind.is_system()
     }
 
     /// given data might be changed
@@ -108,7 +108,7 @@ impl TopicSchema {
 
     /// returns true when topic is not raw, and not [raw_pipeline_monitor_log].
     fn should_aid_hierarchy(&self) -> bool {
-        let topic = self.topic();
+        let topic = &self.topic;
         !topic.is_raw_topic() && topic.name.as_ref() != "raw_pipeline_monitor_log"
     }
 

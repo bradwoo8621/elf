@@ -1,0 +1,53 @@
+use crate::PipelineExecuteTopicData;
+use elf_auth::Principal;
+use elf_model::PipelineTriggerTraceId;
+use elf_runtime_model_kernel::{PipelineSchema, TopicSchema};
+use std::sync::Arc;
+
+pub struct PipelineExecutionTask {
+    principal: Arc<Principal>,
+    topic_data: Arc<PipelineExecuteTopicData>,
+    topic_schema: Arc<TopicSchema>,
+    pipeline_schema: Arc<PipelineSchema>,
+    trace_id: Arc<PipelineTriggerTraceId>,
+}
+
+impl PipelineExecutionTask {
+    pub fn new(
+        principal: Arc<Principal>,
+        topic_data: Arc<PipelineExecuteTopicData>,
+        topic_schema: Arc<TopicSchema>,
+        pipeline_schema: Arc<PipelineSchema>,
+        trace_id: Arc<PipelineTriggerTraceId>,
+    ) -> Self {
+        Self {
+            principal,
+            topic_data,
+            topic_schema,
+            pipeline_schema,
+            trace_id,
+        }
+    }
+}
+
+impl PipelineExecutionTask {
+    pub fn principal(&self) -> Arc<Principal> {
+        self.principal.clone()
+    }
+
+    pub fn topic_data(&self) -> Arc<PipelineExecuteTopicData> {
+        self.topic_data.clone()
+    }
+
+    pub fn topic_schema(&self) -> Arc<TopicSchema> {
+        self.topic_schema.clone()
+    }
+
+    pub fn pipeline_schema(&self) -> Arc<PipelineSchema> {
+        self.pipeline_schema.clone()
+    }
+
+    pub fn trace_id(&self) -> Arc<PipelineTriggerTraceId> {
+        self.trace_id.clone()
+    }
+}

@@ -1,6 +1,6 @@
 use crate::ArcPipeline;
 use elf_base::StdR;
-use elf_model::{Pipeline, PipelineTriggerType, TenantId};
+use elf_model::{Pipeline, PipelineId, PipelineTriggerType, TenantId};
 use std::sync::Arc;
 
 pub struct PipelineSchema {
@@ -18,6 +18,10 @@ impl PipelineSchema {
         &self.inner
     }
 
+    pub fn pipeline_id(&self) -> &Arc<PipelineId> {
+        &self.inner.pipeline_id
+    }
+
     pub fn name(&self) -> &Arc<String> {
         &self.pipeline().name
     }
@@ -27,6 +31,6 @@ impl PipelineSchema {
     }
 
     pub fn tenant_id(&self) -> &Arc<TenantId> {
-        &self.pipeline().tenant_id
+        &self.inner.tenant_id
     }
 }

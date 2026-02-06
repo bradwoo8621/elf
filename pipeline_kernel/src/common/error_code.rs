@@ -36,6 +36,11 @@ pub enum PipelineKernelErrorCode {
     ComputeParameterDivideZero,
     ComputeParameterModulusZero,
     ComputeParameterNotADate,
+    // execution
+    ExecutionRoundIndexOutOfRange,
+    ExecutionRoundHasNoTask,
+    ExecutionHasNoRound,
+    IncorrectExecutionRoundForAddingTask
 }
 
 impl ErrorCode for PipelineKernelErrorCode {
@@ -75,6 +80,11 @@ impl ErrorCode for PipelineKernelErrorCode {
             Self::ComputeParameterDivideZero => "PLKN-00305",
             Self::ComputeParameterModulusZero => "PLKN-00306",
             Self::ComputeParameterNotADate => "PLKN-00307",
+
+            Self::ExecutionRoundIndexOutOfRange => "PLKN-00400",
+            Self::ExecutionRoundHasNoTask => "PLKN-00401",
+            Self::ExecutionHasNoRound => "PLKN-00402",
+            Self::IncorrectExecutionRoundForAddingTask => "PLKN-00403",
         }
     }
 }

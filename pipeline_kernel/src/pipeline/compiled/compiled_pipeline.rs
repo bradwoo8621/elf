@@ -1,4 +1,4 @@
-use crate::{CompiledConditional, InMemoryData, PipelineExecutable, PipelineExecution};
+use crate::{CompiledConditional, InMemoryData, PipelineExecutable, PipelineExecutionTask};
 use elf_base::StdR;
 use elf_runtime_model_kernel::{PipelineSchema, TopicSchema};
 use std::sync::Arc;
@@ -27,9 +27,11 @@ impl CompiledPipeline {
     pub async fn execute(
         &self,
         executable: PipelineExecutable,
-    ) -> StdR<Option<Vec<PipelineExecution>>> {
-        let variables = executable.variables;
+    ) -> StdR<Option<Vec<PipelineExecutionTask>>> {
+        let variables = executable.variables();
+
         let mut in_memory_data = InMemoryData::new(&variables);
+
         if self.conditional.is_true(&mut in_memory_data)? {
             // skip the execution because doesn't meet the prerequisite
             Ok(None)

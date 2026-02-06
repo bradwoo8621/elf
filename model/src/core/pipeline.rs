@@ -476,7 +476,7 @@ pub struct PipelineStage {
     pub on: Option<ParameterJoint>,
 }
 
-#[derive(Display, Serde, PartialEq, Debug, StrEnum)]
+#[derive(Display, Serde, PartialEq, Debug, Clone, StrEnum)]
 pub enum PipelineTriggerType {
     Insert,
     Merge,
@@ -499,6 +499,29 @@ impl PipelineTriggerType {
 
     pub fn is_delete(&self) -> bool {
         *self == PipelineTriggerType::Delete
+    }
+
+    /// check if self (self is from pipeline) matches the given one (from request)
+    /// rules:
+    ///
+    /// | self | given |
+    /// | ---- | ----- |
+    /// | insert | insert |
+    /// | insert or merge | insert |
+    /// | insert or merge | merge |
+    /// | insert or merge | insert or merge |
+    /// | merge | merge |
+    /// | delete | delete |
+    pub fn matches(&self, trigger_type: &Self) -> bool {
+        match (self, trigger_type) {
+            (Self::Insert, Self::Insert) => true,
+            (Self::InsertOrMerge, Self::Insert) => true,
+            (Self::Merge, Self::Merge) => true,
+            (Self::InsertOrMerge, Self::Merge) => true,
+            (Self::InsertOrMerge, Self::InsertOrMerge) => true,
+            (Self::Delete, Self::Delete) => true,
+            _ => false,
+        }
     }
 }
 
