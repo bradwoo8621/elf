@@ -41,7 +41,7 @@ impl PipelineExecutor {
         let mut round_index = 0;
         while context.has_more_task() {
             if let Some(task) = context.take_task(round_index)? {
-                if let Some(more_tasks) = PipelineExecutionTaskRunner::run(task).await? {
+                if let Some(more_tasks) = PipelineExecutionTaskRunner::run_async(task).await? {
                     // this task created more tasks
                     context.add_tasks(round_index + 1, more_tasks)?;
                 }

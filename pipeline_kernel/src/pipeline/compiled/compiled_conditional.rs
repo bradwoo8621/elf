@@ -1,6 +1,6 @@
 use crate::{CompiledParameterJoint, InMemoryData};
 use elf_base::StdR;
-use elf_model::TenantId;
+use elf_model::{PrerequisiteDefinedAs, TenantId};
 use elf_runtime_model_kernel::ArcParameterJoint;
 use std::sync::Arc;
 
@@ -22,6 +22,10 @@ impl CompiledConditional {
         } else {
             CompiledConditional { inner: None }
         })
+    }
+
+    pub fn defined_as(&self) -> Option<PrerequisiteDefinedAs> {
+        todo!("implement defined_as for CompiledConditional")
     }
 
     pub fn is_true(&self, in_memory_data: &mut InMemoryData) -> StdR<bool> {
