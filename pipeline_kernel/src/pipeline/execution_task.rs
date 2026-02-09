@@ -10,6 +10,8 @@ pub struct PipelineExecutionTask {
     topic_schema: Arc<TopicSchema>,
     pipeline_schema: Arc<PipelineSchema>,
     trace_id: Arc<PipelineTriggerTraceId>,
+    /// identify that the monitor log is saved asynchronized or not
+    async_monitor_log: bool,
 }
 
 impl PipelineExecutionTask {
@@ -19,6 +21,7 @@ impl PipelineExecutionTask {
         topic_schema: Arc<TopicSchema>,
         pipeline_schema: Arc<PipelineSchema>,
         trace_id: Arc<PipelineTriggerTraceId>,
+        async_monitor_log: bool,
     ) -> Self {
         Self {
             principal,
@@ -26,6 +29,7 @@ impl PipelineExecutionTask {
             topic_schema,
             pipeline_schema,
             trace_id,
+            async_monitor_log,
         }
     }
 }
@@ -49,5 +53,9 @@ impl PipelineExecutionTask {
 
     pub fn trace_id(&self) -> Arc<PipelineTriggerTraceId> {
         self.trace_id.clone()
+    }
+
+    pub fn async_monitor_log(&self) -> bool {
+        self.async_monitor_log
     }
 }

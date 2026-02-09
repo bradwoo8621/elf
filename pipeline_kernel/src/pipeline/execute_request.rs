@@ -39,13 +39,14 @@ impl PipelineExecuteRequest {
         self.topic_schema.clone()
     }
 
-    pub fn create_execution_context(self) -> PipelineExecutionContext {
+    pub fn create_execution_context(self, async_monitor_log: bool) -> PipelineExecutionContext {
         PipelineExecutionContext::create(
             self.principal,
             self.topic_data,
             self.topic_schema,
             self.pipeline_schemas,
             self.trace_id,
+            async_monitor_log
         )
     }
 }

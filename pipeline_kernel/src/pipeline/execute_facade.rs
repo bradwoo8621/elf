@@ -200,23 +200,27 @@ impl PipelineExecuteFacade {
         })
     }
 
-    pub fn execute(self) -> StdR<TopicDataId> {
+    /// execute synchronized, trigger all pipelines
+    pub async fn execute(self) -> StdR<TopicDataId> {
         let request = PipelinePreExecute::pre_execute(self.input, None)?;
-        PipelineExecutor::execute(request)
+        PipelineExecutor::execute(request).await
     }
 
-    pub async fn execute_async(self) -> StdR<TopicDataId> {
+    /// execute asynchronized, trigger all pipelines
+    pub fn execute_async(self) -> StdR<TopicDataId> {
         let request = PipelinePreExecute::pre_execute(self.input, None)?;
-        PipelineExecutor::execute_async(request).await
+        PipelineExecutor::execute_async(request)
     }
 
-    pub fn execute_single(self, pipeline_id: &PipelineId) -> StdR<TopicDataId> {
+    /// execute synchronized, trigger given pipeline
+    pub async fn execute_single(self, pipeline_id: &PipelineId) -> StdR<TopicDataId> {
         let request = PipelinePreExecute::pre_execute(self.input, Some(&pipeline_id))?;
-        PipelineExecutor::execute(request)
+        PipelineExecutor::execute(request).await
     }
 
-    pub async fn execute_single_async(self, pipeline_id: &PipelineId) -> StdR<TopicDataId> {
+    /// execute asynchronized, trigger given pipeline
+    pub fn execute_single_async(self, pipeline_id: &PipelineId) -> StdR<TopicDataId> {
         let request = PipelinePreExecute::pre_execute(self.input, Some(&pipeline_id))?;
-        PipelineExecutor::execute_async(request).await
+        PipelineExecutor::execute_async(request)
     }
 }

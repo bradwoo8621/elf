@@ -11,10 +11,13 @@ enum BuiltContext {
 pub struct PipelineExecutor;
 
 impl PipelineExecutor {
-    fn build_context(request: PipelineExecuteRequest) -> StdR<BuiltContext> {
+    fn build_context(
+        request: PipelineExecuteRequest,
+        async_monitor_log: bool,
+    ) -> StdR<BuiltContext> {
         let topic_data_id = request.topic_data_id();
         let topic_schema = request.topic_schema();
-        let context = request.create_execution_context();
+        let context = request.create_execution_context(async_monitor_log);
         if !context.has_more_task() {
             println!(
                 "No pipeline needs to be triggered by topic[topic_id={}, topic_name={}].",
@@ -54,23 +57,25 @@ impl PipelineExecutor {
         Ok(())
     }
 
-    pub fn execute(request: PipelineExecuteRequest) -> StdR<TopicDataId> {
-        match PipelineExecutor::build_context(request)? {
+    /// execute synchronized
+    pub async fn execute(request: PipelineExecuteRequest) -> StdR<TopicDataId> {
+        match PipelineExecutor::build_context(request, false)? {
             BuiltContext::NoContext(topic_data_id) => Ok(topic_data_id),
             BuiltContext::Context((topic_data_id, context)) => {
-                // TODO how spawn doing here, and how to configure the Runtime?
-                tokio::spawn(Self::do_execute_async(context));
+                Self::do_execute_async(context).await?;
 
                 Ok(topic_data_id)
             }
         }
     }
 
-    pub async fn execute_async(request: PipelineExecuteRequest) -> StdR<TopicDataId> {
-        match PipelineExecutor::build_context(request)? {
+    /// execute asynchronized
+    pub fn execute_async(request: PipelineExecuteRequest) -> StdR<TopicDataId> {
+        match PipelineExecutor::build_context(request, true)? {
             BuiltContext::NoContext(topic_data_id) => Ok(topic_data_id),
             BuiltContext::Context((topic_data_id, context)) => {
-                Self::do_execute_async(context).await?;
+                // TODO how spawn doing here, and how to configure the Runtime?
+                tokio::spawn(Self::do_execute_async(context));
                 Ok(topic_data_id)
             }
         }

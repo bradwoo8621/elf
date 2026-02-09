@@ -12,6 +12,7 @@ pub struct PipelineExecutable {
 
     pub principal: Arc<Principal>,
     pub trace_id: Arc<PipelineTriggerTraceId>,
+    pub async_monitor_log: bool,
 }
 
 impl PipelineExecutable {
@@ -19,6 +20,7 @@ impl PipelineExecutable {
         topic_data: Arc<PipelineExecuteTopicData>,
         principal: Arc<Principal>,
         trace_id: Arc<PipelineTriggerTraceId>,
+        async_monitor_log: bool,
     ) -> Self {
         PipelineExecutable {
             variables: PipelineExecutionVariables::new(
@@ -28,6 +30,7 @@ impl PipelineExecutable {
             topic_data_id: topic_data.topic_data_id().clone(),
             principal,
             trace_id,
+            async_monitor_log,
         }
     }
 }

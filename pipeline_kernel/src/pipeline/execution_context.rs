@@ -21,6 +21,7 @@ impl PipelineExecutionContext {
         topic_schema: Arc<TopicSchema>,
         pipeline_schemas: Vec<Arc<PipelineSchema>>,
         trace_id: Arc<PipelineTriggerTraceId>,
+        async_monitor_log: bool,
     ) -> Self {
         let mut round0 = PipelineExecutionTaskRound::new();
         for pipeline_scheme in pipeline_schemas {
@@ -30,6 +31,7 @@ impl PipelineExecutionContext {
                 topic_schema.clone(),
                 pipeline_scheme,
                 trace_id.clone(),
+                async_monitor_log
             ));
         }
 
