@@ -1,6 +1,9 @@
-use crate::{PipelineCompilationProvider, PipelineExecutable, PipelineExecutionTask};
+use crate::{
+    CompiledPipelineRunner, InMemoryData, PipelineCompilationProvider, PipelineExecutionTask,
+};
 use elf_base::StdR;
 use elf_runtime_model_kernel::PipelineService;
+use std::ops::Deref;
 
 pub struct PipelineExecutionTaskRunner;
 
@@ -11,13 +14,20 @@ impl PipelineExecutionTaskRunner {
         let compiled_pipeline =
             PipelineService::compilation()?.compile(task.topic_schema(), task.pipeline_schema())?;
 
-        compiled_pipeline
-            .execute_async(PipelineExecutable::new(
-                task.topic_data(),
-                task.principal(),
-                task.trace_id(),
-                task.async_monitor_log(),
-            ))
-            .await
+        let topic_data = task.topic_data();
+        let created_tasks = CompiledPipelineRunner::run(
+            InMemoryData::new(
+                topic_data.previous_data().clone(),
+                topic_data.current_data().clone(),
+            ),
+            topic_data.topic_data_id().deref(),
+            compiled_pipeline.deref(),
+            task.principal().deref(),
+            task.trace_id().deref(),
+            task.async_monitor_log(),
+        )
+        .await;
+
+        Ok(created_tasks)
     }
 }

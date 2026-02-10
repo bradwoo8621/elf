@@ -1,20 +1,22 @@
-use crate::{
-    ArcTopicData, ArcTopicDataValue, DataPath, DataPathSegment, PipelineExecutionVariables,
-    PipelineKernelErrorCode,
-};
+use crate::{ArcTopicData, ArcTopicDataValue, DataPath, DataPathSegment, PipelineKernelErrorCode};
 use elf_base::{ErrorCode, StdR};
 use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct InMemoryData {
-    variables: PipelineExecutionVariables,
+    previous_data: Option<ArcTopicData>,
+    current_data: Option<ArcTopicData>,
+    variables: HashMap<String, Arc<ArcTopicDataValue>>,
+
     current_data_only: bool,
 }
 
 impl InMemoryData {
-    pub fn new(variables: PipelineExecutionVariables) -> Self {
+    pub fn new(previous_data: Option<ArcTopicData>, current_data: Option<ArcTopicData>) -> Self {
         Self {
-            variables,
+            previous_data,
+            current_data,
+            variables: HashMap::new(),
             current_data_only: false,
         }
     }
@@ -38,17 +40,33 @@ impl InMemoryData {
     /// get current topic data.
     /// raise error when current data not exists
     pub fn get_current_data(&self) -> StdR<&ArcTopicData> {
-        self.variables.get_current_data()
+        match &self.current_data {
+            Some(current_data) => Ok(current_data),
+            _ => PipelineKernelErrorCode::CurrentTopicDataMissed
+                .msg("Current trigger data is missed."),
+        }
+    }
+
+    pub fn get_current_data_opt(&self) -> &Option<ArcTopicData> {
+        &self.current_data
     }
 
     /// get previous topic data.
     /// raise error when previous data not exists
     pub fn get_previous_data(&self) -> StdR<&ArcTopicData> {
-        self.variables.get_previous_data()
+        match &self.previous_data {
+            Some(current_data) => Ok(current_data),
+            _ => PipelineKernelErrorCode::PreviousTopicDataMissed
+                .msg("Previous of current trigger data is missed."),
+        }
+    }
+
+    pub fn get_previous_data_opt(&self) -> &Option<ArcTopicData> {
+        &self.previous_data
     }
 
     pub fn get_variables(&self) -> &HashMap<String, Arc<ArcTopicDataValue>> {
-        self.variables.get_variables()
+        &self.variables
     }
 }
 

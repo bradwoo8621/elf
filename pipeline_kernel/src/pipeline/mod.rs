@@ -1,6 +1,7 @@
 mod compile_service;
 mod compiled;
 mod compiled_in_memory_parameter;
+mod compiled_runner;
 mod execute_facade;
 mod execute_input;
 mod execute_request;
@@ -15,6 +16,7 @@ mod pre_execute;
 pub use compile_service::*;
 pub use compiled::*;
 pub use compiled_in_memory_parameter::*;
+pub use compiled_runner::*;
 pub use execute_facade::*;
 pub use execute_input::*;
 pub use execute_request::*;
