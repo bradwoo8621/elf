@@ -7,8 +7,9 @@ use crate::{
     InMemoryData, PipelineKernelErrorCode,
 };
 use elf_base::{ErrorCode, StdR};
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcComputedParameter;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcComputedParameter, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -30,62 +31,68 @@ pub enum CompiledComputedParameter {
 }
 
 impl CompiledComputedParameter {
-    pub fn compile(parameter: &Arc<ArcComputedParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        parameter: &Arc<ArcComputedParameter>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         match parameter.deref() {
             ArcComputedParameter::None(_) => PipelineKernelErrorCode::ComputeParameterTypeMissed
                 .msg("Type of compute parameter is missed."),
-            ArcComputedParameter::Add(param) => CompiledAddParameter::compile(param, tenant_id)
-                .map(|p| CompiledComputedParameter::Add(p)),
+            ArcComputedParameter::Add(param) => {
+                CompiledAddParameter::compile(param, topic_schemas, tenant_id)
+                    .map(|p| CompiledComputedParameter::Add(p))
+            }
             ArcComputedParameter::Subtract(param) => {
-                CompiledSubtractParameter::compile(param, tenant_id)
+                CompiledSubtractParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::Subtract(p))
             }
             ArcComputedParameter::Multiply(param) => {
-                CompiledMultiplyParameter::compile(param, tenant_id)
+                CompiledMultiplyParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::Multiply(p))
             }
             ArcComputedParameter::Divide(param) => {
-                CompiledDivideParameter::compile(param, tenant_id)
+                CompiledDivideParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::Divide(p))
             }
             ArcComputedParameter::Modulus(param) => {
-                CompiledModulusParameter::compile(param, tenant_id)
+                CompiledModulusParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::Modulus(p))
             }
             ArcComputedParameter::YearOf(param) => {
-                CompiledYearOfParameter::compile(param, tenant_id)
+                CompiledYearOfParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::YearOf(Box::new(p)))
             }
             ArcComputedParameter::HalfYearOf(param) => {
-                CompiledHalfYearOfParameter::compile(param, tenant_id)
+                CompiledHalfYearOfParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::HalfYearOf(Box::new(p)))
             }
             ArcComputedParameter::QuarterOf(param) => {
-                CompiledQuarterOfParameter::compile(param, tenant_id)
+                CompiledQuarterOfParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::QuarterOf(Box::new(p)))
             }
             ArcComputedParameter::MonthOf(param) => {
-                CompiledMonthOfParameter::compile(param, tenant_id)
+                CompiledMonthOfParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::MonthOf(Box::new(p)))
             }
             ArcComputedParameter::WeekOfYear(param) => {
-                CompiledWeekOfYearParameter::compile(param, tenant_id)
+                CompiledWeekOfYearParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::WeekOfYear(Box::new(p)))
             }
             ArcComputedParameter::WeekOfMonth(param) => {
-                CompiledWeekOfMonthParameter::compile(param, tenant_id)
+                CompiledWeekOfMonthParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::WeekOfMonth(Box::new(p)))
             }
             ArcComputedParameter::DayOfMonth(param) => {
-                CompiledDayOfMonthParameter::compile(param, tenant_id)
+                CompiledDayOfMonthParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::DayOfMonth(Box::new(p)))
             }
             ArcComputedParameter::DayOfWeek(param) => {
-                CompiledDayOfWeekParameter::compile(param, tenant_id)
+                CompiledDayOfWeekParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::DayOfWeek(Box::new(p)))
             }
             ArcComputedParameter::CaseThen(param) => {
-                CompiledCaseThenParameter::compile(param, tenant_id)
+                CompiledCaseThenParameter::compile(param, topic_schemas, tenant_id)
                     .map(|p| CompiledComputedParameter::CaseThen(Box::new(p)))
             }
         }

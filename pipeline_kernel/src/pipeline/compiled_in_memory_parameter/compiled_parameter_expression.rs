@@ -5,8 +5,9 @@ use crate::{
     CompiledNotInExpression, InMemoryData,
 };
 use elf_base::StdR;
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcParameterExpression;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcParameterExpression, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -24,40 +25,52 @@ pub enum CompiledParameterExpression {
 }
 
 impl CompiledParameterExpression {
-    pub fn compile(value: &Arc<ArcParameterExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        value: &Arc<ArcParameterExpression>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         match value.deref() {
-            ArcParameterExpression::Empty(v) => CompiledEmptyExpression::compile(v, tenant_id)
-                .map(|p| CompiledParameterExpression::Empty(p)),
+            ArcParameterExpression::Empty(v) => {
+                CompiledEmptyExpression::compile(v, topic_schemas, tenant_id)
+                    .map(|p| CompiledParameterExpression::Empty(p))
+            }
             ArcParameterExpression::NotEmpty(v) => {
-                CompiledNotEmptyExpression::compile(v, tenant_id)
+                CompiledNotEmptyExpression::compile(v, topic_schemas, tenant_id)
                     .map(|p| CompiledParameterExpression::NotEmpty(p))
             }
-            ArcParameterExpression::Equals(v) => CompiledEqualsExpression::compile(v, tenant_id)
-                .map(|p| CompiledParameterExpression::Equals(p)),
+            ArcParameterExpression::Equals(v) => {
+                CompiledEqualsExpression::compile(v, topic_schemas, tenant_id)
+                    .map(|p| CompiledParameterExpression::Equals(p))
+            }
             ArcParameterExpression::NotEquals(v) => {
-                CompiledNotEqualsExpression::compile(v, tenant_id)
+                CompiledNotEqualsExpression::compile(v, topic_schemas, tenant_id)
                     .map(|p| CompiledParameterExpression::NotEquals(p))
             }
             ArcParameterExpression::LessThan(v) => {
-                CompiledLessThanExpression::compile(v, tenant_id)
+                CompiledLessThanExpression::compile(v, topic_schemas, tenant_id)
                     .map(|p| CompiledParameterExpression::LessThan(p))
             }
             ArcParameterExpression::LessThanOrEquals(v) => {
-                CompiledLessThanOrEqualsExpression::compile(v, tenant_id)
+                CompiledLessThanOrEqualsExpression::compile(v, topic_schemas, tenant_id)
                     .map(|p| CompiledParameterExpression::LessThanOrEquals(p))
             }
             ArcParameterExpression::MoreThan(v) => {
-                CompiledMoreThanExpression::compile(v, tenant_id)
+                CompiledMoreThanExpression::compile(v, topic_schemas, tenant_id)
                     .map(|p| CompiledParameterExpression::MoreThan(p))
             }
             ArcParameterExpression::MoreThanOrEquals(v) => {
-                CompiledMoreThanOrEqualsExpression::compile(v, tenant_id)
+                CompiledMoreThanOrEqualsExpression::compile(v, topic_schemas, tenant_id)
                     .map(|p| CompiledParameterExpression::MoreThanOrEquals(p))
             }
-            ArcParameterExpression::In(v) => CompiledInExpression::compile(v, tenant_id)
-                .map(|p| CompiledParameterExpression::In(p)),
-            ArcParameterExpression::NotIn(v) => CompiledNotInExpression::compile(v, tenant_id)
-                .map(|p| CompiledParameterExpression::NotIn(p)),
+            ArcParameterExpression::In(v) => {
+                CompiledInExpression::compile(v, topic_schemas, tenant_id)
+                    .map(|p| CompiledParameterExpression::In(p))
+            }
+            ArcParameterExpression::NotIn(v) => {
+                CompiledNotInExpression::compile(v, topic_schemas, tenant_id)
+                    .map(|p| CompiledParameterExpression::NotIn(p))
+            }
         }
     }
 }

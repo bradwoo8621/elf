@@ -1,8 +1,9 @@
 use crate::{ArcFrom, ArcTopicDataValue, CompiledParameter, InMemoryData, PipelineKernelErrorCode};
 use bigdecimal::{BigDecimal, Zero};
 use elf_base::{ErrorCode, NumericUtils, StdR};
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcAddParameter;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcAddParameter, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -11,7 +12,11 @@ pub struct CompiledAddParameter {
 }
 
 impl CompiledAddParameter {
-    pub fn compile(param: &Arc<ArcAddParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        param: &Arc<ArcAddParameter>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         if param.parameters.is_empty() {
             return PipelineKernelErrorCode::ComputeParameterParameterMissed
                 .msg("Parameter of add is missed.");
@@ -19,7 +24,11 @@ impl CompiledAddParameter {
 
         let mut parameters = vec![];
         for parameter in param.parameters.iter() {
-            parameters.push(CompiledParameter::compile(parameter, tenant_id)?);
+            parameters.push(CompiledParameter::compile(
+                parameter,
+                topic_schemas,
+                tenant_id,
+            )?);
         }
 
         Ok(CompiledAddParameter { parameters })
@@ -43,17 +52,21 @@ impl CompiledAddParameter {
                     } else if let Ok(num) = str.to_decimal() {
                         result = result + num;
                     } else {
-                        return PipelineKernelErrorCode::ComputeParameterValueNotSupported.msg(format!(
-                            "Argument value of add must be a decimal, current is [{}].",
-                            str
-                        ));
+                        return PipelineKernelErrorCode::ComputeParameterValueNotSupported.msg(
+                            format!(
+                                "Argument value of add must be a decimal, current is [{}].",
+                                str
+                            ),
+                        );
                     }
                 }
                 other => {
-                    return PipelineKernelErrorCode::ComputeParameterValueNotSupported.msg(format!(
-                        "Argument value of add must be a decimal, current is [{}].",
-                        other
-                    ));
+                    return PipelineKernelErrorCode::ComputeParameterValueNotSupported.msg(
+                        format!(
+                            "Argument value of add must be a decimal, current is [{}].",
+                            other
+                        ),
+                    );
                 }
             }
         }

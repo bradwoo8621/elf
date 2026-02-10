@@ -1,7 +1,8 @@
 use crate::{CompiledParameterCondition, InMemoryData};
 use elf_base::StdR;
-use elf_model::{ParameterJointType, TenantId};
-use elf_runtime_model_kernel::ArcParameterJoint;
+use elf_model::{ParameterJointType, TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcParameterJoint, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -12,10 +13,18 @@ pub struct CompiledParameterJoint {
 }
 
 impl CompiledParameterJoint {
-    pub fn compile(value: &Arc<ArcParameterJoint>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        value: &Arc<ArcParameterJoint>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         let mut conditions = vec![];
         for filter in value.filters.deref() {
-            conditions.push(CompiledParameterCondition::compile(filter, tenant_id)?)
+            conditions.push(CompiledParameterCondition::compile(
+                filter,
+                topic_schemas,
+                tenant_id,
+            )?)
         }
 
         Ok(CompiledParameterJoint {

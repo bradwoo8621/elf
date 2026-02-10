@@ -1,8 +1,9 @@
 use crate::{ArcFrom, ArcTopicDataValue, CompiledParameter, InMemoryData, PipelineKernelErrorCode};
 use bigdecimal::{BigDecimal, Zero};
 use elf_base::{ErrorCode, NumericUtils, StdR};
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcDivideParameter;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcDivideParameter, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -11,7 +12,11 @@ pub struct CompiledDivideParameter {
 }
 
 impl CompiledDivideParameter {
-    pub fn compile(param: &Arc<ArcDivideParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        param: &Arc<ArcDivideParameter>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         if param.parameters.is_empty() {
             return PipelineKernelErrorCode::ComputeParameterParameterMissed
                 .msg("Parameter of divide is missed.");
@@ -19,7 +24,11 @@ impl CompiledDivideParameter {
 
         let mut parameters = vec![];
         for parameter in param.parameters.iter() {
-            parameters.push(CompiledParameter::compile(parameter, tenant_id)?);
+            parameters.push(CompiledParameter::compile(
+                parameter,
+                topic_schemas,
+                tenant_id,
+            )?);
         }
 
         Ok(CompiledDivideParameter { parameters })

@@ -1,7 +1,8 @@
 use crate::{CompiledParameter, InMemoryData};
 use elf_base::StdR;
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcMoreThanOrEqualsExpression;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcMoreThanOrEqualsExpression, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -13,11 +14,12 @@ pub struct CompiledMoreThanOrEqualsExpression {
 impl CompiledMoreThanOrEqualsExpression {
     pub fn compile(
         exp: &Arc<ArcMoreThanOrEqualsExpression>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {
         Ok(CompiledMoreThanOrEqualsExpression {
-            left: CompiledParameter::compile(&exp.left, tenant_id)?,
-            right: CompiledParameter::compile(&exp.right, tenant_id)?,
+            left: CompiledParameter::compile(&exp.left, topic_schemas, tenant_id)?,
+            right: CompiledParameter::compile(&exp.right, topic_schemas, tenant_id)?,
         })
     }
 }

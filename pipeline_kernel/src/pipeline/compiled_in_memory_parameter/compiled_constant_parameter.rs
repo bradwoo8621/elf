@@ -1,7 +1,8 @@
 use crate::{ArcTopicDataValue, DataPath, InMemoryData, PipelineKernelErrorCode};
 use elf_base::{ErrorCode, StdR, StringUtils};
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcConstantParameter;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcConstantParameter, TopicSchema};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct CompiledConstantParameter {
@@ -11,6 +12,7 @@ pub struct CompiledConstantParameter {
 impl CompiledConstantParameter {
     pub fn compile(
         parameter: &Arc<ArcConstantParameter>,
+        _topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         _tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {
         let value = &parameter.value;

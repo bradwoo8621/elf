@@ -2,8 +2,9 @@ use crate::{ArcFrom, ArcTopicDataValue, CompiledParameter, InMemoryData, Pipelin
 use bigdecimal::BigDecimal;
 use chrono::Datelike;
 use elf_base::{DateTimeUtils, ErrorCode, StdR};
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcMonthOfParameter;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcMonthOfParameter, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -12,9 +13,13 @@ pub struct CompiledMonthOfParameter {
 }
 
 impl CompiledMonthOfParameter {
-    pub fn compile(param: &Arc<ArcMonthOfParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        param: &Arc<ArcMonthOfParameter>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         Ok(CompiledMonthOfParameter {
-            parameter: CompiledParameter::compile(&param.parameter, tenant_id)?,
+            parameter: CompiledParameter::compile(&param.parameter, topic_schemas, tenant_id)?,
         })
     }
 }

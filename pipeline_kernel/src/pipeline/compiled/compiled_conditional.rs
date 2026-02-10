@@ -1,7 +1,8 @@
 use crate::{CompiledParameterJoint, InMemoryData};
 use elf_base::StdR;
-use elf_model::{PrerequisiteDefinedAs, TenantId};
-use elf_runtime_model_kernel::ArcParameterJoint;
+use elf_model::{PrerequisiteDefinedAs, TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcParameterJoint, TopicSchema};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 /// in-memory check
@@ -13,11 +14,16 @@ pub struct CompiledConditional {
 impl CompiledConditional {
     pub fn compile(
         conditional: &Option<Arc<ArcParameterJoint>>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {
         Ok(if let Some(conditional) = &conditional {
             CompiledConditional {
-                inner: Some(CompiledParameterJoint::compile(conditional, tenant_id)?),
+                inner: Some(CompiledParameterJoint::compile(
+                    conditional,
+                    topic_schemas,
+                    tenant_id,
+                )?),
             }
         } else {
             CompiledConditional { inner: None }

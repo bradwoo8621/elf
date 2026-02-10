@@ -1,7 +1,8 @@
 use crate::{ArcTopicDataValue, CompiledParameter, CompiledParameterJoint, InMemoryData};
 use elf_base::{ErrorCode, StdR};
-use elf_model::TenantId;
-use elf_runtime_model_kernel::{ArcCaseThenParameter, RuntimeModelKernelErrorCode};
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcCaseThenParameter, RuntimeModelKernelErrorCode, TopicSchema};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct CompiledCaseThenParameter {
@@ -10,21 +11,33 @@ pub struct CompiledCaseThenParameter {
 }
 
 impl CompiledCaseThenParameter {
-    pub fn compile(param: &Arc<ArcCaseThenParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        param: &Arc<ArcCaseThenParameter>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         let mut routes = vec![];
         let mut default_route = None;
         for parameter in param.parameters.iter() {
             if parameter.conditional && parameter.on.is_some() {
                 routes.push((
-                    CompiledParameterJoint::compile(&parameter.on.as_ref().unwrap(), tenant_id)?,
-                    CompiledParameter::compile(&parameter.parameter, tenant_id)?,
+                    CompiledParameterJoint::compile(
+                        &parameter.on.as_ref().unwrap(),
+                        topic_schemas,
+                        tenant_id,
+                    )?,
+                    CompiledParameter::compile(&parameter.parameter, topic_schemas, tenant_id)?,
                 ))
             } else if default_route.is_some() {
                 return RuntimeModelKernelErrorCode::ComputedParametersMissed.msg(
                     "Computed parameter[case-then] can be at most one route without condition.",
                 );
             } else {
-                default_route = Some(CompiledParameter::compile(&parameter.parameter, tenant_id)?)
+                default_route = Some(CompiledParameter::compile(
+                    &parameter.parameter,
+                    topic_schemas,
+                    tenant_id,
+                )?)
             }
         }
 

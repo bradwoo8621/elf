@@ -1,8 +1,9 @@
 use crate::{ArcFrom, ArcTopicDataValue, CompiledParameter, InMemoryData, PipelineKernelErrorCode};
 use bigdecimal::BigDecimal;
 use elf_base::{DateConstValues, DateTimeUtils, ErrorCode, StdR};
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcHalfYearOfParameter;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcHalfYearOfParameter, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -11,9 +12,13 @@ pub struct CompiledHalfYearOfParameter {
 }
 
 impl CompiledHalfYearOfParameter {
-    pub fn compile(param: &Arc<ArcHalfYearOfParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        param: &Arc<ArcHalfYearOfParameter>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         Ok(CompiledHalfYearOfParameter {
-            parameter: CompiledParameter::compile(&param.parameter, tenant_id)?,
+            parameter: CompiledParameter::compile(&param.parameter, topic_schemas, tenant_id)?,
         })
     }
 }

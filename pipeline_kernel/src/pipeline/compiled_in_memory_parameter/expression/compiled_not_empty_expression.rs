@@ -1,7 +1,8 @@
 use crate::{CompiledParameter, InMemoryData};
 use elf_base::StdR;
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcNotEmptyExpression;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcNotEmptyExpression, TopicSchema};
+use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct CompiledNotEmptyExpression {
@@ -9,9 +10,13 @@ pub struct CompiledNotEmptyExpression {
 }
 
 impl CompiledNotEmptyExpression {
-    pub fn compile(exp: &Arc<ArcNotEmptyExpression>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        exp: &Arc<ArcNotEmptyExpression>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         Ok(CompiledNotEmptyExpression {
-            left: CompiledParameter::compile(&exp.left, tenant_id)?,
+            left: CompiledParameter::compile(&exp.left, topic_schemas, tenant_id)?,
         })
     }
 }

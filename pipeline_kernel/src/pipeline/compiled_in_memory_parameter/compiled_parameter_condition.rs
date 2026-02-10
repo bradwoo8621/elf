@@ -1,7 +1,8 @@
 use crate::{CompiledParameterExpression, CompiledParameterJoint, InMemoryData};
 use elf_base::StdR;
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcParameterCondition;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcParameterCondition, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -11,14 +12,20 @@ pub enum CompiledParameterCondition {
 }
 
 impl CompiledParameterCondition {
-    pub fn compile(value: &Arc<ArcParameterCondition>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        value: &Arc<ArcParameterCondition>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         match value.deref() {
             ArcParameterCondition::Expression(v) => {
-                CompiledParameterExpression::compile(v, tenant_id)
+                CompiledParameterExpression::compile(v, topic_schemas, tenant_id)
                     .map(|p| CompiledParameterCondition::Expression(p))
             }
-            ArcParameterCondition::Joint(v) => CompiledParameterJoint::compile(v, tenant_id)
-                .map(|p| CompiledParameterCondition::Joint(p)),
+            ArcParameterCondition::Joint(v) => {
+                CompiledParameterJoint::compile(v, topic_schemas, tenant_id)
+                    .map(|p| CompiledParameterCondition::Joint(p))
+            }
         }
     }
 }

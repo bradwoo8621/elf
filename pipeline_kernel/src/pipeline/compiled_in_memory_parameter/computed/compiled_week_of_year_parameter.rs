@@ -1,8 +1,9 @@
 use crate::{ArcFrom, ArcTopicDataValue, CompiledParameter, InMemoryData, PipelineKernelErrorCode};
 use bigdecimal::BigDecimal;
 use elf_base::{DateConstValues, DateTimeUtils, ErrorCode, StdR};
-use elf_model::TenantId;
-use elf_runtime_model_kernel::ArcWeekOfYearParameter;
+use elf_model::{TenantId, TopicId};
+use elf_runtime_model_kernel::{ArcWeekOfYearParameter, TopicSchema};
+use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -11,9 +12,13 @@ pub struct CompiledWeekOfYearParameter {
 }
 
 impl CompiledWeekOfYearParameter {
-    pub fn compile(param: &Arc<ArcWeekOfYearParameter>, tenant_id: &Arc<TenantId>) -> StdR<Self> {
+    pub fn compile(
+        param: &Arc<ArcWeekOfYearParameter>,
+        topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
+        tenant_id: &Arc<TenantId>,
+    ) -> StdR<Self> {
         Ok(CompiledWeekOfYearParameter {
-            parameter: CompiledParameter::compile(&param.parameter, tenant_id)?,
+            parameter: CompiledParameter::compile(&param.parameter, topic_schemas, tenant_id)?,
         })
     }
 }
