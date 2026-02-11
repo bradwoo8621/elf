@@ -1,13 +1,22 @@
-use crate::{ActionCompiler, CompiledAction};
+use crate::{
+    ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint, DataPath,
+};
 use elf_base::StdR;
-use elf_model::{TenantId, TopicId};
+use elf_model::{AggregateArithmetic, TenantId, TopicId};
 use elf_runtime_model_kernel::{
-    ArcPipeline, ArcPipelineStage, ArcPipelineUnit, ArcReadFactorAction, TopicSchema,
+    ArcFactor, ArcPipeline, ArcPipelineStage, ArcPipelineUnit, ArcReadFactorAction, TopicSchema,
 };
 use std::collections::HashMap;
+use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct CompiledReadFactorAction;
+pub struct CompiledReadFactorAction {
+    variable_path: DataPath,
+    topic_schema: Arc<TopicSchema>,
+    factor: Arc<ArcFactor>,
+    aggregate_arithmetic: Arc<AggregateArithmetic>,
+    by: CompiledParameterJoint,
+}
 
 impl ActionCompiler for CompiledReadFactorAction {
     type SourceAction = ArcReadFactorAction;
@@ -20,7 +29,24 @@ impl ActionCompiler for CompiledReadFactorAction {
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {
-        todo!("implement compile for CompiledReadFactorAction")
+        let variable_path = ActionCompilerHelper::get_variable_name(
+            action.variable_name.as_str(),
+            action.action_id.deref(),
+            action.r#type.deref(),
+        )?;
+        let topic_schema =
+            ActionCompilerHelper::find_topic_schema(&action.topic_id, tenant_id, topic_schemas)?;
+        let factor = ActionCompilerHelper::find_factor(topic_schema.deref(), &action.factor_id)?;
+        let aggregate_arithmetic = action.arithmetic.clone();
+        let by = CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
+
+        Ok(Self {
+            variable_path,
+            topic_schema,
+            factor,
+            aggregate_arithmetic,
+            by,
+        })
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {

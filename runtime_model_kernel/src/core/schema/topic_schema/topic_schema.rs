@@ -34,20 +34,18 @@ impl TopicSchema {
         &self.topic.name
     }
 
-    pub fn factor_by_id(&self, factor_id: &FactorId) -> Option<&ArcFactor> {
+    pub fn factor_by_id(&self, factor_id: &FactorId) -> Option<&Arc<ArcFactor>> {
         self.topic
             .factors
             .iter()
             .find(|f| f.factor_id.deref() == factor_id)
-            .map(|f| f.deref())
     }
 
-    pub fn factor_by_name(&self, factor_name: &String) -> Option<&ArcFactor> {
+    pub fn factor_by_name(&self, factor_name: &String) -> Option<&Arc<ArcFactor>> {
         self.topic
             .factors
             .iter()
             .find(|f| f.name.deref() == factor_name)
-            .map(|f| f.deref())
     }
 
     pub fn tenant_id(&self) -> &Arc<TenantId> {

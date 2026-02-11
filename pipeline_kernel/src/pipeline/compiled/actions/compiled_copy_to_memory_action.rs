@@ -1,14 +1,15 @@
 use crate::{
-    ActionCompiler, CompiledAction, CompiledParameter, DataPath, DataPathSegment,
-    PipelineKernelErrorCode,
+    ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameter, DataPath
+    ,
 };
-use elf_base::{ErrorCode, StdR, StringUtils};
+use elf_base::StdR;
 use elf_model::{TenantId, TopicId};
 use elf_runtime_model_kernel::{
-    ArcCopyToMemoryAction, ArcPipeline, ArcPipelineStage, ArcPipelineUnit,
-    RuntimeModelKernelErrorCode, TopicSchema,
+    ArcCopyToMemoryAction, ArcPipeline, ArcPipelineStage, ArcPipelineUnit
+    , TopicSchema,
 };
 use std::collections::HashMap;
+use std::ops::Deref;
 use std::sync::Arc;
 
 pub struct CompiledCopyToMemoryAction {
@@ -27,28 +28,11 @@ impl ActionCompiler for CompiledCopyToMemoryAction {
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {
-        let variable_name = action.variable_name.as_str();
-        if variable_name.is_blank() {
-            return RuntimeModelKernelErrorCode::ActionVariableNameIsBlank.msg(format!(
-                "Variable name of copy-to-memory action[action_id={}] cannot be blank.",
-                action.action_id
-            ));
-        }
-        let variable_path = DataPath::from_str(variable_name)?;
-        for segment in variable_path.segments().iter() {
-            match segment {
-                DataPathSegment::Plain(_) => {}
-                DataPathSegment::Func(_) => {
-                    return PipelineKernelErrorCode::CopyToMemoryActionVariableIsNotPlain.msg(
-                        format!(
-                            "Variable name of copy-to-memory action[action_id={}] cannot contain function.",
-                            action.action_id
-                        ),
-                    );
-                }
-            }
-        }
-
+        let variable_path = ActionCompilerHelper::get_variable_name(
+            action.variable_name.as_str(),
+            action.action_id.deref(),
+            action.r#type.deref(),
+        )?;
         let source = CompiledParameter::compile(&action.source, topic_schemas, tenant_id)?;
 
         Ok(Self {
