@@ -8,6 +8,12 @@ pub trait StringUtils {
     }
 }
 
+impl StringUtils for &str {
+    fn is_blank(&self) -> bool {
+        self.trim().is_empty()
+    }
+}
+
 impl StringUtils for Option<String> {
     fn is_blank(&self) -> bool {
         match self {
@@ -48,5 +54,7 @@ pub trait StringConverter {
         value.format("%H:%M:%S").to_string()
     }
 }
+
+impl StringConverter for &str {}
 
 impl StringConverter for String {}

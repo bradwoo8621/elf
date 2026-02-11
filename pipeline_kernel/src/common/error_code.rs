@@ -36,6 +36,7 @@ pub enum PipelineKernelErrorCode {
     ComputeParameterDivideZero,
     ComputeParameterModulusZero,
     ComputeParameterNotADate,
+    CopyToMemoryActionVariableIsNotPlain,
     // execution
     ExecutionRoundIndexOutOfRange,
     ExecutionRoundHasNoTask,
@@ -80,6 +81,7 @@ impl ErrorCode for PipelineKernelErrorCode {
             Self::ComputeParameterDivideZero => "PLKN-00305",
             Self::ComputeParameterModulusZero => "PLKN-00306",
             Self::ComputeParameterNotADate => "PLKN-00307",
+            Self::CopyToMemoryActionVariableIsNotPlain => "PLKN-00308",
 
             Self::ExecutionRoundIndexOutOfRange => "PLKN-00400",
             Self::ExecutionRoundHasNoTask => "PLKN-00401",

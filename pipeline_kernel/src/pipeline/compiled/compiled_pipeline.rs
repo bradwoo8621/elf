@@ -7,6 +7,7 @@ use std::sync::Arc;
 pub struct CompiledPipeline {
     topic: Arc<TopicSchema>,
     pipeline: Arc<PipelineSchema>,
+    
     conditional: CompiledConditional,
     stages: Vec<CompiledStage>,
 }
