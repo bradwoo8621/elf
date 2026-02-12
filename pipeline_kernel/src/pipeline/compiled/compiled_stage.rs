@@ -6,6 +6,9 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct CompiledStage {
+    pipeline: Arc<ArcPipeline>,
+    stage: Arc<ArcPipelineStage>,
+
     conditional: CompiledConditional,
     units: Vec<CompiledUnit>,
 }
@@ -31,8 +34,27 @@ impl CompiledStage {
         }
 
         Ok(Self {
+            pipeline: pipeline.clone(),
+            stage: stage.clone(),
+
             conditional: compiled_conditional,
             units: compiled_units,
         })
+    }
+
+    pub fn pipeline(&self) -> &Arc<ArcPipeline> {
+        &self.pipeline
+    }
+
+    pub fn stage(&self) -> &Arc<ArcPipelineStage> {
+        &self.stage
+    }
+
+    pub fn conditional(&self) -> &CompiledConditional {
+        &self.conditional
+    }
+
+    pub fn units(&self) -> &Vec<CompiledUnit> {
+        &self.units
     }
 }

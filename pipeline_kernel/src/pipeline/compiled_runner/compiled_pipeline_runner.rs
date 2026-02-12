@@ -102,15 +102,12 @@ impl<'a> CompiledPipelineRunner<'a> {
                 None => MonitorLogStatus::ERROR,
             }),
             start_time: Some(self.start_time),
-            // will set later
             spent_in_mills: Some(spent_in_mills),
-            // will set later if any error raised
             error: error.map(|e| format!("{}", e)),
             prerequisite: Some(prerequisite),
             data_id: Some(self.topic_data_id.clone()),
             old_value: self.create_previous_data_for_log(),
             new_value: self.create_current_data_for_log(),
-            // will initialize after stage starts
             stages: stage_logs,
         })
     }
@@ -128,7 +125,7 @@ impl<'a> CompiledPipelineRunner<'a> {
     async fn do_run(mut self) -> Option<Vec<PipelineExecutionTask>> {
         match self.check_prerequisite() {
             Ok(true) => {
-                let mut all_stage_run: bool = true;
+                let mut all_stage_accomplished: bool = true;
                 let mut stage_logs = vec![];
                 let mut created_tasks = vec![];
                 for stage in self.compiled_pipeline.stages().iter() {
@@ -154,12 +151,12 @@ impl<'a> CompiledPipelineRunner<'a> {
                     };
                     stage_logs.push(log);
                     if has_error {
-                        all_stage_run = false;
+                        all_stage_accomplished = false;
                         break;
                     }
                 }
 
-                self.save_monitor_log(all_stage_run, Some(stage_logs), None)
+                self.save_monitor_log(all_stage_accomplished, Some(stage_logs), None)
                     .await;
                 Some(created_tasks)
             }
