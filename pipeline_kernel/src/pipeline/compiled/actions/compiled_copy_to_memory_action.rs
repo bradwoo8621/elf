@@ -1,12 +1,8 @@
-use crate::{
-    ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameter, DataPath
-    ,
-};
+use crate::{ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameter, DataPath};
 use elf_base::StdR;
 use elf_model::{TenantId, TopicId};
 use elf_runtime_model_kernel::{
-    ArcCopyToMemoryAction, ArcPipeline, ArcPipelineStage, ArcPipelineUnit
-    , TopicSchema,
+    ArcCopyToMemoryAction, ArcPipeline, ArcPipelineStage, ArcPipelineUnit, TopicSchema,
 };
 use std::collections::HashMap;
 use std::ops::Deref;

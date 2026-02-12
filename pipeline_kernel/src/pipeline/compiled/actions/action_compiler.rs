@@ -1,11 +1,15 @@
 use crate::{CompiledAction, DataPath, DataPathSegment, PipelineKernelErrorCode};
 use elf_base::{ErrorCode, StdR, StringUtils};
-use elf_model::{FactorId, PipelineActionId, PipelineActionType, TenantId, TopicId};
+use elf_model::{
+    AccumulateMode, AggregateArithmetic, FactorId, PipelineActionId, PipelineActionType, TenantId,
+    TopicId,
+};
 use elf_runtime_model_kernel::{
     ArcFactor, ArcPipeline, ArcPipelineStage, ArcPipelineUnit, RuntimeModelKernelErrorCode,
     TopicSchema, TopicSchemaProvider, TopicService,
 };
 use std::collections::HashMap;
+use std::ops::Deref;
 use std::sync::Arc;
 
 pub trait ActionCompiler
@@ -29,6 +33,27 @@ where
 pub struct ActionCompilerHelper;
 
 impl ActionCompilerHelper {
+    /// unwrap from arc
+    pub fn unwrap_accumulate_mode(mode: &Arc<AccumulateMode>) -> AccumulateMode {
+        match mode.deref() {
+            AccumulateMode::Standard => AccumulateMode::Standard,
+            AccumulateMode::Cumulate => AccumulateMode::Cumulate,
+            AccumulateMode::Reverse => AccumulateMode::Reverse,
+        }
+    }
+
+    /// unwrap from arc
+    pub fn unwrap_aggregate_arithmetic(
+        arithmetic: &Arc<AggregateArithmetic>,
+    ) -> AggregateArithmetic {
+        match arithmetic.deref() {
+            AggregateArithmetic::None => AggregateArithmetic::None,
+            AggregateArithmetic::Sum => AggregateArithmetic::Sum,
+            AggregateArithmetic::Count => AggregateArithmetic::Count,
+            AggregateArithmetic::Avg => AggregateArithmetic::Avg,
+        }
+    }
+
     pub fn get_variable_name(
         variable_name: &str,
         action_id: &PipelineActionId,

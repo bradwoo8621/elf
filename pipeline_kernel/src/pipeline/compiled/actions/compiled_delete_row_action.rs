@@ -8,8 +8,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct CompiledDeleteRowAction {
-    topic_schema: Arc<TopicSchema>,
-    by: CompiledParameterJoint,
+    target_topic_schema: Arc<TopicSchema>,
+    target_criteria: CompiledParameterJoint,
 }
 
 impl ActionCompiler for CompiledDeleteRowAction {
@@ -23,11 +23,15 @@ impl ActionCompiler for CompiledDeleteRowAction {
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {
-        let topic_schema =
+        let target_topic_schema =
             ActionCompilerHelper::find_topic_schema(&action.topic_id, tenant_id, topic_schemas)?;
-        let by = CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
+        let target_criteria =
+            CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
 
-        Ok(Self { topic_schema, by })
+        Ok(Self {
+            target_topic_schema,
+            target_criteria,
+        })
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {

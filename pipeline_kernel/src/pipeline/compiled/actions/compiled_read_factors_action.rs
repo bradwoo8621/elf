@@ -12,9 +12,9 @@ use std::sync::Arc;
 
 pub struct CompiledReadFactorsAction {
     variable_path: DataPath,
-    topic_schema: Arc<TopicSchema>,
-    factor: Arc<ArcFactor>,
-    by: CompiledParameterJoint,
+    source_topic_schema: Arc<TopicSchema>,
+    source_factor: Arc<ArcFactor>,
+    source_criteria: CompiledParameterJoint,
 }
 
 impl ActionCompiler for CompiledReadFactorsAction {
@@ -33,16 +33,18 @@ impl ActionCompiler for CompiledReadFactorsAction {
             action.action_id.deref(),
             action.r#type.deref(),
         )?;
-        let topic_schema =
+        let source_topic_schema =
             ActionCompilerHelper::find_topic_schema(&action.topic_id, tenant_id, topic_schemas)?;
-        let factor = ActionCompilerHelper::find_factor(topic_schema.deref(), &action.factor_id)?;
-        let by = CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
+        let source_factor =
+            ActionCompilerHelper::find_factor(source_topic_schema.deref(), &action.factor_id)?;
+        let source_criteria =
+            CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
 
         Ok(Self {
             variable_path,
-            topic_schema,
-            factor,
-            by,
+            source_topic_schema,
+            source_factor,
+            source_criteria,
         })
     }
 

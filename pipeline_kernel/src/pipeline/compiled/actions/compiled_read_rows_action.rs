@@ -12,8 +12,8 @@ use std::sync::Arc;
 
 pub struct CompiledReadRowsAction {
     variable_path: DataPath,
-    topic_schema: Arc<TopicSchema>,
-    by: CompiledParameterJoint,
+    source_topic_schema: Arc<TopicSchema>,
+    source_criteria: CompiledParameterJoint,
 }
 
 impl ActionCompiler for CompiledReadRowsAction {
@@ -32,14 +32,15 @@ impl ActionCompiler for CompiledReadRowsAction {
             action.action_id.deref(),
             action.r#type.deref(),
         )?;
-        let topic_schema =
+        let source_topic_schema =
             ActionCompilerHelper::find_topic_schema(&action.topic_id, tenant_id, topic_schemas)?;
-        let by = CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
+        let source_criteria =
+            CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
 
         Ok(Self {
             variable_path,
-            topic_schema,
-            by,
+            source_topic_schema,
+            source_criteria,
         })
     }
 

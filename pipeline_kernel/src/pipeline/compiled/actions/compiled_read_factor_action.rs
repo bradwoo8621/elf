@@ -12,10 +12,10 @@ use std::sync::Arc;
 
 pub struct CompiledReadFactorAction {
     variable_path: DataPath,
-    topic_schema: Arc<TopicSchema>,
-    factor: Arc<ArcFactor>,
-    aggregate_arithmetic: Arc<AggregateArithmetic>,
-    by: CompiledParameterJoint,
+    source_topic_schema: Arc<TopicSchema>,
+    source_factor: Arc<ArcFactor>,
+    source_criteria: CompiledParameterJoint,
+    aggregate_arithmetic: AggregateArithmetic,
 }
 
 impl ActionCompiler for CompiledReadFactorAction {
@@ -34,18 +34,21 @@ impl ActionCompiler for CompiledReadFactorAction {
             action.action_id.deref(),
             action.r#type.deref(),
         )?;
-        let topic_schema =
+        let source_topic_schema =
             ActionCompilerHelper::find_topic_schema(&action.topic_id, tenant_id, topic_schemas)?;
-        let factor = ActionCompilerHelper::find_factor(topic_schema.deref(), &action.factor_id)?;
-        let aggregate_arithmetic = action.arithmetic.clone();
-        let by = CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
+        let source_factor =
+            ActionCompilerHelper::find_factor(source_topic_schema.deref(), &action.factor_id)?;
+        let source_criteria =
+            CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
+        let aggregate_arithmetic =
+            ActionCompilerHelper::unwrap_aggregate_arithmetic(&action.arithmetic);
 
         Ok(Self {
             variable_path,
-            topic_schema,
-            factor,
+            source_topic_schema,
+            source_factor,
+            source_criteria,
             aggregate_arithmetic,
-            by,
         })
     }
 

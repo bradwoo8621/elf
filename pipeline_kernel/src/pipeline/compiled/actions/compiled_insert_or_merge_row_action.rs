@@ -1,17 +1,22 @@
-use crate::{ActionCompiler, CompiledAction};
+use crate::{ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint};
 use elf_base::StdR;
-use elf_model::{TenantId, TopicId};
+use elf_model::{AccumulateMode, TenantId, TopicId};
 use elf_runtime_model_kernel::{
     ArcInsertOrMergeRowAction, ArcPipeline, ArcPipelineStage, ArcPipelineUnit, TopicSchema,
 };
 use std::collections::HashMap;
+use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct CompiledInsertOrMergeRowAction;
+pub struct CompiledInsertOrMergeRowAction {
+    target_topic_schema: Arc<TopicSchema>,
+    target_criteria: CompiledParameterJoint,
+    accumulate_mode: AccumulateMode,
+}
 
 impl ActionCompiler for CompiledInsertOrMergeRowAction {
     type SourceAction = ArcInsertOrMergeRowAction;
-    
+
     fn compile(
         pipeline: &Arc<ArcPipeline>,
         stage: &Arc<ArcPipelineStage>,
@@ -20,7 +25,22 @@ impl ActionCompiler for CompiledInsertOrMergeRowAction {
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {
-        todo!("implement compile for CompiledInsertOrMergeRowAction")
+        let target_topic_schema =
+            ActionCompilerHelper::find_topic_schema(&action.topic_id, tenant_id, topic_schemas)?;
+        let accumulate_mode = match action.accumulate_mode.deref() {
+            AccumulateMode::Standard => AccumulateMode::Standard,
+            AccumulateMode::Cumulate => AccumulateMode::Cumulate,
+            // for insert or merge, reverse is not allowed, use standard instead
+            AccumulateMode::Reverse => AccumulateMode::Standard,
+        };
+        let target_criteria =
+            CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
+
+        Ok(Self {
+            target_topic_schema,
+            target_criteria,
+            accumulate_mode,
+        })
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
