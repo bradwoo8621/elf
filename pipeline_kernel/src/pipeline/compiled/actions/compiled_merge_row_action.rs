@@ -1,4 +1,7 @@
-use crate::{ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint};
+use crate::{
+    ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledMappingFactor,
+    CompiledParameterJoint,
+};
 use elf_base::StdR;
 use elf_model::{AccumulateMode, TenantId, TopicId};
 use elf_runtime_model_kernel::{
@@ -9,6 +12,7 @@ use std::sync::Arc;
 
 pub struct CompiledMergeRowAction {
     target_topic_schema: Arc<TopicSchema>,
+    factor_mapping: Vec<CompiledMappingFactor>,
     target_criteria: CompiledParameterJoint,
     accumulate_mode: AccumulateMode,
 }
@@ -26,12 +30,19 @@ impl ActionCompiler for CompiledMergeRowAction {
     ) -> StdR<Self> {
         let target_topic_schema =
             ActionCompilerHelper::find_topic_schema(&action.topic_id, tenant_id, topic_schemas)?;
+        let factor_mapping = CompiledMappingFactor::create(
+            &target_topic_schema,
+            &action.mapping,
+            topic_schemas,
+            tenant_id,
+        )?;
         let target_criteria =
             CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
         let accumulate_mode = ActionCompilerHelper::unwrap_accumulate_mode(&action.accumulate_mode);
 
         Ok(Self {
             target_topic_schema,
+            factor_mapping,
             target_criteria,
             accumulate_mode,
         })

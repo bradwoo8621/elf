@@ -1,4 +1,4 @@
-use crate::{ActionCompiler, ActionCompilerHelper, CompiledAction};
+use crate::{ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledMappingFactor};
 use elf_base::StdR;
 use elf_model::{AccumulateMode, TenantId, TopicId};
 use elf_runtime_model_kernel::{
@@ -9,6 +9,7 @@ use std::sync::Arc;
 
 pub struct CompiledInsertRowAction {
     target_topic_schema: Arc<TopicSchema>,
+    factor_mapping: Vec<CompiledMappingFactor>,
     accumulate_mode: AccumulateMode,
 }
 
@@ -25,11 +26,18 @@ impl ActionCompiler for CompiledInsertRowAction {
     ) -> StdR<Self> {
         let target_topic_schema =
             ActionCompilerHelper::find_topic_schema(&action.topic_id, tenant_id, topic_schemas)?;
-        // always be standard
+        let factor_mapping = CompiledMappingFactor::create(
+            &target_topic_schema,
+            &action.mapping,
+            topic_schemas,
+            tenant_id,
+        )?;
+        // always be standard for insertion
         let accumulate_mode = AccumulateMode::Standard;
 
         Ok(Self {
             target_topic_schema,
+            factor_mapping,
             accumulate_mode,
         })
     }
