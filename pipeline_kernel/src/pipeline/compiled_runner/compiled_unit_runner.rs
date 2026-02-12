@@ -80,7 +80,7 @@ impl<'a> CompiledUnitRunner<'a> {
     }
 
     async fn do_run_no_loop(&self, in_memory_data: &mut InMemoryData) -> UnitRunResult {
-        todo!("implement do_run_round for CompiledUnitRunner")
+        todo!("implement do_run_no_loop for CompiledUnitRunner")
     }
 
     fn get_loop_variable(
