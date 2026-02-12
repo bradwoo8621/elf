@@ -1,7 +1,4 @@
-use crate::{
-	CompiledPipeline, CompiledStage, CompiledUnit, InMemoryData,
-	PipelineExecutionTask,
-};
+use crate::{CompiledPipeline, CompiledStage, CompiledUnit, InMemoryData, PipelineExecutionTask};
 use chrono::{NaiveDateTime, Utc};
 use elf_auth::Principal;
 use elf_model::UnitMonitorLog;

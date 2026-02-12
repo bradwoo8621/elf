@@ -1,8 +1,10 @@
 use crate::{
-    CompiledAction, CompiledPipeline, CompiledStage, CompiledUnit, InMemoryData, UnitRunResult,
+    CompiledAction, CompiledPipeline, CompiledStage, CompiledUnit, InMemoryData,
+    PipelineExecutionTask,
 };
 use chrono::{NaiveDateTime, Utc};
 use elf_auth::Principal;
+use elf_model::ActionMonitorLog;
 
 pub struct CompiledActionRunner<'a> {
     in_memory_data: &'a InMemoryData,
@@ -16,6 +18,11 @@ pub struct CompiledActionRunner<'a> {
     start_time: NaiveDateTime,
 }
 
+pub struct ActionRunResult {
+    pub created_tasks: Option<Vec<PipelineExecutionTask>>,
+    pub log: ActionMonitorLog,
+}
+
 impl<'a> CompiledActionRunner<'a> {
     pub async fn run(
         in_memory_data: &'a mut InMemoryData,
@@ -24,7 +31,7 @@ impl<'a> CompiledActionRunner<'a> {
         compiled_unit: &'a CompiledUnit,
         compiled_action: &'a CompiledAction,
         principal: &'a Principal,
-    ) -> UnitRunResult {
+    ) -> ActionRunResult {
         Self {
             in_memory_data,
             compiled_pipeline,
@@ -39,7 +46,7 @@ impl<'a> CompiledActionRunner<'a> {
         .await
     }
 
-    async fn do_run(mut self) -> UnitRunResult {
+    async fn do_run(mut self) -> ActionRunResult {
         todo!("implement do_run for CompiledActionRunner")
     }
 }
