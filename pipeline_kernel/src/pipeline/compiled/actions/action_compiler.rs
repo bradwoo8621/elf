@@ -70,7 +70,7 @@ impl ActionCompilerHelper {
             match segment {
                 DataPathSegment::Plain(_) => {}
                 DataPathSegment::Func(_) => {
-                    return PipelineKernelErrorCode::CopyToMemoryActionVariableIsNotPlain.msg(
+                    return PipelineKernelErrorCode::ActionVariableIsNotPlain.msg(
                         format!(
                             "Variable name of {} action[action_id={}] cannot contain function.",
                             action_type, action_id

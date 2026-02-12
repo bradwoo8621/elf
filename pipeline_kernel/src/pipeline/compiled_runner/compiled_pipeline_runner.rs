@@ -12,7 +12,6 @@ use elf_runtime_model_kernel::IdGen;
 use std::ops::Deref;
 
 pub struct CompiledPipelineRunner<'a> {
-    in_memory_data: InMemoryData,
     topic_data_id: &'a TopicDataId,
 
     compiled_pipeline: &'a CompiledPipeline,
@@ -33,7 +32,6 @@ impl<'a> CompiledPipelineRunner<'a> {
         async_monitor_log: bool,
     ) -> Option<Vec<PipelineExecutionTask>> {
         Self {
-            in_memory_data,
             topic_data_id,
             compiled_pipeline,
             principal,
@@ -42,12 +40,15 @@ impl<'a> CompiledPipelineRunner<'a> {
 
             start_time: Utc::now().naive_utc(),
         }
-        .do_run()
+        .do_run(in_memory_data)
         .await
     }
 
-    fn create_previous_data_for_log(&self) -> Option<NotKnownYetDataStruct> {
-        match self.in_memory_data.get_previous_data_opt() {
+    fn create_previous_data_for_log(
+        &self,
+        in_memory_data: &InMemoryData,
+    ) -> Option<NotKnownYetDataStruct> {
+        match in_memory_data.get_previous_data_opt() {
             Some(_data) => {
                 todo!("implement create_previous_data_for_log for CompiledPipelineRunner")
             }
@@ -55,8 +56,11 @@ impl<'a> CompiledPipelineRunner<'a> {
         }
     }
 
-    fn create_current_data_for_log(&self) -> Option<NotKnownYetDataStruct> {
-        match self.in_memory_data.get_current_data_opt() {
+    fn create_current_data_for_log(
+        &self,
+        in_memory_data: &InMemoryData,
+    ) -> Option<NotKnownYetDataStruct> {
+        match in_memory_data.get_current_data_opt() {
             Some(_data) => {
                 todo!("implement create_current_data_for_log for CompiledPipelineRunner")
             }
@@ -64,14 +68,13 @@ impl<'a> CompiledPipelineRunner<'a> {
         }
     }
 
-    fn check_prerequisite(&mut self) -> StdR<bool> {
-        self.compiled_pipeline
-            .conditional()
-            .is_true(&mut self.in_memory_data)
+    fn check_prerequisite(&self, in_memory_data: &mut InMemoryData) -> StdR<bool> {
+        self.compiled_pipeline.conditional().is_true(in_memory_data)
     }
 
     fn create_monitor_log(
         &self,
+        in_memory_data: &InMemoryData,
         prerequisite: bool,
         stage_logs: Option<Vec<StageMonitorLog>>,
         error: Option<StdErr>,
@@ -106,24 +109,26 @@ impl<'a> CompiledPipelineRunner<'a> {
             error: error.map(|e| format!("{}", e)),
             prerequisite: Some(prerequisite),
             data_id: Some(self.topic_data_id.clone()),
-            old_value: self.create_previous_data_for_log(),
-            new_value: self.create_current_data_for_log(),
+            old_value: self.create_previous_data_for_log(in_memory_data),
+            new_value: self.create_current_data_for_log(in_memory_data),
             stages: stage_logs,
         })
     }
 
     async fn save_monitor_log(
         &self,
+        in_memory_data: &InMemoryData,
         prerequisite: bool,
         stage_logs: Option<Vec<StageMonitorLog>>,
         error: Option<StdErr>,
     ) {
-        let _log = self.create_monitor_log(prerequisite, stage_logs, error);
+        let _log = self.create_monitor_log(in_memory_data, prerequisite, stage_logs, error);
+        let _async_monitor_log = self.async_monitor_log;
         todo!("implement save_monitor_log for CompiledPipelineRunner")
     }
 
-    async fn do_run(mut self) -> Option<Vec<PipelineExecutionTask>> {
-        match self.check_prerequisite() {
+    async fn do_run(self, mut in_memory_data: InMemoryData) -> Option<Vec<PipelineExecutionTask>> {
+        match self.check_prerequisite(&mut in_memory_data) {
             Ok(true) => {
                 let mut all_stage_accomplished: bool = true;
                 let mut stage_logs = vec![];
@@ -133,7 +138,7 @@ impl<'a> CompiledPipelineRunner<'a> {
                         created_tasks: created_tasks_by_stage,
                         log,
                     } = CompiledStageRunner::run(
-                        &mut self.in_memory_data,
+                        &mut in_memory_data,
                         self.compiled_pipeline,
                         stage,
                         self.principal,
@@ -156,16 +161,23 @@ impl<'a> CompiledPipelineRunner<'a> {
                     }
                 }
 
-                self.save_monitor_log(all_stage_accomplished, Some(stage_logs), None)
-                    .await;
+                self.save_monitor_log(
+                    &in_memory_data,
+                    all_stage_accomplished,
+                    Some(stage_logs),
+                    None,
+                )
+                .await;
                 Some(created_tasks)
             }
             Ok(false) => {
-                self.save_monitor_log(false, None, None).await;
+                self.save_monitor_log(&in_memory_data, false, None, None)
+                    .await;
                 None
             }
             Err(error) => {
-                self.save_monitor_log(true, None, Some(error)).await;
+                self.save_monitor_log(&in_memory_data, true, None, Some(error))
+                    .await;
                 None
             }
         }

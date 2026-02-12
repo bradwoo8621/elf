@@ -9,8 +9,6 @@ use elf_model::{MonitorLogStatus, StageMonitorLog, UnitMonitorLog};
 use std::ops::Deref;
 
 pub struct CompiledStageRunner<'a> {
-    in_memory_data: &'a mut InMemoryData,
-
     compiled_pipeline: &'a CompiledPipeline,
     compiled_stage: &'a CompiledStage,
     principal: &'a Principal,
@@ -25,27 +23,24 @@ pub struct StageRunResult {
 
 impl<'a> CompiledStageRunner<'a> {
     pub async fn run(
-        in_memory_data: &'a mut InMemoryData,
+        in_memory_data: &mut InMemoryData,
         compiled_pipeline: &'a CompiledPipeline,
         compiled_stage: &'a CompiledStage,
         principal: &'a Principal,
     ) -> StageRunResult {
         Self {
-            in_memory_data,
             compiled_pipeline,
             compiled_stage,
             principal,
 
             start_time: Utc::now().naive_utc(),
         }
-        .do_run()
+        .do_run(in_memory_data)
         .await
     }
 
-    fn check_prerequisite(&mut self) -> StdR<bool> {
-        self.compiled_stage
-            .conditional()
-            .is_true(self.in_memory_data)
+    fn check_prerequisite(&self, in_memory_data: &mut InMemoryData) -> StdR<bool> {
+        self.compiled_stage.conditional().is_true(in_memory_data)
     }
 
     fn create_monitor_log(
@@ -60,7 +55,7 @@ impl<'a> CompiledStageRunner<'a> {
         StageMonitorLog {
             stage_id: Some(self.compiled_stage.stage().stage_id.deref().clone()),
             name: Some(self.compiled_stage.stage().name.deref().clone()),
-            prerequisite_defined_as: self.compiled_pipeline.conditional().defined_as(),
+            prerequisite_defined_as: self.compiled_stage.conditional().defined_as(),
             status: Some(match &error {
                 Some(_) => MonitorLogStatus::DONE,
                 None => MonitorLogStatus::ERROR,
@@ -73,18 +68,15 @@ impl<'a> CompiledStageRunner<'a> {
         }
     }
 
-    async fn do_run(mut self) -> StageRunResult {
-        match self.check_prerequisite() {
+    async fn do_run(self, in_memory_data: &mut InMemoryData) -> StageRunResult {
+        match self.check_prerequisite(in_memory_data) {
             Ok(true) => {
                 let mut all_unit_accomplished: bool = true;
                 let mut unit_logs = vec![];
                 let mut created_tasks = vec![];
                 for unit in self.compiled_stage.units().iter() {
-                    let UnitRunResult {
-                        created_tasks: created_tasks_by_unit,
-                        log,
-                    } = CompiledUnitRunner::run(
-                        &mut self.in_memory_data,
+                    let results = CompiledUnitRunner::run(
+                        in_memory_data,
                         self.compiled_pipeline,
                         self.compiled_stage,
                         unit,
@@ -92,19 +84,26 @@ impl<'a> CompiledStageRunner<'a> {
                     )
                     .await;
 
-                    // push created tasks by stage into created tasks
-                    if let Some(created_tasks_by_unit) = created_tasks_by_unit {
-                        created_tasks.extend(created_tasks_by_unit);
-                    }
-                    // check there is any error occurred in stage running
-                    let has_error = match log.status {
-                        Some(MonitorLogStatus::ERROR) => true,
-                        _ => false,
-                    };
-                    unit_logs.push(log);
-                    if has_error {
-                        all_unit_accomplished = false;
-                        break;
+                    for UnitRunResult {
+                        created_tasks: created_tasks_by_unit,
+                        log,
+                    } in results
+                    {
+                        // push created tasks by stage into created tasks
+                        if let Some(created_tasks_by_unit) = created_tasks_by_unit {
+                            created_tasks.extend(created_tasks_by_unit);
+                        }
+                        // check there is any error occurred in stage running
+                        let has_error = match log.status {
+                            Some(MonitorLogStatus::ERROR) => true,
+                            _ => false,
+                        };
+                        unit_logs.push(log);
+
+                        if has_error {
+                            all_unit_accomplished = false;
+                            break;
+                        }
                     }
                 }
 

@@ -99,7 +99,7 @@ impl AesCryptographer {
                     buf
                 };
                 String::from_utf8(buf).map_err(|e| {
-                    RuntimeModelKernelErrorCode::AesCrypto.err_with_msg(format!(
+                    RuntimeModelKernelErrorCode::AesCrypto.e_msg(format!(
                         "Failed to create string by utf8 buffer, caused by {}.",
                         e
                     ))
@@ -296,7 +296,7 @@ impl AesCrypto {
             .read()
             .map_err(|e| {
                 StdErrCode::RwLock
-                    .err_with_msg(format!("Failed to get read lock, caused by {}.", e))
+                    .e_msg(format!("Failed to get read lock, caused by {}.", e))
             })?;
         if let Some(tenant_map) = guard.get(self.tenant_id.deref()) {
             match key {
@@ -326,7 +326,7 @@ impl AesCrypto {
             .write()
             .map_err(|e| {
                 StdErrCode::RwLock
-                    .err_with_msg(format!("Failed to get write lock, caused by {}.", e))
+                    .e_msg(format!("Failed to get write lock, caused by {}.", e))
             })?;
 
         if let Some(tenant_map) = guard.get_mut(self.tenant_id.deref()) {

@@ -1,12 +1,10 @@
 use crate::{
-    ActionMonitorLog, BaseDataModel, MonitorLogStatus, NotKnownYetDataStruct, PipelineUnitId,
-    PrerequisiteDefinedAs, Storable,
+    ActionMonitorLog, BaseDataModel, MonitorLogStatus, PipelineUnitId, PrerequisiteDefinedAs,
+    Storable, UnitLoopVariableValue,
 };
 use chrono::NaiveDateTime;
 use elf_base::serde::option_naive_datetime;
 use elf_model_marco::adapt_model;
-
-pub type UnitLoopVariableValue = NotKnownYetDataStruct;
 
 #[adapt_model(storable)]
 pub struct UnitMonitorLog {

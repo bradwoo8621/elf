@@ -27,7 +27,7 @@ pub enum PipelineKernelErrorCode {
     FailedToGetNextSeq,
     // schema
     FactorNotFound,
-    // parameter
+    // pipeline
     ConstantParameterIsEmpty,
     ConstantParameterIsBlank,
     ComputeParameterTypeMissed,
@@ -36,12 +36,14 @@ pub enum PipelineKernelErrorCode {
     ComputeParameterDivideZero,
     ComputeParameterModulusZero,
     ComputeParameterNotADate,
-    CopyToMemoryActionVariableIsNotPlain,
+    ActionVariableIsNotPlain,
+    UnitLoopVariableMissed,
     // execution
     ExecutionRoundIndexOutOfRange,
     ExecutionRoundHasNoTask,
     ExecutionHasNoRound,
-    IncorrectExecutionRoundForAddingTask
+    IncorrectExecutionRoundForAddingTask,
+    UnitLoopVariableNotAVec,
 }
 
 impl ErrorCode for PipelineKernelErrorCode {
@@ -81,12 +83,14 @@ impl ErrorCode for PipelineKernelErrorCode {
             Self::ComputeParameterDivideZero => "PLKN-00305",
             Self::ComputeParameterModulusZero => "PLKN-00306",
             Self::ComputeParameterNotADate => "PLKN-00307",
-            Self::CopyToMemoryActionVariableIsNotPlain => "PLKN-00308",
+            Self::ActionVariableIsNotPlain => "PLKN-00308",
+            Self::UnitLoopVariableMissed => "PLKN-00309",
 
             Self::ExecutionRoundIndexOutOfRange => "PLKN-00400",
             Self::ExecutionRoundHasNoTask => "PLKN-00401",
             Self::ExecutionHasNoRound => "PLKN-00402",
             Self::IncorrectExecutionRoundForAddingTask => "PLKN-00403",
+            Self::UnitLoopVariableNotAVec => "PLKN-00404",
         }
     }
 }

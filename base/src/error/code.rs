@@ -18,7 +18,7 @@ pub trait ErrorCode {
     }
 
     #[track_caller]
-    fn err_with_msg<M>(&self, msg: M) -> StdErr
+    fn e_msg<M>(&self, msg: M) -> StdErr
     where
         M: Into<String>,
     {
