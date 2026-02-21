@@ -6,11 +6,12 @@ use std::sync::Arc;
 pub struct PipelineCompileService;
 
 impl PipelineCompileService {
+    /// TODO maybe find from cache
     fn new() -> StdR<Arc<Self>> {
-        // TODO maybe find from cache
         Ok(Arc::new(Self {}))
     }
 
+    /// TODO compiled pipeline maybe find from cache
     pub fn compile(
         &self,
         topic_schema: Arc<TopicSchema>,

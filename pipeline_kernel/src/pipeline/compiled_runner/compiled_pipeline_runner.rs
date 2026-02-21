@@ -1,11 +1,12 @@
 use crate::{
-    CompiledPipeline, CompiledStageRunner, InMemoryData, PipelineExecutionTask, StageRunResult,
+    CompiledPipeline, CompiledStageRunner, InMemoryData, MonitorLogHelper, PipelineExecutionTask,
+    StageRunResult,
 };
 use chrono::{NaiveDateTime, Utc};
 use elf_auth::Principal;
 use elf_base::{StdErr, StdR};
 use elf_model::{
-    MonitorLogStatus, NotKnownYetDataStruct, PipelineMonitorLog, PipelineTriggerTraceId,
+    MonitorLogStatus, PipelineMonitorLog, PipelineTopicData, PipelineTriggerTraceId,
     StageMonitorLog, TopicDataId,
 };
 use elf_runtime_model_kernel::IdGen;
@@ -47,11 +48,9 @@ impl<'a> CompiledPipelineRunner<'a> {
     fn create_previous_data_for_log(
         &self,
         in_memory_data: &InMemoryData,
-    ) -> Option<NotKnownYetDataStruct> {
+    ) -> Option<PipelineTopicData> {
         match in_memory_data.get_previous_data_opt() {
-            Some(_data) => {
-                todo!("implement create_previous_data_for_log for CompiledPipelineRunner")
-            }
+            Some(data) => Some(MonitorLogHelper::convert_to_log_data_map(data)),
             None => None,
         }
     }
@@ -59,11 +58,9 @@ impl<'a> CompiledPipelineRunner<'a> {
     fn create_current_data_for_log(
         &self,
         in_memory_data: &InMemoryData,
-    ) -> Option<NotKnownYetDataStruct> {
+    ) -> Option<PipelineTopicData> {
         match in_memory_data.get_current_data_opt() {
-            Some(_data) => {
-                todo!("implement create_current_data_for_log for CompiledPipelineRunner")
-            }
+            Some(data) => Some(MonitorLogHelper::convert_to_log_data_map(data)),
             None => None,
         }
     }

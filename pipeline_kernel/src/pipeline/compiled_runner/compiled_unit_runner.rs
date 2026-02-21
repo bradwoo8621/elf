@@ -66,7 +66,16 @@ impl<'a> CompiledUnitRunner<'a> {
             spent_in_mills: Some(spent_in_mills),
             error: error.map(|e| format!("{}", e)),
             prerequisite: Some(prerequisite),
-            loop_variable_value: loop_variable_value.map(|v| MonitorLogHelper::transform_value(&v)),
+            loop_variable_value: if let Some(value) = loop_variable_value {
+                if let Some(converted_value) = MonitorLogHelper::convert_to_log_value(value.deref())
+                {
+                    Some(converted_value)
+                } else {
+                    None
+                }
+            } else {
+                None
+            },
             actions: action_logs,
         }
     }
@@ -121,6 +130,7 @@ impl<'a> CompiledUnitRunner<'a> {
                                         log: self.create_monitor_log(true, Some(value), None, None),
                                     }]
                                 } else {
+                                    // TODO parallel?
                                     let mut results = vec![];
                                     for element in vec.iter() {
                                         results.push(

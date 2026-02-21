@@ -1,6 +1,6 @@
 use crate::{
-    BaseDataModel, MonitorLogStatus, NotKnownYetDataStruct, PipelineId, PipelineTriggerTraceId,
-    PrerequisiteDefinedAs, StageMonitorLog, Storable, TopicDataId, TopicId,
+    BaseDataModel, MonitorLogStatus, PipelineId, PipelineTopicData,
+    PipelineTriggerTraceId, PrerequisiteDefinedAs, StageMonitorLog, Storable, TopicDataId, TopicId,
 };
 use chrono::NaiveDateTime;
 use elf_base::serde::option_naive_datetime;
@@ -30,7 +30,7 @@ pub struct PipelineMonitorLog {
     /// result of prerequisite, true when it is not defined
     pub prerequisite: Option<bool>,
     pub data_id: Option<TopicDataId>,
-    pub old_value: Option<NotKnownYetDataStruct>,
-    pub new_value: Option<NotKnownYetDataStruct>,
+    pub old_value: Option<PipelineTopicData>,
+    pub new_value: Option<PipelineTopicData>,
     pub stages: Option<Vec<StageMonitorLog>>,
 }
