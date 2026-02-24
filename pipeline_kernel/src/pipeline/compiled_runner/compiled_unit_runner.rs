@@ -113,13 +113,24 @@ impl<'a> CompiledUnitRunner<'a> {
         vec: &Arc<Vec<Arc<ArcTopicDataValue>>>,
     ) -> Vec<UnitRunResult> {
         let mut results = vec![];
-        if PipelineExecuteEnvs::use_parallel_actions_in_loop_unit() {
-        } else {
-            for element in vec.iter() {
-                results.push(
-                    self.do_run_with_loop_element(in_memory_data, loop_variable_name, element)
-                        .await,
-                );
+        match (
+            PipelineExecuteEnvs::use_parallel_actions_in_loop_unit(),
+            PipelineExecuteEnvs::loop_parallel_thread_pool_size(),
+        ) {
+            (true, 0) | (true, 1) => {
+                // TODO parallel with coroutine
+            }
+            (true, count) => {
+                // TODO parallel with thread pool
+            }
+            (false, _) => {
+                // no parallel
+                for element in vec.iter() {
+                    results.push(
+                        self.do_run_with_loop_element(in_memory_data, loop_variable_name, element)
+                            .await,
+                    );
+                }
             }
         }
         results
@@ -152,7 +163,6 @@ impl<'a> CompiledUnitRunner<'a> {
                                         log: self.create_monitor_log(true, Some(value), None, None),
                                     }]
                                 } else {
-                                    // TODO parallel?
                                     self.loop_with_variable(in_memory_data, loop_variable_name, vec)
                                         .await
                                 }

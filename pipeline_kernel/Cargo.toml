@@ -5,8 +5,9 @@ edition = "2024"
 
 [dependencies]
 bigdecimal = "0.4.10"
-chrono = "0.4.42"
-tokio = { version = "1.49.0", features = ["rt"] }
+chrono = "0.4.44"
+num_cpus = "1.17.0"
+tokio = { version = "1.49.0", features = ["rt-multi-thread", "sync"] }
 elf_base = { path = "../base" }
 elf_model = { path = "../model" }
 elf_auth = { path = "../auth" }

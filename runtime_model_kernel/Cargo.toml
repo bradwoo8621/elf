@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 bigdecimal = "0.4.10"
-chrono = "0.4.42"
+chrono = "0.4.44"
 serde = { version = "1.0.228", features = ["derive"] }
 md5 = "0.8.0"
 sha2 = "0.11.0-rc.3"
