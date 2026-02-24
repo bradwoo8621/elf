@@ -24,7 +24,7 @@ impl CompiledUnit {
         unit: &Arc<ArcPipelineUnit>,
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
-    ) -> StdR<Self> {
+    ) -> StdR<Arc<Self>> {
         let compiled_conditional =
             CompiledConditional::compile(&unit.on, topic_schemas, tenant_id)?;
         let (has_loop, loop_variable_name) =
@@ -49,7 +49,7 @@ impl CompiledUnit {
             )?);
         }
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             pipeline: pipeline.clone(),
             stage: stage.clone(),
             unit: unit.clone(),
@@ -58,7 +58,7 @@ impl CompiledUnit {
             has_loop,
             loop_variable_name,
             actions: compiled_actions,
-        })
+        }))
     }
 
     pub fn pipeline(&self) -> &Arc<ArcPipeline> {

@@ -7,11 +7,12 @@ use elf_auth::Principal;
 use elf_base::{StdErr, StdR};
 use elf_model::{MonitorLogStatus, StageMonitorLog, UnitMonitorLog};
 use std::ops::Deref;
+use std::sync::Arc;
 
-pub struct CompiledStageRunner<'a> {
-    compiled_pipeline: &'a CompiledPipeline,
-    compiled_stage: &'a CompiledStage,
-    principal: &'a Principal,
+pub struct CompiledStageRunner {
+    compiled_pipeline: Arc<CompiledPipeline>,
+    compiled_stage: Arc<CompiledStage>,
+    principal: Arc<Principal>,
 
     start_time: NaiveDateTime,
 }
@@ -21,12 +22,12 @@ pub struct StageRunResult {
     pub log: StageMonitorLog,
 }
 
-impl<'a> CompiledStageRunner<'a> {
+impl CompiledStageRunner {
     pub async fn run(
         in_memory_data: &mut InMemoryData,
-        compiled_pipeline: &'a CompiledPipeline,
-        compiled_stage: &'a CompiledStage,
-        principal: &'a Principal,
+        compiled_pipeline: Arc<CompiledPipeline>,
+        compiled_stage: Arc<CompiledStage>,
+        principal: Arc<Principal>,
     ) -> StageRunResult {
         Self {
             compiled_pipeline,
@@ -77,10 +78,10 @@ impl<'a> CompiledStageRunner<'a> {
                 for unit in self.compiled_stage.units().iter() {
                     let results = CompiledUnitRunner::run(
                         in_memory_data,
-                        self.compiled_pipeline,
-                        self.compiled_stage,
-                        unit,
-                        self.principal,
+                        self.compiled_pipeline.clone(),
+                        self.compiled_stage.clone(),
+                        unit.clone(),
+                        self.principal.clone(),
                     )
                     .await;
 

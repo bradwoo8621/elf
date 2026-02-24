@@ -10,7 +10,7 @@ pub struct CompiledStage {
     stage: Arc<ArcPipelineStage>,
 
     conditional: CompiledConditional,
-    units: Vec<CompiledUnit>,
+    units: Vec<Arc<CompiledUnit>>,
 }
 
 impl CompiledStage {
@@ -19,7 +19,7 @@ impl CompiledStage {
         stage: &Arc<ArcPipelineStage>,
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
-    ) -> StdR<Self> {
+    ) -> StdR<Arc<Self>> {
         let compiled_conditional =
             CompiledConditional::compile(&stage.on, topic_schemas, tenant_id)?;
         let mut compiled_units = vec![];
@@ -33,13 +33,13 @@ impl CompiledStage {
             )?);
         }
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             pipeline: pipeline.clone(),
             stage: stage.clone(),
 
             conditional: compiled_conditional,
             units: compiled_units,
-        })
+        }))
     }
 
     pub fn pipeline(&self) -> &Arc<ArcPipeline> {
@@ -54,7 +54,7 @@ impl CompiledStage {
         &self.conditional
     }
 
-    pub fn units(&self) -> &Vec<CompiledUnit> {
+    pub fn units(&self) -> &Vec<Arc<CompiledUnit>> {
         &self.units
     }
 }

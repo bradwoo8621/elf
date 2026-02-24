@@ -21,8 +21,8 @@ impl PipelineExecutionTaskRunner {
                 topic_data.current_data().clone(),
             ),
             topic_data.topic_data_id().deref(),
-            compiled_pipeline.deref(),
-            task.principal().deref(),
+            compiled_pipeline.clone(),
+            task.principal().clone(),
             task.trace_id().deref(),
             task.async_monitor_log(),
         )

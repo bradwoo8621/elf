@@ -11,12 +11,13 @@ use elf_model::{
 };
 use elf_runtime_model_kernel::IdGen;
 use std::ops::Deref;
+use std::sync::Arc;
 
 pub struct CompiledPipelineRunner<'a> {
     topic_data_id: &'a TopicDataId,
 
-    compiled_pipeline: &'a CompiledPipeline,
-    principal: &'a Principal,
+    compiled_pipeline: Arc<CompiledPipeline>,
+    principal: Arc<Principal>,
     trace_id: &'a PipelineTriggerTraceId,
     async_monitor_log: bool,
 
@@ -27,8 +28,8 @@ impl<'a> CompiledPipelineRunner<'a> {
     pub async fn run(
         in_memory_data: InMemoryData,
         topic_data_id: &'a TopicDataId,
-        compiled_pipeline: &'a CompiledPipeline,
-        principal: &'a Principal,
+        compiled_pipeline: Arc<CompiledPipeline>,
+        principal: Arc<Principal>,
         trace_id: &'a PipelineTriggerTraceId,
         async_monitor_log: bool,
     ) -> Option<Vec<PipelineExecutionTask>> {
@@ -136,9 +137,9 @@ impl<'a> CompiledPipelineRunner<'a> {
                         log,
                     } = CompiledStageRunner::run(
                         &mut in_memory_data,
-                        self.compiled_pipeline,
-                        stage,
-                        self.principal,
+                        self.compiled_pipeline.clone(),
+                        stage.clone(),
+                        self.principal.clone(),
                     )
                     .await;
 

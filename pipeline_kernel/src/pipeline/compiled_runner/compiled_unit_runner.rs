@@ -9,11 +9,11 @@ use elf_model::{ActionMonitorLog, MonitorLogStatus, UnitMonitorLog};
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct CompiledUnitRunner<'a> {
-    compiled_pipeline: &'a CompiledPipeline,
-    compiled_stage: &'a CompiledStage,
-    compiled_unit: &'a CompiledUnit,
-    principal: &'a Principal,
+pub struct CompiledUnitRunner {
+    compiled_pipeline: Arc<CompiledPipeline>,
+    compiled_stage: Arc<CompiledStage>,
+    compiled_unit: Arc<CompiledUnit>,
+    principal: Arc<Principal>,
 
     start_time: NaiveDateTime,
 }
@@ -23,13 +23,13 @@ pub struct UnitRunResult {
     pub log: UnitMonitorLog,
 }
 
-impl<'a> CompiledUnitRunner<'a> {
+impl CompiledUnitRunner {
     pub async fn run(
-        in_memory_data: &'a mut InMemoryData,
-        compiled_pipeline: &'a CompiledPipeline,
-        compiled_stage: &'a CompiledStage,
-        compiled_unit: &'a CompiledUnit,
-        principal: &'a Principal,
+        in_memory_data: &mut InMemoryData,
+        compiled_pipeline: Arc<CompiledPipeline>,
+        compiled_stage: Arc<CompiledStage>,
+        compiled_unit: Arc<CompiledUnit>,
+        principal: Arc<Principal>,
     ) -> Vec<UnitRunResult> {
         Self {
             compiled_pipeline,
@@ -80,19 +80,12 @@ impl<'a> CompiledUnitRunner<'a> {
         }
     }
 
-    async fn do_run_with_loop_element(
-        &self,
-        in_memory_data: &InMemoryData,
-        loop_variable_name: &String,
-        loop_variable_value: &ArcTopicDataValue,
-    ) -> UnitRunResult {
-        let mut in_memory_data_for_loop =
-            in_memory_data.fork_with(loop_variable_name, loop_variable_value.clone());
-        self.do_run_no_loop(&mut in_memory_data_for_loop).await
-    }
-
     async fn do_run_no_loop(&self, in_memory_data: &mut InMemoryData) -> UnitRunResult {
         todo!("implement do_run_no_loop for CompiledUnitRunner")
+    }
+
+    async fn do_run_for_loop(&self, in_memory_data: InMemoryData) -> UnitRunResult {
+        todo!("implement do_run_for_loop for CompiledUnitRunner")
     }
 
     fn get_loop_variable(
@@ -106,8 +99,27 @@ impl<'a> CompiledUnitRunner<'a> {
             .map(|v| v.clone())
     }
 
+    fn clone_runner_for_loop(&self) -> Self {
+        Self {
+            compiled_pipeline: self.compiled_pipeline.clone(),
+            compiled_stage: self.compiled_stage.clone(),
+            compiled_unit: self.compiled_unit.clone(),
+            principal: self.principal.clone(),
+            start_time: Utc::now().naive_utc(),
+        }
+    }
+
+    fn clone_in_memory_data_for_loop(
+        &self,
+        in_memory_data: &InMemoryData,
+        loop_variable_name: &String,
+        loop_variable_value: &ArcTopicDataValue,
+    ) -> InMemoryData {
+        in_memory_data.fork_with(loop_variable_name, loop_variable_value.clone())
+    }
+
     async fn loop_with_variable(
-        self,
+        &self,
         in_memory_data: &mut InMemoryData,
         loop_variable_name: &String,
         vec: &Arc<Vec<Arc<ArcTopicDataValue>>>,
@@ -117,19 +129,43 @@ impl<'a> CompiledUnitRunner<'a> {
             PipelineExecuteEnvs::use_parallel_actions_in_loop_unit(),
             PipelineExecuteEnvs::loop_parallel_thread_pool_size(),
         ) {
-            (true, 0) | (true, 1) => {
-                // TODO parallel with coroutine
-            }
-            (true, count) => {
-                // TODO parallel with thread pool
+            (true, _) => {
+                // parallel, doesn't matter the pool size, all tasks handle over to Tokio,
+                // because almost all actions are I/O-intensive
+                let mut handles = vec![];
+                for element in vec.iter() {
+                    let runner = self.clone_runner_for_loop();
+                    let in_memory_data = self.clone_in_memory_data_for_loop(
+                        in_memory_data,
+                        loop_variable_name,
+                        element,
+                    );
+                    let handle =
+                        tokio::spawn(async move { runner.do_run_for_loop(in_memory_data).await });
+                    handles.push(handle);
+                }
+                for handle in handles {
+                    match handle.await {
+                        Ok(result) => {
+                            results.push(result);
+                        }
+                        Err(e) => {
+                            // TODO how to handle join error?
+                            eprintln!("Task panicked: {:?}", e);
+                        }
+                    }
+                }
             }
             (false, _) => {
                 // no parallel
                 for element in vec.iter() {
-                    results.push(
-                        self.do_run_with_loop_element(in_memory_data, loop_variable_name, element)
-                            .await,
+                    let runner = self.clone_runner_for_loop();
+                    let mut in_memory_data = self.clone_in_memory_data_for_loop(
+                        in_memory_data,
+                        loop_variable_name,
+                        element,
                     );
+                    results.push(runner.do_run_no_loop(&mut in_memory_data).await);
                 }
             }
         }
