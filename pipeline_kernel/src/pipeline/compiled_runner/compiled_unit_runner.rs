@@ -99,7 +99,7 @@ impl CompiledUnitRunner {
             .map(|v| v.clone())
     }
 
-    fn clone_runner_for_loop(&self) -> Self {
+    fn create_runner_for_loop(&self) -> Self {
         Self {
             compiled_pipeline: self.compiled_pipeline.clone(),
             compiled_stage: self.compiled_stage.clone(),
@@ -109,7 +109,7 @@ impl CompiledUnitRunner {
         }
     }
 
-    fn clone_in_memory_data_for_loop(
+    fn create_in_memory_data_for_loop(
         &self,
         in_memory_data: &InMemoryData,
         loop_variable_name: &String,
@@ -134,8 +134,8 @@ impl CompiledUnitRunner {
                 // because almost all actions are I/O-intensive
                 let mut handles = vec![];
                 for element in vec.iter() {
-                    let runner = self.clone_runner_for_loop();
-                    let in_memory_data = self.clone_in_memory_data_for_loop(
+                    let runner = self.create_runner_for_loop();
+                    let in_memory_data = self.create_in_memory_data_for_loop(
                         in_memory_data,
                         loop_variable_name,
                         element,
@@ -159,8 +159,8 @@ impl CompiledUnitRunner {
             (false, _) => {
                 // no parallel
                 for element in vec.iter() {
-                    let runner = self.clone_runner_for_loop();
-                    let mut in_memory_data = self.clone_in_memory_data_for_loop(
+                    let runner = self.create_runner_for_loop();
+                    let mut in_memory_data = self.create_in_memory_data_for_loop(
                         in_memory_data,
                         loop_variable_name,
                         element,
