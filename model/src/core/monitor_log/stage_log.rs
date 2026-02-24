@@ -8,7 +8,6 @@ use elf_model_marco::adapt_model;
 
 #[adapt_model(storable)]
 pub struct StageMonitorLog {
-    //(ConditionalMonitorLog):
     pub stage_id: Option<PipelineStageId>,
     pub name: Option<String>,
     /// definition of prerequisite

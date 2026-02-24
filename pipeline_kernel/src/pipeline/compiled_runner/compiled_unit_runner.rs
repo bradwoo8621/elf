@@ -1,6 +1,6 @@
 use crate::{
     ArcTopicDataValue, CompiledPipeline, CompiledStage, CompiledUnit, InMemoryData,
-    MonitorLogHelper, PipelineExecutionTask, PipelineKernelErrorCode,
+    MonitorLogHelper, PipelineExecuteEnvs, PipelineExecutionTask, PipelineKernelErrorCode,
 };
 use chrono::{NaiveDateTime, Utc};
 use elf_auth::Principal;
@@ -82,10 +82,13 @@ impl<'a> CompiledUnitRunner<'a> {
 
     async fn do_run_with_loop_element(
         &self,
-        in_memory_data: &mut InMemoryData,
+        in_memory_data: &InMemoryData,
+        loop_variable_name: &String,
         loop_variable_value: &ArcTopicDataValue,
     ) -> UnitRunResult {
-        todo!("implement do_run_round for CompiledUnitRunner")
+        let mut in_memory_data_for_loop =
+            in_memory_data.fork_with(loop_variable_name, loop_variable_value.clone());
+        self.do_run_no_loop(&mut in_memory_data_for_loop).await
     }
 
     async fn do_run_no_loop(&self, in_memory_data: &mut InMemoryData) -> UnitRunResult {
@@ -101,6 +104,25 @@ impl<'a> CompiledUnitRunner<'a> {
             .get_variables()
             .get(loop_variable_name)
             .map(|v| v.clone())
+    }
+
+    async fn loop_with_variable(
+        self,
+        in_memory_data: &mut InMemoryData,
+        loop_variable_name: &String,
+        vec: &Arc<Vec<Arc<ArcTopicDataValue>>>,
+    ) -> Vec<UnitRunResult> {
+        let mut results = vec![];
+        if PipelineExecuteEnvs::use_parallel_actions_in_loop_unit() {
+        } else {
+            for element in vec.iter() {
+                results.push(
+                    self.do_run_with_loop_element(in_memory_data, loop_variable_name, element)
+                        .await,
+                );
+            }
+        }
+        results
     }
 
     async fn do_run(self, in_memory_data: &mut InMemoryData) -> Vec<UnitRunResult> {
@@ -131,14 +153,8 @@ impl<'a> CompiledUnitRunner<'a> {
                                     }]
                                 } else {
                                     // TODO parallel?
-                                    let mut results = vec![];
-                                    for element in vec.iter() {
-                                        results.push(
-                                            self.do_run_with_loop_element(in_memory_data, element)
-                                                .await,
-                                        );
-                                    }
-                                    results
+                                    self.loop_with_variable(in_memory_data, loop_variable_name, vec)
+                                        .await
                                 }
                             }
                             other_value => {

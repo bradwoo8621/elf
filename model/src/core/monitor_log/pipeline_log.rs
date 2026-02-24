@@ -10,7 +10,6 @@ pub type PipelineMonitorLogId = String;
 
 #[adapt_model(storable)]
 pub struct PipelineMonitorLog {
-    //(ConditionalMonitorLog):
     pub uid: Option<PipelineMonitorLogId>,
     pub trace_id: Option<PipelineTriggerTraceId>,
     pub pipeline_id: Option<PipelineId>,

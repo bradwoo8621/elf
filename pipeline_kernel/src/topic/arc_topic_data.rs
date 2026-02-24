@@ -7,7 +7,7 @@ use std::ops::Deref;
 use std::sync::Arc;
 
 /// make every [Arc].
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ArcTopicDataValue {
     DateTime(Arc<NaiveDateTime>),
     Date(Arc<NaiveDate>),

@@ -134,3 +134,26 @@ impl InMemoryData {
         }
     }
 }
+
+impl InMemoryData {
+    /// fork in-memory data with
+    /// - clone previous data,
+    /// - clone current data,
+    /// - clone variables and replace value by given [variable_value] at given [variable_name],
+    pub fn fork_with(&self, variable_name: &String, variable_value: ArcTopicDataValue) -> Self {
+        let mut variables = HashMap::new();
+        for (key, value) in self.variables.iter() {
+            if key != variable_name {
+                variables.insert(key.clone(), value.clone());
+            }
+        }
+        variables.insert(variable_name.clone(), Arc::new(variable_value));
+
+        Self {
+            previous_data: self.previous_data.clone(),
+            current_data: self.current_data.clone(),
+            variables,
+            current_data_only: false,
+        }
+    }
+}
