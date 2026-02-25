@@ -114,7 +114,7 @@ impl CompiledUnitRunner {
         vec![UnitRunResult {
             created_tasks: None,
             log: self.create_monitor_log(
-                true,
+                false,
                 None,
                 None,
                 Some(
@@ -130,7 +130,7 @@ impl CompiledUnitRunner {
     fn create_loop_run_monitor_log_of_none(&self) -> Vec<UnitRunResult> {
         vec![UnitRunResult {
             created_tasks: None,
-            log: self.create_monitor_log(true, None, None, None),
+            log: self.create_monitor_log(false, None, None, None),
         }]
     }
 
@@ -140,7 +140,7 @@ impl CompiledUnitRunner {
     ) -> Vec<UnitRunResult> {
         vec![UnitRunResult {
             created_tasks: None,
-            log: self.create_monitor_log(true, Some(value), None, None),
+            log: self.create_monitor_log(false, Some(value), None, None),
         }]
     }
 
@@ -152,7 +152,7 @@ impl CompiledUnitRunner {
         vec![UnitRunResult {
             created_tasks: None,
             log: self.create_monitor_log(
-                true,
+                false,
                 Some(value.clone()),
                 None,
                 Some(PipelineKernelErrorCode::UnitLoopVariableNotAVec.e_msg(format!(
@@ -228,7 +228,7 @@ impl CompiledUnitRunner {
             },
             Err(error) => UnitRunResult {
                 created_tasks: None,
-                log: self.create_monitor_log(true, loop_variable_value, None, Some(error)),
+                log: self.create_monitor_log(false, loop_variable_value, None, Some(error)),
             },
         }
     }

@@ -185,7 +185,7 @@ impl<'a> CompiledPipelineRunner<'a> {
                 None
             }
             Err(error) => {
-                self.save_monitor_log(&in_memory_data, true, None, Some(error))
+                self.save_monitor_log(&in_memory_data, false, None, Some(error))
                     .await;
                 None
             }

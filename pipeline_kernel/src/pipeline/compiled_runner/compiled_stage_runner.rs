@@ -133,7 +133,7 @@ impl CompiledStageRunner {
             },
             Err(error) => StageRunResult {
                 created_tasks: None,
-                log: self.create_monitor_log(true, None, Some(error)),
+                log: self.create_monitor_log(false, None, Some(error)),
             },
         }
     }

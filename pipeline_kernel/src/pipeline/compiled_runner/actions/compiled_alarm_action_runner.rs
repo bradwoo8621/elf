@@ -66,15 +66,17 @@ impl CompiledAlarmActionRunner {
             Ok((true, Some((severity, message)))) => {
                 todo!("implement do_run for CompiledAlarmActionRunner")
             }
-            Ok((true, None)) => {
-                todo!("implement do_run for CompiledAlarmActionRunner")
-            }
-            Ok((false, ..)) => {
-                todo!("implement do_run for CompiledAlarmActionRunner")
-            }
+            Ok((true, None)) => ActionRunResult {
+                created_tasks: None,
+                log: self.create_monitor_log(true, None),
+            },
+            Ok((false, ..)) => ActionRunResult {
+                created_tasks: None,
+                log: self.create_monitor_log(false, None),
+            },
             Err(error) => ActionRunResult {
                 created_tasks: None,
-                log: self.create_monitor_log(true, Some(error)),
+                log: self.create_monitor_log(false, Some(error)),
             },
         }
     }
