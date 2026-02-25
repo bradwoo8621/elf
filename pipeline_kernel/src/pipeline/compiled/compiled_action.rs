@@ -15,20 +15,20 @@ use std::ops::Deref;
 use std::sync::Arc;
 
 pub enum CompiledAction {
-    Alarm(CompiledAlarmAction),
-    CopyToMemory(CompiledCopyToMemoryAction),
-    WriteToExternal(CompiledWriteToExternalAction),
-    ReadRow(CompiledReadRowAction),
-    ReadFactor(CompiledReadFactorAction),
-    Exists(CompiledExistsAction),
-    ReadRows(CompiledReadRowsAction),
-    ReadFactors(CompiledReadFactorsAction),
-    MergeRow(CompiledMergeRowAction),
-    InsertRow(CompiledInsertRowAction),
-    InsertOrMergeRow(CompiledInsertOrMergeRowAction),
-    WriteFactor(CompiledWriteFactorAction),
-    DeleteRow(CompiledDeleteRowAction),
-    DeleteRows(CompiledDeleteRowsAction),
+    Alarm(Arc<CompiledAlarmAction>),
+    CopyToMemory(Arc<CompiledCopyToMemoryAction>),
+    WriteToExternal(Arc<CompiledWriteToExternalAction>),
+    ReadRow(Arc<CompiledReadRowAction>),
+    ReadFactor(Arc<CompiledReadFactorAction>),
+    Exists(Arc<CompiledExistsAction>),
+    ReadRows(Arc<CompiledReadRowsAction>),
+    ReadFactors(Arc<CompiledReadFactorsAction>),
+    MergeRow(Arc<CompiledMergeRowAction>),
+    InsertRow(Arc<CompiledInsertRowAction>),
+    InsertOrMergeRow(Arc<CompiledInsertOrMergeRowAction>),
+    WriteFactor(Arc<CompiledWriteFactorAction>),
+    DeleteRow(Arc<CompiledDeleteRowAction>),
+    DeleteRows(Arc<CompiledDeleteRowsAction>),
 }
 
 struct CompileContext<'a> {
@@ -40,7 +40,7 @@ struct CompileContext<'a> {
 }
 
 impl CompileContext<'_> {
-    fn compile<C>(self, action: &C::SourceAction) -> StdR<CompiledAction>
+    fn compile<C>(self, action: &C::SourceAction) -> StdR<Arc<CompiledAction>>
     where
         C: ActionCompiler,
     {
@@ -52,7 +52,7 @@ impl CompileContext<'_> {
             self.topic_schemas,
             self.tenant_id,
         )
-        .map(|compiled| C::wrap_into_enum(compiled))
+        .map(|compiled| Arc::new(C::wrap_into_enum(compiled)))
     }
 }
 
@@ -110,6 +110,5 @@ impl CompiledAction {
                 context.compile::<CompiledDeleteRowsAction>(action)
             }
         }
-        .map(|complied| Arc::new(complied))
     }
 }

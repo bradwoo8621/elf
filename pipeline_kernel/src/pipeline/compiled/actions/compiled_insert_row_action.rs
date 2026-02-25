@@ -43,6 +43,6 @@ impl ActionCompiler for CompiledInsertRowAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::InsertRow(compiled_action)
+        CompiledAction::InsertRow(Arc::new(compiled_action))
     }
 }

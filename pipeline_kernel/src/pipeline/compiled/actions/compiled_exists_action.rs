@@ -45,6 +45,6 @@ impl ActionCompiler for CompiledExistsAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::Exists(compiled_action)
+        CompiledAction::Exists(Arc::new(compiled_action))
     }
 }

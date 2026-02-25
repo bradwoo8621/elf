@@ -53,6 +53,6 @@ impl ActionCompiler for CompiledReadFactorAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::ReadFactor(compiled_action)
+        CompiledAction::ReadFactor(Arc::new(compiled_action))
     }
 }

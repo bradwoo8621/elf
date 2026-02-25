@@ -24,6 +24,6 @@ impl ActionCompiler for CompiledWriteToExternalAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::WriteToExternal(compiled_action)
+        CompiledAction::WriteToExternal(Arc::new(compiled_action))
     }
 }

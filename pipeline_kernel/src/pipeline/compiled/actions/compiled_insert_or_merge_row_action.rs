@@ -55,6 +55,6 @@ impl ActionCompiler for CompiledInsertOrMergeRowAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::InsertOrMergeRow(compiled_action)
+        CompiledAction::InsertOrMergeRow(Arc::new(compiled_action))
     }
 }

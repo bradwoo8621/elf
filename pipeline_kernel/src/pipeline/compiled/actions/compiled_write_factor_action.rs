@@ -52,6 +52,6 @@ impl ActionCompiler for CompiledWriteFactorAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::WriteFactor(compiled_action)
+        CompiledAction::WriteFactor(Arc::new(compiled_action))
     }
 }

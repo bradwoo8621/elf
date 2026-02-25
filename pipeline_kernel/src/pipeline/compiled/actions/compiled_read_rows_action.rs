@@ -45,6 +45,6 @@ impl ActionCompiler for CompiledReadRowsAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::ReadRows(compiled_action)
+        CompiledAction::ReadRows(Arc::new(compiled_action))
     }
 }

@@ -38,6 +38,6 @@ impl ActionCompiler for CompiledCopyToMemoryAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::CopyToMemory(compiled_action)
+        CompiledAction::CopyToMemory(Arc::new(compiled_action))
     }
 }

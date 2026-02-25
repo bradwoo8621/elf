@@ -40,6 +40,6 @@ impl ActionCompiler for CompiledAlarmAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::Alarm(compiled_action)
+        CompiledAction::Alarm(Arc::new(compiled_action))
     }
 }

@@ -35,6 +35,6 @@ impl ActionCompiler for CompiledDeleteRowAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::DeleteRow(compiled_action)
+        CompiledAction::DeleteRow(Arc::new(compiled_action))
     }
 }

@@ -70,12 +70,10 @@ impl ActionCompilerHelper {
             match segment {
                 DataPathSegment::Plain(_) => {}
                 DataPathSegment::Func(_) => {
-                    return PipelineKernelErrorCode::ActionVariableIsNotPlain.msg(
-                        format!(
-                            "Variable name of {} action[action_id={}] cannot contain function.",
-                            action_type, action_id
-                        ),
-                    );
+                    return PipelineKernelErrorCode::ActionVariableIsNotPlain.msg(format!(
+                        "Variable name of {} action[action_id={}] cannot contain function.",
+                        action_type, action_id
+                    ));
                 }
             }
         }

@@ -49,6 +49,6 @@ impl ActionCompiler for CompiledMergeRowAction {
     }
 
     fn wrap_into_enum(compiled_action: Self) -> CompiledAction {
-        CompiledAction::MergeRow(compiled_action)
+        CompiledAction::MergeRow(Arc::new(compiled_action))
     }
 }
