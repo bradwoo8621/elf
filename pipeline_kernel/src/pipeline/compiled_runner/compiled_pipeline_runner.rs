@@ -74,11 +74,24 @@ impl<'a> CompiledPipelineRunner<'a> {
         &self,
         in_memory_data: &InMemoryData,
         prerequisite: bool,
-        stage_logs: Option<Vec<StageMonitorLog>>,
+        // the bool is all stages are run or not
+        stage_logs: Option<(Vec<StageMonitorLog>, bool)>,
         error: Option<StdErr>,
     ) -> StdR<PipelineMonitorLog> {
         let spent_in_mills =
             (Utc::now().timestamp() - self.start_time.and_utc().timestamp()) as u32;
+
+        let (stage_logs, all_stage_accomplished) =
+            if let Some((stage_logs, all_stage_accomplished)) = stage_logs {
+                (Some(stage_logs), all_stage_accomplished)
+            } else {
+                (None, true)
+            };
+        let status = if !all_stage_accomplished || error.is_some() {
+            Some(MonitorLogStatus::ERROR)
+        } else {
+            Some(MonitorLogStatus::DONE)
+        };
 
         Ok(PipelineMonitorLog {
             uid: Some(IdGen::next_id()?.to_string()),
@@ -98,10 +111,7 @@ impl<'a> CompiledPipelineRunner<'a> {
                     .clone(),
             ),
             prerequisite_defined_as: self.compiled_pipeline.conditional().defined_as(),
-            status: Some(match &error {
-                Some(_) => MonitorLogStatus::DONE,
-                None => MonitorLogStatus::ERROR,
-            }),
+            status,
             start_time: Some(self.start_time),
             spent_in_mills: Some(spent_in_mills),
             error: error.map(|e| format!("{}", e)),
@@ -117,7 +127,8 @@ impl<'a> CompiledPipelineRunner<'a> {
         &self,
         in_memory_data: &InMemoryData,
         prerequisite: bool,
-        stage_logs: Option<Vec<StageMonitorLog>>,
+        // the bool is all stages are run or not
+        stage_logs: Option<(Vec<StageMonitorLog>, bool)>,
         error: Option<StdErr>,
     ) {
         let _log = self.create_monitor_log(in_memory_data, prerequisite, stage_logs, error);
@@ -161,8 +172,8 @@ impl<'a> CompiledPipelineRunner<'a> {
 
                 self.save_monitor_log(
                     &in_memory_data,
-                    all_stage_accomplished,
-                    Some(stage_logs),
+                    true,
+                    Some((stage_logs, all_stage_accomplished)),
                     None,
                 )
                 .await;

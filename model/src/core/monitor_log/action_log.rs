@@ -1,5 +1,5 @@
 use crate::{
-	AlarmActionMonitorLog, CopyToMemoryActionMonitorLog, DeleteActionMonitorLog,
+	AlarmActionMonitorLog, CopyToMemoryActionMonitorLog, DeleteActionMonitorLog, MonitorLogStatus,
 	ReadActionMonitorLog, WriteActionMonitorLog, WriteToExternalActionMonitorLog,
 };
 use elf_model_marco::VariousStructTypes;
@@ -14,4 +14,17 @@ pub enum ActionMonitorLog {
     Read(ReadActionMonitorLog),
     Write(WriteActionMonitorLog),
     Delete(DeleteActionMonitorLog),
+}
+
+impl ActionMonitorLog {
+    pub fn status(&self) -> &Option<MonitorLogStatus> {
+        match self {
+            ActionMonitorLog::Alarm(AlarmActionMonitorLog { status, .. }) => status,
+            ActionMonitorLog::CopyToMemory(CopyToMemoryActionMonitorLog { status, .. }) => status,
+            ActionMonitorLog::WriteToExternal(WriteToExternalActionMonitorLog { status, .. }) => status,
+            ActionMonitorLog::Write(WriteActionMonitorLog { status, .. }) => status,
+            ActionMonitorLog::Read(ReadActionMonitorLog { status, .. }) => status,
+            ActionMonitorLog::Delete(DeleteActionMonitorLog { status, .. }) => status,
+        }
+    }
 }

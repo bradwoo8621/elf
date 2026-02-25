@@ -47,20 +47,30 @@ impl CompiledStageRunner {
     fn create_monitor_log(
         &self,
         prerequisite: bool,
-        unit_logs: Option<Vec<UnitMonitorLog>>,
+        // the bool is all units are run or not
+        unit_logs: Option<(Vec<UnitMonitorLog>, bool)>,
         error: Option<StdErr>,
     ) -> StageMonitorLog {
         let spent_in_mills =
             (Utc::now().timestamp() - self.start_time.and_utc().timestamp()) as u32;
 
+        let (unit_logs, all_unit_accomplished) =
+            if let Some((unit_logs, all_unit_accomplished)) = unit_logs {
+                (Some(unit_logs), all_unit_accomplished)
+            } else {
+                (None, true)
+            };
+        let status = if !all_unit_accomplished || error.is_some() {
+            Some(MonitorLogStatus::ERROR)
+        } else {
+            Some(MonitorLogStatus::DONE)
+        };
+
         StageMonitorLog {
             stage_id: Some(self.compiled_stage.stage().stage_id.deref().clone()),
             name: Some(self.compiled_stage.stage().name.deref().clone()),
             prerequisite_defined_as: self.compiled_stage.conditional().defined_as(),
-            status: Some(match &error {
-                Some(_) => MonitorLogStatus::DONE,
-                None => MonitorLogStatus::ERROR,
-            }),
+            status,
             start_time: Some(self.start_time),
             spent_in_mills: Some(spent_in_mills),
             error: error.map(|e| format!("{}", e)),
@@ -110,7 +120,11 @@ impl CompiledStageRunner {
 
                 StageRunResult {
                     created_tasks: Some(created_tasks),
-                    log: self.create_monitor_log(all_unit_accomplished, Some(unit_logs), None),
+                    log: self.create_monitor_log(
+                        true,
+                        Some((unit_logs, all_unit_accomplished)),
+                        None,
+                    ),
                 }
             }
             Ok(false) => StageRunResult {

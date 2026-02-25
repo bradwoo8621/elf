@@ -12,9 +12,8 @@ pub struct CompiledUnit {
     unit: Arc<ArcPipelineUnit>,
 
     conditional: CompiledConditional,
-    has_loop: bool,
     loop_variable_name: Option<String>,
-    actions: Vec<CompiledAction>,
+    actions: Vec<Arc<CompiledAction>>,
 }
 
 impl CompiledUnit {
@@ -27,16 +26,15 @@ impl CompiledUnit {
     ) -> StdR<Arc<Self>> {
         let compiled_conditional =
             CompiledConditional::compile(&unit.on, topic_schemas, tenant_id)?;
-        let (has_loop, loop_variable_name) =
-            if let Some(loop_variable_name) = &unit.loop_variable_name {
-                if loop_variable_name.is_not_blank() {
-                    (true, Some(loop_variable_name.deref().clone()))
-                } else {
-                    (false, None)
-                }
+        let loop_variable_name = if let Some(loop_variable_name) = &unit.loop_variable_name {
+            if loop_variable_name.is_not_blank() {
+                Some(loop_variable_name.deref().clone())
             } else {
-                (false, None)
-            };
+                None
+            }
+        } else {
+            None
+        };
         let mut compiled_actions = vec![];
         for action in unit.r#do.iter() {
             compiled_actions.push(CompiledAction::compile(
@@ -55,7 +53,6 @@ impl CompiledUnit {
             unit: unit.clone(),
 
             conditional: compiled_conditional,
-            has_loop,
             loop_variable_name,
             actions: compiled_actions,
         }))
@@ -74,7 +71,7 @@ impl CompiledUnit {
     }
 
     pub fn has_loop(&self) -> bool {
-        self.has_loop
+        self.loop_variable_name.is_some()
     }
 
     pub fn loop_variable_name(&self) -> &Option<String> {
@@ -85,7 +82,7 @@ impl CompiledUnit {
         &self.conditional
     }
 
-    pub fn actions(&self) -> &Vec<CompiledAction> {
+    pub fn actions(&self) -> &Vec<Arc<CompiledAction>> {
         &self.actions
     }
 }

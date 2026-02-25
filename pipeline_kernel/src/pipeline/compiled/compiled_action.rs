@@ -64,7 +64,7 @@ impl CompiledAction {
         action: &Arc<ArcPipelineAction>,
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
-    ) -> StdR<Self> {
+    ) -> StdR<Arc<Self>> {
         let context = CompileContext {
             pipeline,
             stage,
@@ -110,5 +110,6 @@ impl CompiledAction {
                 context.compile::<CompiledDeleteRowsAction>(action)
             }
         }
+        .map(|complied| Arc::new(complied))
     }
 }

@@ -44,6 +44,7 @@ pub enum PipelineKernelErrorCode {
     ExecutionHasNoRound,
     IncorrectExecutionRoundForAddingTask,
     UnitLoopVariableNotAVec,
+    ParallelUnitExecute,
 }
 
 impl ErrorCode for PipelineKernelErrorCode {
@@ -91,6 +92,7 @@ impl ErrorCode for PipelineKernelErrorCode {
             Self::ExecutionHasNoRound => "PLKN-00402",
             Self::IncorrectExecutionRoundForAddingTask => "PLKN-00403",
             Self::UnitLoopVariableNotAVec => "PLKN-00404",
+            Self::ParallelUnitExecute => "PLKN-00405",
         }
     }
 }
