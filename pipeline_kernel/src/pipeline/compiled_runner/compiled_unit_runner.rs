@@ -203,10 +203,7 @@ impl CompiledUnitRunner {
                         created_tasks.extend(created_tasks_by_action);
                     }
                     // check there is any error occurred in stage running
-                    let has_error = match log.status() {
-                        Some(MonitorLogStatus::ERROR) => true,
-                        _ => false,
-                    };
+                    let has_error = ActionRunResult::has_error(&log);
                     action_logs.push(log);
 
                     if has_error {
