@@ -14,7 +14,7 @@ pub struct ArcCopyToMemoryAction {
 impl ArcHelper for ArcCopyToMemoryAction {}
 
 impl ArcCopyToMemoryAction {
-    pub fn new(action: CopyToMemoryAction) -> StdR<Self> {
+    pub fn new(action: CopyToMemoryAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let source = Self::action_source(action.source, || {
             format!("Copy to memory action[{}]", action_id)
@@ -23,11 +23,11 @@ impl ArcCopyToMemoryAction {
             format!("Copy to memory action[{}]", action_id)
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::CopyToMemory),
             source,
             variable_name,
-        })
+        }))
     }
 }

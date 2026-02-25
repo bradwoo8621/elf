@@ -16,7 +16,7 @@ pub struct ArcAlarmAction {
 impl ArcHelper for ArcAlarmAction {}
 
 impl ArcAlarmAction {
-    pub fn new(action: AlarmAction) -> StdR<Self> {
+    pub fn new(action: AlarmAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let on = Self::conditional(action.conditional, action.on, || {
             format!(
@@ -25,13 +25,13 @@ impl ArcAlarmAction {
             )
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::Alarm),
             severity: Arc::new(action.severity.unwrap_or(AlarmActionSeverity::Medium)),
             message: action.message.map(Arc::new),
             conditional: on.is_some(),
             on,
-        })
+        }))
     }
 }

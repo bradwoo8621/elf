@@ -40,7 +40,7 @@ struct CompileContext<'a> {
 }
 
 impl CompileContext<'_> {
-    fn compile<C>(self, action: &C::SourceAction) -> StdR<Arc<CompiledAction>>
+    fn compile<C>(self, action: &Arc<C::SourceAction>) -> StdR<Arc<CompiledAction>>
     where
         C: ActionCompiler,
     {

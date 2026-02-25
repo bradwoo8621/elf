@@ -19,7 +19,7 @@ pub struct ArcMergeRowAction {
 impl ArcHelper for ArcMergeRowAction {}
 
 impl ArcMergeRowAction {
-    pub fn new(action: MergeRowAction) -> StdR<Self> {
+    pub fn new(action: MergeRowAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let mapping = Self::must_vec(action.mapping, ArcMappingFactor::new, || {
             RuntimeModelKernelErrorCode::ActionMappingFactorMissed.msg(format!(
@@ -32,13 +32,13 @@ impl ArcMergeRowAction {
         })?;
         let by = Self::action_by(action.by, || format!("Merge row action[{}]", action_id))?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::MergeRow),
             accumulate_mode: Arc::new(action.accumulate_mode.unwrap_or(AccumulateMode::Standard)),
             mapping,
             topic_id,
             by,
-        })
+        }))
     }
 }

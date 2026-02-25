@@ -23,7 +23,7 @@ impl ActionCompiler for CompiledExistsAction {
         pipeline: &Arc<ArcPipeline>,
         stage: &Arc<ArcPipelineStage>,
         unit: &Arc<ArcPipelineUnit>,
-        action: &ArcExistsAction,
+        action: &Arc<ArcExistsAction>,
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {

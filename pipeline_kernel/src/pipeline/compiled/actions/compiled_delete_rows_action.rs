@@ -19,7 +19,7 @@ impl ActionCompiler for CompiledDeleteRowsAction {
         pipeline: &Arc<ArcPipeline>,
         stage: &Arc<ArcPipelineStage>,
         unit: &Arc<ArcPipelineUnit>,
-        action: &ArcDeleteRowsAction,
+        action: &Arc<ArcDeleteRowsAction>,
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {

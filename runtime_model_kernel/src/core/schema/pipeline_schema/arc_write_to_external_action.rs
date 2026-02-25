@@ -14,7 +14,7 @@ pub struct ArcWriteToExternalAction {
 impl ArcHelper for ArcWriteToExternalAction {}
 
 impl ArcWriteToExternalAction {
-    pub fn new(action: WriteToExternalAction) -> StdR<Self> {
+    pub fn new(action: WriteToExternalAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let external_writer_id = Self::not_blank(
             action.external_writer_id,
@@ -47,11 +47,11 @@ impl ArcWriteToExternalAction {
             },
         )?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::WriteToExternal),
             external_writer_id,
             event_code,
-        })
+        }))
     }
 }

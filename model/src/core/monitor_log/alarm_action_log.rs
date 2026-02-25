@@ -1,6 +1,6 @@
 use crate::{
-    ActionDefinedAs, ActionTouchedValues, BaseDataModel, MonitorLogActionId, MonitorLogStatus,
-    PipelineActionId, PipelineActionType, PrerequisiteDefinedAs, Storable,
+    ActionDefinedAs, ActionTouchedValues, BaseDataModel, MonitorLogStatus, PipelineActionId,
+    PipelineActionType, PrerequisiteDefinedAs, Storable,
 };
 use chrono::NaiveDateTime;
 use elf_base::serde::option_naive_datetime;
@@ -8,7 +8,6 @@ use elf_model_marco::adapt_model;
 
 #[adapt_model(storable)]
 pub struct AlarmActionMonitorLog {
-    pub uid: Option<MonitorLogActionId>,
     pub action_id: Option<PipelineActionId>,
     pub r#type: Option<PipelineActionType>,
     /// definition of action

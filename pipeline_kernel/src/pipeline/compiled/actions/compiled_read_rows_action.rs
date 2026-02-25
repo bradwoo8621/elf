@@ -23,7 +23,7 @@ impl ActionCompiler for CompiledReadRowsAction {
         pipeline: &Arc<ArcPipeline>,
         stage: &Arc<ArcPipelineStage>,
         unit: &Arc<ArcPipelineUnit>,
-        action: &ArcReadRowsAction,
+        action: &Arc<ArcReadRowsAction>,
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {

@@ -16,7 +16,7 @@ pub struct ArcInsertRowAction {
 impl ArcHelper for ArcInsertRowAction {}
 
 impl ArcInsertRowAction {
-    pub fn new(action: InsertRowAction) -> StdR<Self> {
+    pub fn new(action: InsertRowAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let mapping = Self::must_vec(action.mapping, ArcMappingFactor::new, || {
             RuntimeModelKernelErrorCode::ActionMappingFactorMissed.msg(format!(
@@ -28,12 +28,12 @@ impl ArcInsertRowAction {
             format!("Insert row action[{}]", action_id)
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::InsertRow),
             accumulate_mode: Arc::new(action.accumulate_mode.unwrap_or(AccumulateMode::Standard)),
             mapping,
             topic_id,
-        })
+        }))
     }
 }

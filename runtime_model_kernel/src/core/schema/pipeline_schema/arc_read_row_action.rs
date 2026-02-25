@@ -18,7 +18,7 @@ pub struct ArcReadRowAction {
 impl ArcHelper for ArcReadRowAction {}
 
 impl ArcReadRowAction {
-    pub fn new(action: ReadRowAction) -> StdR<Self> {
+    pub fn new(action: ReadRowAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let topic_id = Self::topic_id(action.topic_id, || {
             format!("Read row action[{}]", action_id)
@@ -28,12 +28,12 @@ impl ArcReadRowAction {
             format!("Read row action[{}]", action_id)
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::ReadRow),
             topic_id,
             by,
             variable_name,
-        })
+        }))
     }
 }

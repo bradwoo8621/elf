@@ -25,7 +25,7 @@ impl ActionCompiler for CompiledInsertOrMergeRowAction {
         pipeline: &Arc<ArcPipeline>,
         stage: &Arc<ArcPipelineStage>,
         unit: &Arc<ArcPipelineUnit>,
-        action: &ArcInsertOrMergeRowAction,
+        action: &Arc<ArcInsertOrMergeRowAction>,
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {

@@ -20,7 +20,7 @@ pub struct ArcReadFactorsAction {
 impl ArcHelper for ArcReadFactorsAction {}
 
 impl ArcReadFactorsAction {
-    pub fn new(action: ReadFactorsAction) -> StdR<Self> {
+    pub fn new(action: ReadFactorsAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let topic_id = Self::topic_id(action.topic_id, || {
             format!("Read factors action[{}]", action_id)
@@ -33,13 +33,13 @@ impl ArcReadFactorsAction {
             format!("Read factors action[{}]", action_id)
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::ReadFactors),
             topic_id,
             factor_id,
             by,
             variable_name,
-        })
+        }))
     }
 }

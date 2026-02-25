@@ -1,5 +1,5 @@
 use crate::{
-    ActionDefinedAs, ActionFindByCriteria, ActionTouchedValues, BaseDataModel, MonitorLogActionId,
+    ActionDefinedAs, ActionFindByCriteria, ActionTouchedValues, BaseDataModel,
     MonitorLogStatus, PipelineActionId, PipelineActionType, Storable,
 };
 use chrono::NaiveDateTime;
@@ -8,7 +8,6 @@ use elf_model_marco::adapt_model;
 
 #[adapt_model(storable)]
 pub struct DeleteActionMonitorLog {
-    pub uid: Option<MonitorLogActionId>,
     pub action_id: Option<PipelineActionId>,
     pub r#type: Option<PipelineActionType>,
     /// definition of action

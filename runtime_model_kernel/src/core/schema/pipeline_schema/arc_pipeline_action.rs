@@ -10,20 +10,20 @@ use std::sync::Arc;
 
 #[derive(Debug)]
 pub enum ArcPipelineAction {
-    Alarm(ArcAlarmAction),
-    CopyToMemory(ArcCopyToMemoryAction),
-    WriteToExternal(ArcWriteToExternalAction),
-    ReadRow(ArcReadRowAction),
-    ReadFactor(ArcReadFactorAction),
-    Exists(ArcExistsAction),
-    ReadRows(ArcReadRowsAction),
-    ReadFactors(ArcReadFactorsAction),
-    MergeRow(ArcMergeRowAction),
-    InsertRow(ArcInsertRowAction),
-    InsertOrMergeRow(ArcInsertOrMergeRowAction),
-    WriteFactor(ArcWriteFactorAction),
-    DeleteRow(ArcDeleteRowAction),
-    DeleteRows(ArcDeleteRowsAction),
+    Alarm(Arc<ArcAlarmAction>),
+    CopyToMemory(Arc<ArcCopyToMemoryAction>),
+    WriteToExternal(Arc<ArcWriteToExternalAction>),
+    ReadRow(Arc<ArcReadRowAction>),
+    ReadFactor(Arc<ArcReadFactorAction>),
+    Exists(Arc<ArcExistsAction>),
+    ReadRows(Arc<ArcReadRowsAction>),
+    ReadFactors(Arc<ArcReadFactorsAction>),
+    MergeRow(Arc<ArcMergeRowAction>),
+    InsertRow(Arc<ArcInsertRowAction>),
+    InsertOrMergeRow(Arc<ArcInsertOrMergeRowAction>),
+    WriteFactor(Arc<ArcWriteFactorAction>),
+    DeleteRow(Arc<ArcDeleteRowAction>),
+    DeleteRows(Arc<ArcDeleteRowsAction>),
 }
 
 impl ArcPipelineAction {

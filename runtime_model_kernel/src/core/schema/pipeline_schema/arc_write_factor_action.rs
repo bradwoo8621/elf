@@ -24,7 +24,7 @@ pub struct ArcWriteFactorAction {
 impl ArcHelper for ArcWriteFactorAction {}
 
 impl ArcWriteFactorAction {
-    pub fn new(action: WriteFactorAction) -> StdR<Self> {
+    pub fn new(action: WriteFactorAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let source = Self::action_source(action.source, || {
             format!("Write factor action[{}]", action_id)
@@ -37,7 +37,7 @@ impl ArcWriteFactorAction {
         })?;
         let by = Self::action_by(action.by, || format!("Write factor action[{}]", action_id))?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::WriteFactor),
             accumulate_mode: Arc::new(action.accumulate_mode.unwrap_or(AccumulateMode::Standard)),
@@ -46,6 +46,6 @@ impl ArcWriteFactorAction {
             factor_id,
             by,
             arithmetic: Arc::new(action.arithmetic.unwrap_or(AggregateArithmetic::None)),
-        })
+        }))
     }
 }

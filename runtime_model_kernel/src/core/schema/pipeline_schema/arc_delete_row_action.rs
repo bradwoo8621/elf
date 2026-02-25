@@ -16,18 +16,18 @@ pub struct ArcDeleteRowAction {
 impl ArcHelper for ArcDeleteRowAction {}
 
 impl ArcDeleteRowAction {
-    pub fn new(action: DeleteRowAction) -> StdR<Self> {
+    pub fn new(action: DeleteRowAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let topic_id = Self::topic_id(action.topic_id, || {
             format!("Delete row action[{}]", action_id)
         })?;
         let by = Self::action_by(action.by, || format!("Delete row action[{}]", action_id))?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::DeleteRow),
             topic_id,
             by,
-        })
+        }))
     }
 }

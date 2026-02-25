@@ -3,8 +3,6 @@ use elf_model_marco::VariousValueTypes;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-pub type MonitorLogActionId = String;
-
 #[derive(Deserialize, Serialize, Clone, Debug, VariousValueTypes)]
 #[serde(untagged)]
 pub enum MonitorLogDataValue {

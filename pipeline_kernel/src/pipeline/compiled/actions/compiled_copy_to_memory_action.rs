@@ -20,7 +20,7 @@ impl ActionCompiler for CompiledCopyToMemoryAction {
         pipeline: &Arc<ArcPipeline>,
         stage: &Arc<ArcPipelineStage>,
         unit: &Arc<ArcPipelineUnit>,
-        action: &ArcCopyToMemoryAction,
+        action: &Arc<ArcCopyToMemoryAction>,
         topic_schemas: &mut HashMap<Arc<TopicId>, Arc<TopicSchema>>,
         tenant_id: &Arc<TenantId>,
     ) -> StdR<Self> {

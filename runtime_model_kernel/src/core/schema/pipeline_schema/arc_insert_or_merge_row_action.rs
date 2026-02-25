@@ -21,7 +21,7 @@ pub struct ArcInsertOrMergeRowAction {
 impl ArcHelper for ArcInsertOrMergeRowAction {}
 
 impl ArcInsertOrMergeRowAction {
-    pub fn new(action: InsertOrMergeRowAction) -> StdR<Self> {
+    pub fn new(action: InsertOrMergeRowAction) -> StdR<Arc<Self>> {
         let action_id = Self::or_empty_str(action.action_id);
         let mapping = Self::must_vec(action.mapping, ArcMappingFactor::new, || {
             RuntimeModelKernelErrorCode::ActionMappingFactorMissed.msg(format!(
@@ -36,13 +36,13 @@ impl ArcInsertOrMergeRowAction {
             format!("Insert or merge row action[{}]", action_id)
         })?;
 
-        Ok(Self {
+        Ok(Arc::new(Self {
             action_id,
             r#type: Arc::new(PipelineActionType::InsertOrMergeRow),
             accumulate_mode: Arc::new(action.accumulate_mode.unwrap_or(AccumulateMode::Standard)),
             mapping,
             topic_id,
             by,
-        })
+        }))
     }
 }
