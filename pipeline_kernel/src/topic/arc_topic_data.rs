@@ -32,7 +32,7 @@ where
     }
 }
 
-pub const BIG_DECIMAL_TOKEN: &str = "$serde_json::private::RawValue";
+pub const BIG_DECIMAL_TOKEN: &str = "$elf::private::BigDecimal";
 
 impl Serialize for ArcTopicDataValue {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
