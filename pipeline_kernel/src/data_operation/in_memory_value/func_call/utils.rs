@@ -1,7 +1,7 @@
 use crate::{ArcFrom, ArcTopicDataValue, InMemoryFuncCall};
 use bigdecimal::BigDecimal;
 use chrono::NaiveDate;
-use elf_base::{DateTimeUtils, StdR, StringConverter};
+use elf_base::{DateTimeUtils, StdR, StringConverterFrom};
 use std::ops::Deref;
 use std::sync::Arc;
 

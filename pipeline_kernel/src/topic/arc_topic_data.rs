@@ -1,12 +1,14 @@
 use bigdecimal::BigDecimal;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-use elf_base::DisplayLines;
+use elf_base::{DisplayLines, StringConverterFrom};
+use serde::ser::{SerializeMap, SerializeSeq, SerializeStruct};
+use serde::{Serialize, Serializer};
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::ops::Deref;
 use std::sync::Arc;
 
-/// make every [Arc].
+/// make everything [Arc].
 #[derive(Debug, Clone)]
 pub enum ArcTopicDataValue {
     DateTime(Arc<NaiveDateTime>),
@@ -18,6 +20,59 @@ pub enum ArcTopicDataValue {
     Map(Arc<HashMap<String, Arc<ArcTopicDataValue>>>),
     Vec(Arc<Vec<Arc<ArcTopicDataValue>>>),
     None,
+}
+
+fn iterator_len_hint<I>(iter: &I) -> Option<usize>
+where
+    I: Iterator,
+{
+    match iter.size_hint() {
+        (lo, Some(hi)) if lo == hi => Some(lo),
+        _ => None,
+    }
+}
+
+pub const BIG_DECIMAL_TOKEN: &str = "$serde_json::private::RawValue";
+
+impl Serialize for ArcTopicDataValue {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            Self::None => serializer.serialize_none(),
+            Self::Str(s) => serializer.serialize_str(s),
+            Self::Bool(b) => serializer.serialize_bool(*b),
+            Self::Num(n) => {
+                let mut serializer = serializer.serialize_struct(BIG_DECIMAL_TOKEN, 1)?;
+                serializer.serialize_field(BIG_DECIMAL_TOKEN, n.to_plain_string().as_str())?;
+                serializer.end()
+            }
+            Self::DateTime(dt) => serializer.serialize_str(String::from_datetime(dt).as_str()),
+            Self::Date(d) => serializer.serialize_str(String::from_date(d).as_str()),
+            Self::Time(t) => serializer.serialize_str(String::from_time(t).as_str()),
+            Self::Vec(vec) => {
+                let mut iter = vec.deref().into_iter();
+                let mut serializer = serializer.serialize_seq(iterator_len_hint(&iter))?;
+                match iter.try_for_each(|item| serializer.serialize_element(item.deref())) {
+                    Ok(val) => val,
+                    Err(err) => return Err(err),
+                }
+                serializer.end()
+            }
+            Self::Map(map) => {
+                let mut iter = map.deref().into_iter();
+                let mut serializer = serializer.serialize_map(iterator_len_hint(&iter))?;
+                match iter
+                    .try_for_each(|(key, value)| serializer.serialize_entry(&key, value.deref()))
+                {
+                    Ok(val) => val,
+                    Err(err) => return Err(err),
+                }
+                serializer.end()
+            }
+        }
+    }
 }
 
 pub trait ArcFrom<T>: Sized + From<T> {

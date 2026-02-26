@@ -7,6 +7,10 @@ use bigdecimal::{BigDecimal, Signed, ToPrimitive};
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use std::fmt::Display;
 
+pub const DEFAULT_DATETIME_FORMAT: &str = "%Y-%m-%d %H:%M:%S";
+pub const DEFAULT_DATE_FORMAT: &str = "%Y-%m-%d";
+pub const DEFAULT_TIME_FORMAT: &str = "%H:%M:%S";
+
 pub trait DateTimeUtils {
     fn to_date(&self) -> StdR<NaiveDate>;
     /// to date, when string can be [to_date] or [to_datetime],

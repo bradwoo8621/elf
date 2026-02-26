@@ -1,6 +1,6 @@
 use crate::{ArcTopicDataValue, InMemoryFuncCall};
 use bigdecimal::{BigDecimal, FromPrimitive, Zero};
-use elf_base::{StdR, StringConverter};
+use elf_base::{StdR, StringConverterFrom};
 use std::ops::Deref;
 use std::sync::Arc;
 

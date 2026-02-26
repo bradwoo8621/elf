@@ -1,3 +1,4 @@
+use crate::{StringConverterFrom, StringConverterTo};
 use chrono::NaiveTime;
 use serde::de::Error;
 use serde::{Deserialize, Deserializer, Serializer};
@@ -7,7 +8,7 @@ pub fn serialize<S: Serializer>(
     serializer: S,
 ) -> Result<S::Ok, S::Error> {
     match time {
-        Some(time) => serializer.serialize_str(&time.format("%H:%M:%S").to_string()),
+        Some(time) => serializer.serialize_str(&String::from_time(time)),
         _ => serializer.serialize_none(),
     }
 }
@@ -18,9 +19,7 @@ where
 {
     let s: Option<&str> = Option::deserialize(deserializer)?;
     if let Some(s) = s {
-        Ok(Some(
-            NaiveTime::parse_from_str(s, "%H:%M:%S").map_err(Error::custom)?,
-        ))
+        Ok(Some(s.to_time().map_err(Error::custom)?))
     } else {
         Ok(None)
     }

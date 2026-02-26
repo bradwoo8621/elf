@@ -1,5 +1,5 @@
 use crate::ArcTopicDataValue;
-use elf_base::StringConverter;
+use elf_base::StringConverterFrom;
 use elf_model::{MonitorLogDataValue, PipelineTopicData};
 use std::collections::HashMap;
 use std::ops::Deref;

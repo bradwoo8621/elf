@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use crate::{ArcTopicDataValue, FuncDataPath, InMemoryFuncCall, PathStr};
+    use crate::{ArcFrom, ArcTopicDataValue, FuncDataPath, InMemoryFuncCall, PathStr};
     use bigdecimal::BigDecimal;
-    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+    use elf_base::StringConverterTo;
     use elf_model::VariablePredefineFunctions;
     use std::ops::Deref;
     use std::str::FromStr;
@@ -23,21 +23,15 @@ mod tests {
     }
 
     fn create_date(value: &str) -> Arc<ArcTopicDataValue> {
-        Arc::new(ArcTopicDataValue::Date(Arc::new(
-            NaiveDate::parse_from_str(value, "%Y-%m-%d").unwrap(),
-        )))
+        ArcTopicDataValue::arc_from(value.to_date().unwrap())
     }
 
     fn create_datetime(value: &str) -> Arc<ArcTopicDataValue> {
-        Arc::new(ArcTopicDataValue::DateTime(Arc::new(
-            NaiveDateTime::parse_from_str(value, "%Y-%m-%d %H:%M:%S").unwrap(),
-        )))
+        ArcTopicDataValue::arc_from(value.to_datetime().unwrap())
     }
 
     fn create_time(value: &str) -> Arc<ArcTopicDataValue> {
-        Arc::new(ArcTopicDataValue::Time(Arc::new(
-            NaiveTime::parse_from_str(value, "%H:%M:%S").unwrap(),
-        )))
+        ArcTopicDataValue::arc_from(value.to_time().unwrap())
     }
 
     #[allow(dead_code)]
@@ -416,10 +410,7 @@ mod tests {
         assert!(matches!(result.deref(), ArcTopicDataValue::Date(_)));
 
         if let ArcTopicDataValue::Date(date) = result.deref() {
-            assert_eq!(
-                date.deref(),
-                &NaiveDate::parse_from_str("2024-01-03", "%Y-%m-%d").unwrap()
-            );
+            assert_eq!(date.deref(), &"2024-01-03".to_date().unwrap());
         }
     }
 
@@ -436,10 +427,7 @@ mod tests {
         assert!(matches!(result.deref(), ArcTopicDataValue::DateTime(_)));
 
         if let ArcTopicDataValue::DateTime(dt) = result.deref() {
-            assert_eq!(
-                dt.deref(),
-                &NaiveDateTime::parse_from_str("2024-01-01 11:00:00", "%Y-%m-%d %H:%M:%S").unwrap()
-            );
+            assert_eq!(dt.deref(), &"2024-01-01 11:00:00".to_datetime().unwrap());
         }
     }
 
@@ -457,10 +445,7 @@ mod tests {
         assert!(matches!(result.deref(), ArcTopicDataValue::Time(_)));
 
         if let ArcTopicDataValue::Time(time) = result.deref() {
-            assert_eq!(
-                time.deref(),
-                &NaiveTime::parse_from_str("12:00:00", "%H:%M:%S").unwrap()
-            );
+            assert_eq!(time.deref(), &"12:00:00".to_time().unwrap());
         }
     }
 
@@ -514,10 +499,7 @@ mod tests {
         assert!(matches!(result.deref(), ArcTopicDataValue::Date(_)));
 
         if let ArcTopicDataValue::Date(date) = result.deref() {
-            assert_eq!(
-                date.deref(),
-                &NaiveDate::parse_from_str("2024-01-01", "%Y-%m-%d").unwrap()
-            );
+            assert_eq!(date.deref(), &"2024-01-01".to_date().unwrap());
         }
     }
 
@@ -534,10 +516,7 @@ mod tests {
         assert!(matches!(result.deref(), ArcTopicDataValue::DateTime(_)));
 
         if let ArcTopicDataValue::DateTime(dt) = result.deref() {
-            assert_eq!(
-                dt.deref(),
-                &NaiveDateTime::parse_from_str("2024-01-01 10:00:00", "%Y-%m-%d %H:%M:%S").unwrap()
-            );
+            assert_eq!(dt.deref(), &"2024-01-01 10:00:00".to_datetime().unwrap());
         }
     }
 
@@ -555,10 +534,7 @@ mod tests {
         assert!(matches!(result.deref(), ArcTopicDataValue::Time(_)));
 
         if let ArcTopicDataValue::Time(time) = result.deref() {
-            assert_eq!(
-                time.deref(),
-                &NaiveTime::parse_from_str("10:00:00", "%H:%M:%S").unwrap()
-            );
+            assert_eq!(time.deref(), &"10:00:00".to_time().unwrap());
         }
     }
 
@@ -678,8 +654,7 @@ mod tests {
             ArcTopicDataValue::DateTime(datetime) => {
                 assert_eq!(
                     datetime.deref(),
-                    &NaiveDateTime::parse_from_str("2025-02-02 00:00:00", "%Y-%m-%d %H:%M:%S")
-                        .unwrap()
+                    &"2025-02-02 00:00:00".to_datetime().unwrap()
                 );
             }
             _ => {}

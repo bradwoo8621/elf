@@ -1,5 +1,5 @@
 use crate::{ArcFrom, ArcTopicDataValue, InMemoryFuncCall};
-use elf_base::{StdR, StringConverter};
+use elf_base::{StdR, StringConverterFrom};
 use std::ops::Deref;
 use std::sync::Arc;
 

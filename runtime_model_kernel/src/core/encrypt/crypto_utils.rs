@@ -1,5 +1,5 @@
 use crate::RuntimeModelKernelErrorCode;
-use elf_base::{ErrorCode, StdR};
+use elf_base::{ErrorCode, StdR, StringConverterFrom};
 use elf_model::TopicDataValue;
 
 pub struct CryptoUtils;
@@ -72,36 +72,9 @@ impl CryptoUtils {
             .expect("Failed to get value from StdR<>.")
             .expect("Failed to get value from Option<>.");
         match value {
-            TopicDataValue::Date(d) => d.format("%Y-%m-%d").to_string(),
-            TopicDataValue::DateTime(dt) => dt.format("%Y-%m-%d").to_string(),
+            TopicDataValue::Date(d) => String::from_date(&d),
+            TopicDataValue::DateTime(dt) => String::from_datetime(&dt),
             _ => panic!("Value from TopicDataValue is not date or datetime."),
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-
-    #[test]
-    fn test() {
-        assert_eq!(
-            NaiveDateTime::parse_from_str("2026-01-08 01:02:03", "%Y-%m-%d %H:%M:%S")
-                .unwrap()
-                .to_string(),
-            "2026-01-08 01:02:03"
-        );
-        assert_eq!(
-            NaiveDate::parse_from_str("2026-01-08", "%Y-%m-%d")
-                .unwrap()
-                .to_string(),
-            "2026-01-08"
-        );
-        assert_eq!(
-            NaiveTime::parse_from_str("01:02:03", "%H:%M:%S")
-                .unwrap()
-                .to_string(),
-            "01:02:03"
-        );
     }
 }

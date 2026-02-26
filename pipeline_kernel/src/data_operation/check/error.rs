@@ -1,5 +1,5 @@
 use crate::{ArcTopicDataValue, PipelineKernelErrorCode};
-use elf_base::{ErrorCode, StdR, StringConverter};
+use elf_base::{ErrorCode, StdR, StringConverterFrom};
 
 impl ArcTopicDataValue {
     pub fn display_in_error(value: &ArcTopicDataValue) -> String {

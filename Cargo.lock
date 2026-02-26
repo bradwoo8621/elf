@@ -352,6 +352,7 @@ dependencies = [
  "elf_runtime_model_kernel",
  "num_cpus",
  "paste",
+ "serde",
  "tokio",
 ]
 
