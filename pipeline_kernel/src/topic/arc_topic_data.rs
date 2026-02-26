@@ -1,8 +1,9 @@
 use bigdecimal::BigDecimal;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use elf_base::{DisplayLines, StringConverterFrom};
-use serde::ser::{SerializeMap, SerializeSeq, SerializeStruct};
+use serde::ser::{Error, SerializeMap, SerializeSeq};
 use serde::{Serialize, Serializer};
+use serde_json::value::RawValue;
 use std::collections::HashMap;
 use std::fmt::{Display, Formatter};
 use std::ops::Deref;
@@ -32,8 +33,6 @@ where
     }
 }
 
-pub const BIG_DECIMAL_TOKEN: &str = "$elf::private::BigDecimal";
-
 impl Serialize for ArcTopicDataValue {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -44,9 +43,8 @@ impl Serialize for ArcTopicDataValue {
             Self::Str(s) => serializer.serialize_str(s),
             Self::Bool(b) => serializer.serialize_bool(*b),
             Self::Num(n) => {
-                let mut serializer = serializer.serialize_struct(BIG_DECIMAL_TOKEN, 1)?;
-                serializer.serialize_field(BIG_DECIMAL_TOKEN, n.to_plain_string().as_str())?;
-                serializer.end()
+                let value = RawValue::from_string(format!("{}", n)).map_err(S::Error::custom)?;
+                value.serialize(serializer)
             }
             Self::DateTime(dt) => serializer.serialize_str(String::from_datetime(dt).as_str()),
             Self::Date(d) => serializer.serialize_str(String::from_date(d).as_str()),
@@ -271,3 +269,255 @@ impl Display for ArcTopicDataValue {
 
 pub type ArcTopicDataMap = HashMap<String, Arc<ArcTopicDataValue>>;
 pub type ArcTopicData = Arc<ArcTopicDataMap>;
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use bigdecimal::BigDecimal;
+	use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+	use elf_base::StringConverterTo;
+	use serde_json;
+
+	#[test]
+    fn test_serialize_none() {
+        let value = ArcTopicDataValue::None;
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "null");
+    }
+
+    #[test]
+    fn test_serialize_bool_true() {
+        let value = ArcTopicDataValue::Bool(true);
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "true");
+    }
+
+    #[test]
+    fn test_serialize_bool_false() {
+        let value = ArcTopicDataValue::Bool(false);
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "false");
+    }
+
+    #[test]
+    fn test_serialize_string() {
+        let value = ArcTopicDataValue::Str(Arc::new("hello".to_string()));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "\"hello\"");
+    }
+
+    #[test]
+    fn test_serialize_string_with_special_chars() {
+        let value = ArcTopicDataValue::Str(Arc::new("hello\nworld".to_string()));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "\"hello\\nworld\"");
+    }
+
+    #[test]
+    fn test_serialize_number() {
+        let value = ArcTopicDataValue::Num(Arc::new(BigDecimal::from(123)));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "123");
+    }
+
+    #[test]
+    fn test_serialize_number_decimal() {
+        let value = ArcTopicDataValue::Num(Arc::new(BigDecimal::from(1234567890i64)));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "1234567890");
+    }
+
+    #[test]
+    fn test_serialize_datetime() {
+        let dt = "2024-01-15 10:30:00".to_datetime().unwrap();
+        let value = ArcTopicDataValue::DateTime(Arc::new(dt));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "\"2024-01-15 10:30:00\"");
+    }
+
+    #[test]
+    fn test_serialize_date() {
+        let d = "2024-01-15".to_date().unwrap();
+        let value = ArcTopicDataValue::Date(Arc::new(d));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "\"2024-01-15\"");
+    }
+
+    #[test]
+    fn test_serialize_time() {
+        let t = "10:30:45".to_time().unwrap();
+        let value = ArcTopicDataValue::Time(Arc::new(t));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "\"10:30:45\"");
+    }
+
+    #[test]
+    fn test_serialize_empty_vec() {
+        let value = ArcTopicDataValue::Vec(Arc::new(vec![]));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "[]");
+    }
+
+    #[test]
+    fn test_serialize_vec_single_element() {
+        let value = ArcTopicDataValue::Vec(Arc::new(vec![Arc::new(ArcTopicDataValue::Str(
+            Arc::new("test".to_string()),
+        ))]));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "[\"test\"]");
+    }
+
+    #[test]
+    fn test_serialize_vec_multiple_elements() {
+        let value = ArcTopicDataValue::Vec(Arc::new(vec![
+            Arc::new(ArcTopicDataValue::Str(Arc::new("a".to_string()))),
+            Arc::new(ArcTopicDataValue::Num(Arc::new(BigDecimal::from(1)))),
+            Arc::new(ArcTopicDataValue::Bool(true)),
+        ]));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "[\"a\",1,true]");
+    }
+
+    #[test]
+    fn test_serialize_nested_vec() {
+        let inner_vec = Arc::new(vec![Arc::new(ArcTopicDataValue::Str(Arc::new(
+            "nested".to_string(),
+        )))]);
+        let value =
+            ArcTopicDataValue::Vec(Arc::new(vec![Arc::new(ArcTopicDataValue::Vec(inner_vec))]));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "[[\"nested\"]]");
+    }
+
+    #[test]
+    fn test_serialize_empty_map() {
+        let value = ArcTopicDataValue::Map(Arc::new(HashMap::new()));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "{}");
+    }
+
+    #[test]
+    fn test_serialize_map_single_entry() {
+        let mut map = HashMap::new();
+        map.insert(
+            "key".to_string(),
+            Arc::new(ArcTopicDataValue::Str(Arc::new("value".to_string()))),
+        );
+        let value = ArcTopicDataValue::Map(Arc::new(map));
+        let json = serde_json::to_string(&value).unwrap();
+        assert_eq!(json, "{\"key\":\"value\"}");
+    }
+
+    #[test]
+    fn test_serialize_map_multiple_entries() {
+        let mut map = HashMap::new();
+        map.insert(
+            "name".to_string(),
+            Arc::new(ArcTopicDataValue::Str(Arc::new("test".to_string()))),
+        );
+        map.insert(
+            "count".to_string(),
+            Arc::new(ArcTopicDataValue::Num(Arc::new(BigDecimal::from(42)))),
+        );
+        map.insert(
+            "active".to_string(),
+            Arc::new(ArcTopicDataValue::Bool(true)),
+        );
+        let value = ArcTopicDataValue::Map(Arc::new(map));
+        let json = serde_json::to_string(&value).unwrap();
+        assert!(json.contains("\"name\":\"test\""));
+        assert!(json.contains("\"count\":42"));
+        assert!(json.contains("\"active\":true"));
+    }
+
+    #[test]
+    fn test_serialize_nested_map() {
+        let mut inner_map = HashMap::new();
+        inner_map.insert(
+            "inner_key".to_string(),
+            Arc::new(ArcTopicDataValue::Num(Arc::new(BigDecimal::from(1)))),
+        );
+
+        let mut outer_map = HashMap::new();
+        outer_map.insert(
+            "outer".to_string(),
+            Arc::new(ArcTopicDataValue::Map(Arc::new(inner_map))),
+        );
+
+        let value = ArcTopicDataValue::Map(Arc::new(outer_map));
+        let json = serde_json::to_string(&value).unwrap();
+        assert!(json.contains("\"outer\":{"));
+        assert!(json.contains("\"inner_key\":1"));
+    }
+
+    #[test]
+    fn test_serialize_complex_nested() {
+        let mut inner_map = HashMap::new();
+        inner_map.insert(
+            "value".to_string(),
+            Arc::new(ArcTopicDataValue::Num(Arc::new(BigDecimal::from(100)))),
+        );
+
+        let vec_with_map = Arc::new(vec![Arc::new(ArcTopicDataValue::Map(Arc::new(inner_map)))]);
+
+        let mut outer_map = HashMap::new();
+        outer_map.insert(
+            "items".to_string(),
+            Arc::new(ArcTopicDataValue::Vec(vec_with_map)),
+        );
+        outer_map.insert(
+            "name".to_string(),
+            Arc::new(ArcTopicDataValue::Str(Arc::new("complex".to_string()))),
+        );
+
+        let value = ArcTopicDataValue::Map(Arc::new(outer_map));
+        let json = serde_json::to_string(&value).unwrap();
+        assert!(json.contains("\"name\":\"complex\""));
+        assert!(json.contains("\"items\":["));
+    }
+
+    #[test]
+    fn test_serialize_all_types_together() {
+        let dt = NaiveDateTime::parse_from_str("2024-06-15 14:30:00", "%Y-%m-%d %H:%M:%S").unwrap();
+        let d = NaiveDate::parse_from_str("2024-06-15", "%Y-%m-%d").unwrap();
+        let t = NaiveTime::parse_from_str("14:30:00", "%H:%M:%S").unwrap();
+
+        let mut map = HashMap::new();
+        map.insert(
+            "str_field".to_string(),
+            Arc::new(ArcTopicDataValue::Str(Arc::new("hello".to_string()))),
+        );
+        map.insert(
+            "num_field".to_string(),
+            Arc::new(ArcTopicDataValue::Num(Arc::new(BigDecimal::from(42)))),
+        );
+        map.insert(
+            "bool_field".to_string(),
+            Arc::new(ArcTopicDataValue::Bool(true)),
+        );
+        map.insert(
+            "datetime_field".to_string(),
+            Arc::new(ArcTopicDataValue::DateTime(Arc::new(dt))),
+        );
+        map.insert(
+            "date_field".to_string(),
+            Arc::new(ArcTopicDataValue::Date(Arc::new(d))),
+        );
+        map.insert(
+            "time_field".to_string(),
+            Arc::new(ArcTopicDataValue::Time(Arc::new(t))),
+        );
+        map.insert("null_field".to_string(), Arc::new(ArcTopicDataValue::None));
+
+        let value = ArcTopicDataValue::Map(Arc::new(map));
+        let json = serde_json::to_string(&value).unwrap();
+
+        assert!(json.contains("\"str_field\":\"hello\""));
+        assert!(json.contains("\"num_field\":42"));
+        assert!(json.contains("\"bool_field\":true"));
+        assert!(json.contains("\"datetime_field\":\"2024-06-15 14:30:00\""));
+        assert!(json.contains("\"date_field\":\"2024-06-15\""));
+        assert!(json.contains("\"time_field\":\"14:30:00\""));
+        assert!(json.contains("\"null_field\":null"));
+    }
+}

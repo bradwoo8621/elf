@@ -1,5 +1,5 @@
 use crate::RuntimeModelKernelErrorCode;
-use elf_base::{ErrorCode, StdR, StringConverterFrom};
+use elf_base::{ErrorCode, StdR};
 use elf_model::TopicDataValue;
 
 pub struct CryptoUtils;
@@ -68,6 +68,8 @@ impl CryptoUtils {
 
     #[cfg(test)]
     pub fn get_date_str(value: StdR<Option<TopicDataValue>>) -> String {
+        use elf_base::StringConverterFrom;
+
         let value = value
             .expect("Failed to get value from StdR<>.")
             .expect("Failed to get value from Option<>.");
