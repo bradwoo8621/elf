@@ -18,16 +18,3 @@ pub fn serialize<S: Serializer>(
         _ => serializer.serialize_none(),
     }
 }
-
-// TODO deserializer of Option<ArcTopicData>
-// pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<ArcTopicData>, D::Error>
-// where
-//     D: Deserializer<'de>,
-// {
-//     let s: Option<ArcTopicDataMap> = Option::deserialize(deserializer)?;
-//     if let Some(s) = s {
-//         Ok(Some(Arc::new(s.to_owned())))
-//     } else {
-//         Ok(None)
-//     }
-// }

@@ -1,12 +1,11 @@
 use crate::{
     CompiledPipeline, CompiledStage, CompiledUnitRunner, InMemoryData, PipelineExecutionTask,
-    UnitRunResult,
+    StageExecuteLog, UnitExecuteLog, UnitRunResult,
 };
 use chrono::{NaiveDateTime, Utc};
 use elf_auth::Principal;
 use elf_base::{StdErr, StdR};
-use elf_model::{MonitorLogStatus, StageMonitorLog, UnitMonitorLog};
-use std::ops::Deref;
+use elf_model::MonitorLogStatus;
 use std::sync::Arc;
 
 pub struct CompiledStageRunner {
@@ -19,7 +18,7 @@ pub struct CompiledStageRunner {
 
 pub struct StageRunResult {
     pub created_tasks: Option<Vec<PipelineExecutionTask>>,
-    pub log: StageMonitorLog,
+    pub log: StageExecuteLog,
 }
 
 impl CompiledStageRunner {
@@ -48,33 +47,33 @@ impl CompiledStageRunner {
         &self,
         prerequisite: bool,
         // the bool is all units are run or not
-        unit_logs: Option<(Vec<UnitMonitorLog>, bool)>,
+        unit_logs: Option<(Vec<UnitExecuteLog>, bool)>,
         error: Option<StdErr>,
-    ) -> StageMonitorLog {
+    ) -> StageExecuteLog {
         let spent_in_mills =
             (Utc::now().timestamp() - self.start_time.and_utc().timestamp()) as u32;
 
         let (unit_logs, all_unit_accomplished) =
             if let Some((unit_logs, all_unit_accomplished)) = unit_logs {
-                (Some(unit_logs), all_unit_accomplished)
+                (unit_logs, all_unit_accomplished)
             } else {
-                (None, true)
+                (vec![], true)
             };
         let status = if !all_unit_accomplished || error.is_some() {
-            Some(MonitorLogStatus::ERROR)
+            MonitorLogStatus::ERROR
         } else {
-            Some(MonitorLogStatus::DONE)
+            MonitorLogStatus::DONE
         };
 
-        StageMonitorLog {
-            stage_id: Some(self.compiled_stage.stage().stage_id.deref().clone()),
-            name: Some(self.compiled_stage.stage().name.deref().clone()),
+        StageExecuteLog {
+            stage_id: self.compiled_stage.stage().stage_id.clone(),
+            name: self.compiled_stage.stage().name.clone(),
             prerequisite_defined_as: self.compiled_stage.conditional().defined_as(),
             status,
-            start_time: Some(self.start_time),
-            spent_in_mills: Some(spent_in_mills),
+            start_time: self.start_time,
+            spent_in_mills,
             error: error.map(|e| format!("{}", e)),
-            prerequisite: Some(prerequisite),
+            prerequisite,
             units: unit_logs,
         }
     }
@@ -106,7 +105,7 @@ impl CompiledStageRunner {
                         }
                         // check there is any error occurred in stage running
                         let has_error = match log.status {
-                            Some(MonitorLogStatus::ERROR) => true,
+                            MonitorLogStatus::ERROR => true,
                             _ => false,
                         };
                         unit_logs.push(log);

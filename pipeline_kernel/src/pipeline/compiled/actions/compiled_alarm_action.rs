@@ -1,4 +1,6 @@
-use crate::{ActionCompiler, CompiledAction, CompiledConditional, DataPath};
+use crate::{
+    generate_compiled_action, ActionCompiler, CompiledAction, CompiledConditional, DataPath,
+};
 use elf_base::StdR;
 use elf_model::{AlarmActionSeverity, TenantId, TopicId};
 use elf_runtime_model_kernel::{
@@ -8,34 +10,13 @@ use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct CompiledAlarmAction {
-    pipeline: Arc<ArcPipeline>,
-    stage: Arc<ArcPipelineStage>,
-    unit: Arc<ArcPipelineUnit>,
-    action: Arc<ArcAlarmAction>,
-
+generate_compiled_action!(Alarm {
     conditional: Option<CompiledConditional>,
     severity: Arc<AlarmActionSeverity>,
     message: Option<DataPath>,
-}
+});
 
 impl CompiledAlarmAction {
-    pub fn pipeline(&self) -> &Arc<ArcPipeline> {
-        &self.pipeline
-    }
-
-    pub fn stage(&self) -> &Arc<ArcPipelineStage> {
-        &self.stage
-    }
-
-    pub fn unit(&self) -> &Arc<ArcPipelineUnit> {
-        &self.unit
-    }
-
-    pub fn action(&self) -> &Arc<ArcAlarmAction> {
-        &self.action
-    }
-
     pub fn conditional(&self) -> &Option<CompiledConditional> {
         &self.conditional
     }

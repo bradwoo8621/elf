@@ -1,21 +1,19 @@
-use crate::{
-    ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledMappingFactor,
-    CompiledParameterJoint,
-};
+use crate::{generate_compiled_action, ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledMappingFactor, CompiledParameterJoint};
 use elf_base::StdR;
 use elf_model::{AccumulateMode, TenantId, TopicId};
 use elf_runtime_model_kernel::{
-    ArcMergeRowAction, ArcPipeline, ArcPipelineStage, ArcPipelineUnit, TopicSchema,
+    ArcMergeRowAction, ArcPipeline, ArcPipelineStage, ArcPipelineUnit,
+    TopicSchema,
 };
 use std::collections::HashMap;
 use std::sync::Arc;
 
-pub struct CompiledMergeRowAction {
+generate_compiled_action!(MergeRow {
     target_topic_schema: Arc<TopicSchema>,
     factor_mapping: Vec<CompiledMappingFactor>,
     target_criteria: CompiledParameterJoint,
     accumulate_mode: AccumulateMode,
-}
+});
 
 impl ActionCompiler for CompiledMergeRowAction {
     type SourceAction = ArcMergeRowAction;
@@ -41,6 +39,11 @@ impl ActionCompiler for CompiledMergeRowAction {
         let accumulate_mode = ActionCompilerHelper::unwrap_accumulate_mode(&action.accumulate_mode);
 
         Ok(Self {
+            pipeline: pipeline.clone(),
+            stage: stage.clone(),
+            unit: unit.clone(),
+            action: action.clone(),
+
             target_topic_schema,
             factor_mapping,
             target_criteria,

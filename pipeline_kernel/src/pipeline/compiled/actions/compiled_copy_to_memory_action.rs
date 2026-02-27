@@ -1,4 +1,7 @@
-use crate::{ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameter, DataPath};
+use crate::{
+    generate_compiled_action, ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameter,
+    DataPath,
+};
 use elf_base::StdR;
 use elf_model::{TenantId, TopicId};
 use elf_runtime_model_kernel::{
@@ -8,10 +11,10 @@ use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct CompiledCopyToMemoryAction {
+generate_compiled_action!(CopyToMemory {
     variable_path: DataPath,
     source: CompiledParameter,
-}
+});
 
 impl ActionCompiler for CompiledCopyToMemoryAction {
     type SourceAction = ArcCopyToMemoryAction;
@@ -32,6 +35,11 @@ impl ActionCompiler for CompiledCopyToMemoryAction {
         let source = CompiledParameter::compile(&action.source, topic_schemas, tenant_id)?;
 
         Ok(Self {
+            pipeline: pipeline.clone(),
+            stage: stage.clone(),
+            unit: unit.clone(),
+            action: action.clone(),
+
             variable_path,
             source,
         })

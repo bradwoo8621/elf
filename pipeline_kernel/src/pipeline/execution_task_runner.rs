@@ -3,7 +3,6 @@ use crate::{
 };
 use elf_base::StdR;
 use elf_runtime_model_kernel::PipelineService;
-use std::ops::Deref;
 
 pub struct PipelineExecutionTaskRunner;
 
@@ -20,10 +19,10 @@ impl PipelineExecutionTaskRunner {
                 topic_data.previous_data().clone(),
                 topic_data.current_data().clone(),
             ),
-            topic_data.topic_data_id().deref(),
+            topic_data.topic_data_id().clone(),
             compiled_pipeline.clone(),
             task.principal().clone(),
-            task.trace_id().deref(),
+            task.trace_id().clone(),
             task.async_monitor_log(),
         )
         .await;

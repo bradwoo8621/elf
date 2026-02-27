@@ -1,22 +1,21 @@
-use crate::{
-    ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint, DataPath,
-};
+use crate::{generate_compiled_action, ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint, DataPath};
 use elf_base::StdR;
 use elf_model::{AggregateArithmetic, TenantId, TopicId};
 use elf_runtime_model_kernel::{
-    ArcFactor, ArcPipeline, ArcPipelineStage, ArcPipelineUnit, ArcReadFactorAction, TopicSchema,
+    ArcFactor, ArcPipeline, ArcPipelineStage, ArcPipelineUnit,
+    ArcReadFactorAction, TopicSchema,
 };
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct CompiledReadFactorAction {
+generate_compiled_action!(ReadFactor {
     variable_path: DataPath,
     source_topic_schema: Arc<TopicSchema>,
     source_factor: Arc<ArcFactor>,
     source_criteria: CompiledParameterJoint,
     aggregate_arithmetic: AggregateArithmetic,
-}
+});
 
 impl ActionCompiler for CompiledReadFactorAction {
     type SourceAction = ArcReadFactorAction;
@@ -44,6 +43,11 @@ impl ActionCompiler for CompiledReadFactorAction {
             ActionCompilerHelper::unwrap_aggregate_arithmetic(&action.arithmetic);
 
         Ok(Self {
+            pipeline: pipeline.clone(),
+            stage: stage.clone(),
+            unit: unit.clone(),
+            action: action.clone(),
+
             variable_path,
             source_topic_schema,
             source_factor,

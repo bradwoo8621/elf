@@ -3,7 +3,6 @@ use elf_base::{StdR, StringUtils};
 use elf_model::{TenantId, TopicId};
 use elf_runtime_model_kernel::{ArcPipeline, ArcPipelineStage, ArcPipelineUnit, TopicSchema};
 use std::collections::HashMap;
-use std::ops::Deref;
 use std::sync::Arc;
 
 pub struct CompiledUnit {
@@ -12,7 +11,7 @@ pub struct CompiledUnit {
     unit: Arc<ArcPipelineUnit>,
 
     conditional: CompiledConditional,
-    loop_variable_name: Option<String>,
+    loop_variable_name: Option<Arc<String>>,
     actions: Vec<Arc<CompiledAction>>,
 }
 
@@ -28,7 +27,7 @@ impl CompiledUnit {
             CompiledConditional::compile(&unit.on, topic_schemas, tenant_id)?;
         let loop_variable_name = if let Some(loop_variable_name) = &unit.loop_variable_name {
             if loop_variable_name.is_not_blank() {
-                Some(loop_variable_name.deref().clone())
+                Some(loop_variable_name.clone())
             } else {
                 None
             }
@@ -74,7 +73,7 @@ impl CompiledUnit {
         self.loop_variable_name.is_some()
     }
 
-    pub fn loop_variable_name(&self) -> &Option<String> {
+    pub fn loop_variable_name(&self) -> &Option<Arc<String>> {
         &self.loop_variable_name
     }
 

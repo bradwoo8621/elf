@@ -1,21 +1,20 @@
-use crate::{
-    ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint, DataPath,
-};
+use crate::{generate_compiled_action, ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint, DataPath};
 use elf_base::StdR;
 use elf_model::{TenantId, TopicId};
 use elf_runtime_model_kernel::{
-    ArcFactor, ArcPipeline, ArcPipelineStage, ArcPipelineUnit, ArcReadFactorsAction, TopicSchema,
+    ArcFactor, ArcPipeline, ArcPipelineStage, ArcPipelineUnit,
+    ArcReadFactorsAction, TopicSchema,
 };
 use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct CompiledReadFactorsAction {
+generate_compiled_action!(ReadFactors {
     variable_path: DataPath,
     source_topic_schema: Arc<TopicSchema>,
     source_factor: Arc<ArcFactor>,
     source_criteria: CompiledParameterJoint,
-}
+});
 
 impl ActionCompiler for CompiledReadFactorsAction {
     type SourceAction = ArcReadFactorsAction;
@@ -41,6 +40,11 @@ impl ActionCompiler for CompiledReadFactorsAction {
             CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
 
         Ok(Self {
+            pipeline: pipeline.clone(),
+            stage: stage.clone(),
+            unit: unit.clone(),
+            action: action.clone(),
+
             variable_path,
             source_topic_schema,
             source_factor,

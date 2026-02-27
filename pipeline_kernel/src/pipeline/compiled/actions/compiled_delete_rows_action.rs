@@ -1,4 +1,7 @@
-use crate::{ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint};
+use crate::{
+    generate_compiled_action, ActionCompiler, ActionCompilerHelper, CompiledAction,
+    CompiledParameterJoint,
+};
 use elf_base::StdR;
 use elf_model::{TenantId, TopicId};
 use elf_runtime_model_kernel::{
@@ -7,10 +10,10 @@ use elf_runtime_model_kernel::{
 use std::collections::HashMap;
 use std::sync::Arc;
 
-pub struct CompiledDeleteRowsAction {
+generate_compiled_action!(DeleteRows {
     target_topic_schema: Arc<TopicSchema>,
     target_criteria: CompiledParameterJoint,
-}
+});
 
 impl ActionCompiler for CompiledDeleteRowsAction {
     type SourceAction = ArcDeleteRowsAction;
@@ -29,6 +32,11 @@ impl ActionCompiler for CompiledDeleteRowsAction {
             CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
 
         Ok(Self {
+            pipeline: pipeline.clone(),
+            stage: stage.clone(),
+            unit: unit.clone(),
+            action: action.clone(),
+
             target_topic_schema,
             target_criteria,
         })

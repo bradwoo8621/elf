@@ -1,6 +1,4 @@
-use crate::{
-    ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint, DataPath,
-};
+use crate::{generate_compiled_action, ActionCompiler, ActionCompilerHelper, CompiledAction, CompiledParameterJoint, DataPath};
 use elf_base::StdR;
 use elf_model::{TenantId, TopicId};
 use elf_runtime_model_kernel::{
@@ -10,11 +8,11 @@ use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct CompiledReadRowsAction {
+generate_compiled_action!(ReadRows {
     variable_path: DataPath,
     source_topic_schema: Arc<TopicSchema>,
     source_criteria: CompiledParameterJoint,
-}
+});
 
 impl ActionCompiler for CompiledReadRowsAction {
     type SourceAction = ArcReadRowsAction;
@@ -38,6 +36,11 @@ impl ActionCompiler for CompiledReadRowsAction {
             CompiledParameterJoint::compile(&action.by, topic_schemas, tenant_id)?;
 
         Ok(Self {
+            pipeline: pipeline.clone(),
+            stage: stage.clone(),
+            unit: unit.clone(),
+            action: action.clone(),
+
             variable_path,
             source_topic_schema,
             source_criteria,

@@ -1,4 +1,4 @@
-use crate::{ActionCompiler, CompiledAction};
+use crate::{generate_compiled_action, ActionCompiler, CompiledAction};
 use elf_base::StdR;
 use elf_model::{TenantId, TopicId};
 use elf_runtime_model_kernel::{
@@ -7,7 +7,7 @@ use elf_runtime_model_kernel::{
 use std::collections::HashMap;
 use std::sync::Arc;
 
-pub struct CompiledWriteToExternalAction;
+generate_compiled_action!(WriteToExternal {});
 
 impl ActionCompiler for CompiledWriteToExternalAction {
     type SourceAction = ArcWriteToExternalAction;

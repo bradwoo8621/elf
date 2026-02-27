@@ -33,6 +33,10 @@ where
     }
 }
 
+/// serialize
+/// TIP It should be noted that [ArcTopicDataValue::Num] is serialized as a number (without double quotes),
+///  which differs from the default serialization behavior of [BigDecimal],
+///  which is when [json_num] is not specified, it is serialized as a string by default.
 impl Serialize for ArcTopicDataValue {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -272,13 +276,13 @@ pub type ArcTopicData = Arc<ArcTopicDataMap>;
 
 #[cfg(test)]
 mod tests {
-	use super::*;
-	use bigdecimal::BigDecimal;
-	use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-	use elf_base::StringConverterTo;
-	use serde_json;
+    use super::*;
+    use bigdecimal::BigDecimal;
+    use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+    use elf_base::StringConverterTo;
+    use serde_json;
 
-	#[test]
+    #[test]
     fn test_serialize_none() {
         let value = ArcTopicDataValue::None;
         let json = serde_json::to_string(&value).unwrap();

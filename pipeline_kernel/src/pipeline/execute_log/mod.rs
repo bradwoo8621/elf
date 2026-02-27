@@ -5,6 +5,7 @@ mod serde_arc_action_type;
 mod serde_arc_string;
 mod serde_option_arc_string;
 mod serde_option_arc_topic_data;
+mod serde_option_arc_topic_data_value;
 mod stage_execute_log;
 mod unit_execute_log;
 

@@ -1,5 +1,5 @@
 use crate::{
-    CompiledAction, CompiledAlarmActionRunner, CompiledCopyToMemoryActionRunner,
+    ActionExecuteLog, CompiledAction, CompiledAlarmActionRunner, CompiledCopyToMemoryActionRunner,
     CompiledDeleteRowActionRunner, CompiledDeleteRowsActionRunner, CompiledExistsActionRunner,
     CompiledInsertOrMergeRowActionRunner, CompiledInsertRowActionRunner,
     CompiledMergeRowActionRunner, CompiledPipeline, CompiledReadFactorActionRunner,
@@ -9,10 +9,6 @@ use crate::{
     SpecCompiledActionRunner,
 };
 use elf_auth::Principal;
-use elf_model::{
-    ActionMonitorLog, AlarmActionMonitorLog, CopyToMemoryActionMonitorLog, DeleteActionMonitorLog,
-    MonitorLogStatus, ReadActionMonitorLog, WriteActionMonitorLog, WriteToExternalActionMonitorLog,
-};
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -25,26 +21,7 @@ pub struct CompiledActionRunner {
 
 pub struct ActionRunResult {
     pub created_tasks: Option<Vec<PipelineExecutionTask>>,
-    pub log: ActionMonitorLog,
-}
-
-impl ActionRunResult {
-    pub fn has_error(log: &ActionMonitorLog) -> bool {
-        let status = match log {
-            ActionMonitorLog::Alarm(AlarmActionMonitorLog { status, .. }) => status,
-            ActionMonitorLog::CopyToMemory(CopyToMemoryActionMonitorLog { status, .. }) => status,
-            ActionMonitorLog::WriteToExternal(WriteToExternalActionMonitorLog {
-                status, ..
-            }) => status,
-            ActionMonitorLog::Write(WriteActionMonitorLog { status, .. }) => status,
-            ActionMonitorLog::Read(ReadActionMonitorLog { status, .. }) => status,
-            ActionMonitorLog::Delete(DeleteActionMonitorLog { status, .. }) => status,
-        };
-        match status {
-            Some(MonitorLogStatus::ERROR) => true,
-            _ => false,
-        }
-    }
+    pub log: ActionExecuteLog,
 }
 
 impl CompiledActionRunner {

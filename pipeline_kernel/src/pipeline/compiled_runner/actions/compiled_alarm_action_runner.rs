@@ -1,15 +1,11 @@
 use crate::{
-    create_spec_action_runner, ActionRunResult, CompiledAlarmAction, CompiledPipeline, CompiledStage, CompiledUnit,
-    DataPath, InMemoryData, SpecCompiledActionRunner,
+    create_spec_action_runner, ActionExecuteLog, ActionRunResult, CompiledAlarmAction, CompiledPipeline,
+    CompiledStage, CompiledUnit, DataPath, InMemoryData, SpecCompiledActionRunner,
 };
 use chrono::{NaiveDateTime, Utc};
 use elf_auth::Principal;
 use elf_base::{StdErr, StdR};
-use elf_model::{
-    ActionMonitorLog, AlarmActionMonitorLog, AlarmActionSeverity, MonitorLogStatus,
-    PipelineActionType,
-};
-use std::ops::Deref;
+use elf_model::{AlarmActionSeverity, MonitorLogStatus};
 use std::sync::Arc;
 
 create_spec_action_runner!(CompiledAlarmAction);
@@ -29,19 +25,19 @@ impl CompiledAlarmActionRunner {
         }
     }
 
-    fn create_monitor_log(&self, prerequisite: bool, error: Option<StdErr>) -> ActionMonitorLog {
+    fn create_monitor_log(&self, prerequisite: bool, error: Option<StdErr>) -> ActionExecuteLog {
         let spent_in_mills =
             (Utc::now().timestamp() - self.start_time.and_utc().timestamp()) as u32;
 
         let status = if error.is_some() {
-            Some(MonitorLogStatus::ERROR)
+            MonitorLogStatus::ERROR
         } else {
-            Some(MonitorLogStatus::DONE)
+            MonitorLogStatus::DONE
         };
 
-        ActionMonitorLog::Alarm(AlarmActionMonitorLog {
-            action_id: Some(self.compiled_action.action().action_id.deref().clone()),
-            r#type: Some(PipelineActionType::Alarm),
+        ActionExecuteLog {
+            action_id: self.compiled_action.action().action_id.clone(),
+            r#type: self.compiled_action.action().r#type.clone(),
             // TODO compute the action defined as
             defined_as: None,
             prerequisite_defined_as: match self.compiled_action.conditional() {
@@ -49,16 +45,17 @@ impl CompiledAlarmActionRunner {
                 None => None,
             },
             status,
-            start_time: Some(self.start_time),
-            spent_in_mills: Some(spent_in_mills),
+            start_time: self.start_time,
+            spent_in_mills,
             error: error.map(|e| format!("{}", e)),
-            prerequisite: Some(prerequisite),
+            prerequisite,
+            find_by: None,
             // TODO compute touched
             touched: None,
             insert_count: None,
             update_count: None,
             delete_count: None,
-        })
+        }
     }
 
     async fn do_run(self, in_memory_data: &mut InMemoryData) -> ActionRunResult {

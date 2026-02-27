@@ -14,6 +14,7 @@ mod compiled_read_row_action;
 mod compiled_read_rows_action;
 mod compiled_write_factor_action;
 mod compiled_write_to_external_action;
+mod marcos;
 
 pub use action_compiler::*;
 pub use compiled_alarm_action::*;

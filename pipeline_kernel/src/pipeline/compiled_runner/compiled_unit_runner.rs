@@ -1,12 +1,12 @@
 use crate::{
-    ActionRunResult, ArcTopicDataValue, CompiledActionRunner, CompiledPipeline, CompiledStage,
-    CompiledUnit, InMemoryData, MonitorLogHelper, PipelineExecuteEnvs, PipelineExecutionTask,
-    PipelineKernelErrorCode,
+    ActionExecuteLog, ActionRunResult, ArcTopicDataValue, CompiledActionRunner, CompiledPipeline,
+    CompiledStage, CompiledUnit, InMemoryData, PipelineExecuteEnvs, PipelineExecutionTask,
+    PipelineKernelErrorCode, UnitExecuteLog,
 };
 use chrono::{NaiveDateTime, Utc};
 use elf_auth::Principal;
 use elf_base::{ErrorCode, StdErr, StdR};
-use elf_model::{ActionMonitorLog, MonitorLogStatus, UnitMonitorLog};
+use elf_model::MonitorLogStatus;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -21,7 +21,7 @@ pub struct CompiledUnitRunner {
 
 pub struct UnitRunResult {
     pub created_tasks: Option<Vec<PipelineExecutionTask>>,
-    pub log: UnitMonitorLog,
+    pub log: UnitExecuteLog,
 }
 
 impl CompiledUnitRunner {
@@ -68,44 +68,35 @@ impl CompiledUnitRunner {
         prerequisite: bool,
         loop_variable_value: Option<Arc<ArcTopicDataValue>>,
         // the bool is all actions are run or not
-        action_logs: Option<(Vec<ActionMonitorLog>, bool)>,
+        action_logs: Option<(Vec<ActionExecuteLog>, bool)>,
         error: Option<StdErr>,
-    ) -> UnitMonitorLog {
+    ) -> UnitExecuteLog {
         let spent_in_mills =
             (Utc::now().timestamp() - self.start_time.and_utc().timestamp()) as u32;
 
         let (action_logs, all_action_accomplished) =
             if let Some((action_logs, all_action_accomplished)) = action_logs {
-                (Some(action_logs), all_action_accomplished)
+                (action_logs, all_action_accomplished)
             } else {
-                (None, true)
+                (vec![], true)
             };
         let status = if !all_action_accomplished || error.is_some() {
-            Some(MonitorLogStatus::ERROR)
+            MonitorLogStatus::ERROR
         } else {
-            Some(MonitorLogStatus::DONE)
+            MonitorLogStatus::DONE
         };
 
-        UnitMonitorLog {
-            unit_id: Some(self.compiled_unit.stage().stage_id.deref().clone()),
-            name: Some(self.compiled_unit.stage().name.deref().clone()),
+        UnitExecuteLog {
+            unit_id: self.compiled_unit.stage().stage_id.clone(),
+            name: self.compiled_unit.stage().name.clone(),
             loop_variable_name: self.compiled_unit.loop_variable_name().clone(),
             prerequisite_defined_as: self.compiled_unit.conditional().defined_as(),
             status,
-            start_time: Some(self.start_time),
-            spent_in_mills: Some(spent_in_mills),
+            start_time: self.start_time,
+            spent_in_mills,
             error: error.map(|e| format!("{}", e)),
-            prerequisite: Some(prerequisite),
-            loop_variable_value: if let Some(value) = loop_variable_value {
-                if let Some(converted_value) = MonitorLogHelper::convert_to_log_value(value.deref())
-                {
-                    Some(converted_value)
-                } else {
-                    None
-                }
-            } else {
-                None
-            },
+            prerequisite,
+            loop_variable_value,
             actions: action_logs,
         }
     }
@@ -203,7 +194,10 @@ impl CompiledUnitRunner {
                         created_tasks.extend(created_tasks_by_action);
                     }
                     // check there is any error occurred in stage running
-                    let has_error = ActionRunResult::has_error(&log);
+                    let has_error = match log.status {
+                        MonitorLogStatus::ERROR => true,
+                        _ => false,
+                    };
                     action_logs.push(log);
 
                     if has_error {

@@ -1,11 +1,11 @@
-use super::{serde_arc_string, serde_option_arc_string};
-use crate::{ActionExecuteLog, ExecuteLogErrorStackTrace, ExecuteLogPrerequisiteDefinedAs};
+use super::{serde_arc_string, serde_option_arc_string, serde_option_arc_topic_data_value};
+use crate::{
+    ActionExecuteLog, ArcTopicDataValue, ExecuteLogErrorStackTrace, ExecuteLogPrerequisiteDefinedAs,
+};
 use chrono::NaiveDateTime;
 use elf_base::serde::naive_datetime;
-use elf_model::{MonitorLogDataValue, MonitorLogStatus, PipelineUnitId};
+use elf_model::{MonitorLogStatus, PipelineUnitId};
 use std::sync::Arc;
-
-pub type ExecuteLogUnitLoopVariableValue = MonitorLogDataValue;
 
 #[derive(serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -32,7 +32,7 @@ pub struct UnitExecuteLog {
     pub prerequisite: bool,
     #[serde(with = "serde_option_arc_string")]
     pub loop_variable_name: Option<Arc<String>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub loop_variable_value: Option<ExecuteLogUnitLoopVariableValue>,
+    #[serde(with = "serde_option_arc_topic_data_value")]
+    pub loop_variable_value: Option<Arc<ArcTopicDataValue>>,
     pub actions: Vec<ActionExecuteLog>,
 }

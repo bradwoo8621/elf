@@ -1,6 +1,6 @@
-use crate::{CompiledParameterJoint, InMemoryData};
+use crate::{CompiledParameterJoint, ExecuteLogPrerequisiteDefinedAs, InMemoryData};
 use elf_base::StdR;
-use elf_model::{PrerequisiteDefinedAs, TenantId, TopicId};
+use elf_model::{TenantId, TopicId};
 use elf_runtime_model_kernel::{ArcParameterJoint, TopicSchema};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -30,7 +30,7 @@ impl CompiledConditional {
         })
     }
 
-    pub fn defined_as(&self) -> Option<PrerequisiteDefinedAs> {
+    pub fn defined_as(&self) -> Option<ExecuteLogPrerequisiteDefinedAs> {
         todo!("implement defined_as for CompiledConditional")
     }
 
