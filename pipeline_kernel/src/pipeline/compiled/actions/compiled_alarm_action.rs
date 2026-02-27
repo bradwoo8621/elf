@@ -17,20 +17,16 @@ generate_compiled_action!(Alarm {
 });
 
 impl CompiledAlarmAction {
-    pub fn conditional(&self) -> &Option<CompiledConditional> {
-        &self.conditional
-    }
-
     /// return none when there is no message defined
-    pub fn defs(
+    pub fn fields(
         &self,
     ) -> Option<(
         &Option<CompiledConditional>,
-        &AlarmActionSeverity,
+        &Arc<AlarmActionSeverity>,
         &DataPath,
     )> {
         match self.message {
-            Some(ref message) => Some((&self.conditional, self.severity.deref(), message)),
+            Some(ref message) => Some((&self.conditional, &self.severity, message)),
             None => None,
         }
     }

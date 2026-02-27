@@ -13,22 +13,24 @@ macro_rules! generate_compiled_action {
                 $($field : $field_type),*
             }
 
+            /// getters
             impl [<Compiled $struct_name Action>] {
                 pub fn pipeline(&self) -> &Arc<ArcPipeline> {
                     &self.pipeline
                 }
-
                 pub fn stage(&self) -> &Arc<ArcPipelineStage> {
                     &self.stage
                 }
-
                 pub fn unit(&self) -> &Arc<ArcPipelineUnit> {
                     &self.unit
                 }
-
                 pub fn action(&self) -> &Arc<[<Arc $struct_name Action>]> {
                     &self.action
                 }
+
+                $(pub fn [<$field:snake>](&self) -> &$field_type {
+                    &self.$field
+                })*
             }
         }
     };

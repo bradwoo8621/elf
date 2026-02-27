@@ -15,7 +15,7 @@ impl CompiledAlarmActionRunner {
         &self,
         in_memory_data: &mut InMemoryData,
     ) -> StdR<(bool, Option<(&AlarmActionSeverity, &DataPath)>)> {
-        match self.compiled_action.defs() {
+        match self.compiled_action.fields() {
             Some((Some(conditional), severity, message)) => Ok((
                 conditional.is_true(in_memory_data)?,
                 Some((severity, message)),
