@@ -1,6 +1,6 @@
 use crate::{
-	ArcTopicData, CompiledPipeline, CompiledStageRunner, InMemoryData, PipelineExecuteLog,
-	PipelineExecutionTask, StageExecuteLog, StageRunResult,
+    ArcTopicData, CompiledPipeline, CompiledStageRunner, InMemoryData, PipelineExecuteLog,
+    PipelineExecutionTask, StageExecuteLog, StageRunResult,
 };
 use chrono::{NaiveDateTime, Utc};
 use elf_auth::Principal;
